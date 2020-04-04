@@ -1,67 +1,128 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Show video box example</title>
-    <style>
-      div {
-        position: absolute;
-        top: 50%;
-        transform: translate(-50%,-50%);
-        width: 480px;
-        height: 380px;
-        border-radius: 10px;
-        background-color: #eee;
-        background-image: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.1));
-      }
+<html lang="en">
 
-      .hidden {
-        left: -50%;
-      }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Test your skills : Events</title>
+</head>
 
-      .showing {
-        left: 50%;
-      }
-
-      div video {
-        display: block;
-        width: 400px;
-        margin: 40px auto;
-      }
-
-    </style>
-  </head>
-  <body>
-    <button>Display video</button>
-
-    <!--"hidden", "showing" 이라는 클래스들은 nested elements를 가리거나 나타낸다.-->
-    <div class="hidden">
-      <video>
-        <source src="rabbit320.mp4" type="video/mp4">
-        <source src="rabbit320.webm" type="video/webm">
-        <p>Your browser doesn't support HTML5 video. Here is a <a href="rabbit320.mp4">link to the video</a> instead.</p> 
-      </video>
+<body>
+    <!--EVENTS ONE-->
+    <div class="events-one">
+        <h1>EVENTS 1</h1>
+        <p>In our first events-related task, you need to create a simple event handler that causes the text inside the
+            button (btn) to change when it is clicked on, and change back when it is clicked again.</p>
     </div>
+    <button class="off">Machine is off</button>
+    <script>
+        let btn = document.querySelector(".off");
+        let btnFlag = 0;
+        btn.addEventListener("click", function () {
+            if (!btnFlag) {
+                btn.textContent = "Machine is on";
+                btnFlag = 1;
+            } else {
+                btn.textContent = "Machine is off";
+                btnFlag = 0;
+            }
+        });
+    </script>
 
+
+    <!--EVENTS TWO-->
+    <div class="events-two">
+        <h1>EVENTS 2</h1>
+        <p>
+            Now we'll look at keyboard events. To pass this assessment you need to build an event handler that moves the
+            circle around the provided canvas when the WASD keys are pressed on the keyboard. The circle is drawn with
+            the function drawCircle(), which takes the folllowing parameters as inputs:
+        </p>
+        <ul>
+            <li>x — the x coordinate of the circle.</li>
+            <li>y — the y coordinate of the circle.</li>
+            <li>size — the radius of the circle.</li>
+        </ul>
+    </div>
+    <canvas width="480" height="320"></canvas>
     <script>
 
-      const btn = document.querySelector('button');
-      const videoBox = document.querySelector('div');
-      const video = document.querySelector('video');
+        let canvas = document.querySelector('canvas');
+        let ctx = canvas.getContext('2d');
 
-      btn.onclick = function() {
-        videoBox.setAttribute('class','showing');
-      }
+        function drawCircle(x, y, size) {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      videoBox.onclick = function() {
-        videoBox.setAttribute('class','hidden');
-      };
+            ctx.beginPath();
+            ctx.fillStyle = 'black';
+            ctx.arc(x, y, size, 0, 2 * Math.PI);
+            ctx.fill();
+        }
 
-      video.onclick = function(e) {
-        e.stopPropagation();
-        video.play();
-      };
+        let x = 50;
+        let y = 50;
+        const size = 30;
 
+        drawCircle(x, y, size);
+
+        // Add your code here
+        document.body.addEventListener("keydown", e => {
+            switch (e.code) {
+                case "ArrowLeft":
+                    console.log(e.code);
+                    x -= 5;
+                    drawCircle(x, y, size);
+                    break;
+                case "ArrowRight":
+                    console.log(e.code);
+                    x += 5;
+                    drawCircle(x, y, size);
+                    break;
+                case "ArrowUp":
+                    console.log(e.code);
+                    y -= 5;
+                    drawCircle(x, y, size);
+                    break;
+                case "ArrowDown":
+                    console.log(e.code);
+                    y += 5;
+                    drawCircle(x, y, size);
+                    break;
+            }
+        });
     </script>
-  </body>
+
+    <!--EVENT 3-->
+    <div>
+        <h1>EVENTS 3</h1>
+        <p>
+            In our final events-related task, you need to set an event listener on the <code><button></code>s' parent
+            element (<code><div class="button-bar"> ... </div> </code>), which when invoked by clicking any of the buttons will set
+            the
+            background of the button-bar to the color contained in the button's data-color attribute.
+        </p>
+        <p>
+            We want you to solve this without looping through all the buttons and giving each one their own event
+            listener.
+        </p>
+        <p>
+            Try updating the live code below to recreate the finished example:
+        </p>
+    </div>
+    <section class="preview"></section>
+    <div class="button-bar">
+        <button data-color="red">Red</button>
+        <button data-color="yellow">Yellow</button>
+        <button data-color="green">Green</button>
+        <button data-color="purple">Purple</button>
+    </div>
+    <script>
+        let buttonBar = document.querySelector(".button-bar");
+        let section = document.querySelector("section");
+    </script>
+
+</body>
+
 </html>
