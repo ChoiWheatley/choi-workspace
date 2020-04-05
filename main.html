@@ -98,17 +98,14 @@
     <div>
         <h1>EVENTS 3</h1>
         <p>
-            In our final events-related task, you need to set an event listener on the <code><button></code>s' parent
-            element (<code><div class="button-bar"> ... </div> </code>), which when invoked by clicking any of the buttons will set
-            the
-            background of the button-bar to the color contained in the button's data-color attribute.
-        </p>
-        <p>
-            We want you to solve this without looping through all the buttons and giving each one their own event
-            listener.
-        </p>
-        <p>
-            Try updating the live code below to recreate the finished example:
+            <p>In our final events-related task, you need to set an event listener on
+                the&nbsp;<code>&lt;button&gt;</code>s' parent element
+                (<code>&lt;div class="button-bar"&gt; ... &lt;/div&gt;</code>), which when invoked by clicking any of
+                the buttons will set the background of the&nbsp;<code>button-bar</code>&nbsp;to the color contained in
+                the button's&nbsp;<code>data-color</code>&nbsp;attribute.</p>
+            <p>We want you to solve this without looping through all the buttons and giving each one their own event
+                listener.</p>
+            <p>Try updating the live code below to recreate the finished example:</p>
         </p>
     </div>
     <section class="preview"></section>
@@ -121,6 +118,23 @@
     <script>
         let buttonBar = document.querySelector(".button-bar");
         let section = document.querySelector("section");
+
+        buttonBar.addEventListener("click", e => {
+            switch (e.target.textContent) {
+                case "Red":
+                    buttonBar.style.backgroundColor = "red";
+                    break;
+                case "Yellow":
+                    buttonBar.style.backgroundColor = "yellow";
+                    break;
+                case "Green":
+                    buttonBar.style.backgroundColor = "green";
+                    break;
+                case "Purple":
+                    buttonBar.style.backgroundColor = "purple";
+                    break;
+            }
+        });
     </script>
 
 </body>
