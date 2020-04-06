@@ -1,43 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <title>Object-oriented JavaScript example</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test your skills : Object basics</title>
 </head>
 
 <body>
-  <p>This example requires you to enter commands in your browser's JavaScript console (see <a
-      href="https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools">What are
-      browser developer tools</a> for more information).</p>
+  <p>In this task you are provided with an object literal, and your tasks are to</p>
+  <ul>
+    <li>Store the value of the&nbsp;<code>name</code>&nbsp;property inside the&nbsp;<code>catName</code>&nbsp;variable,
+      using bracket notation.</li>
+    <li>Run the&nbsp;<code>greeting()</code>&nbsp;method using dot notation (it will log the greeting to the browser
+      DevTools' console).</li>
+    <li>Update the&nbsp;<code>color</code>&nbsp;property value to&nbsp;<code>black</code>.</li>
+  </ul>
+  <p>Try updating the live code below to recreate the finished example:</p>
+
+  <script>
+    
+  </script>
 
 </body>
-
-<script>
-  //기본 object literal
-  const person = {
-    //sub namespaces : 오브젝트 안에 다른 오브젝트를 넣을 수 있음
-    name: {
-      first: "Bob",
-      last: "Smith"
-    },
-    age: 32,
-    gender: "male",
-    interests: ["music", "skiing"],
-    bio: function () {
-      alert(this.name.first + " " + this.name.last + " is " + this.age + " years old. He likes " + this.interests[0] + " and " + this.interests[1] + ".");
-    },
-    greeting: function () {
-      alert("Hi! I\'m' " + this.name.first + ".");
-    }
-  };
-
-  //오브젝트 외부에서 오브젝트의 멤버를 추가할 수 있다니...
-  person["eyes"] = "hazel";
-  person.farewell = function () { alert("Bye everybody!"); }
-
-  //Not every objects instance automatically.
-  const myNotification = new Notification("Hello!");
-</script>
 
 </html>
