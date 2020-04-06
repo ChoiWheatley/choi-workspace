@@ -14,6 +14,30 @@
 </body>
 
 <script>
+  //기본 object literal
+  const person = {
+    //sub namespaces : 오브젝트 안에 다른 오브젝트를 넣을 수 있음
+    name: {
+      first: "Bob",
+      last: "Smith"
+    },
+    age: 32,
+    gender: "male",
+    interests: ["music", "skiing"],
+    bio: function () {
+      alert(this.name.first + " " + this.name.last + " is " + this.age + " years old. He likes " + this.interests[0] + " and " + this.interests[1] + ".");
+    },
+    greeting: function () {
+      alert("Hi! I\'m' " + this.name.first + ".");
+    }
+  };
+
+  //오브젝트 외부에서 오브젝트의 멤버를 추가할 수 있다니...
+  person["eyes"] = "hazel";
+  person.farewell = function () { alert("Bye everybody!"); }
+
+  //Not every objects instance automatically.
+  const myNotification = new Notification("Hello!");
 </script>
 
 </html>
