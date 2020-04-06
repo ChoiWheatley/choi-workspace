@@ -14,6 +14,7 @@ for (let i = 1; i <= 5; i++) {
     thumbBar.appendChild(newImages[i]);
 }
 
+
 //thumb-bar에 이벤트핸들러 부착하기
 thumbBar.addEventListener("click", e => {
     //참고로 e.target.id는 무조건 String을 반환한다.
