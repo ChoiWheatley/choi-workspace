@@ -28,7 +28,7 @@
   <section class="section1"></section>
 
   <script>
-    let cat = {
+    cat = {
       name: 'Bertie',
       breed: 'Cymric',
       color: 'white',
@@ -93,21 +93,44 @@
     let bandInfo;
     //Write down your own code
     const Foals = {
-      name:,
-      nationality:,
-      genre:,
-      members:,
-      formed:,
-      split:,
-      albums: {
-        name:,
-        released:
-      }
+      name: "Foals",
+      nationality: "England",
+      genre: ["indie rock", "alternative rock", "art rock"],
+      members: 4,
+      formed: 2005,
+      split: false,
+      albums: [
+        {
+          name: "Holy Fire",
+          released: 2012
+        },
+        {
+          name: "What Went Down",
+          released: 2014
+        },
+        {
+          name: "Everything Not Saved Will Be Lost",
+          released: 2017
+        }
+      ]
     }
+    bandInfo =
+      `
+    <p>Let me introduce my favourite band, <b>${Foals.name}!</b> 
+      first of all, Foals is formed at ${Foals.nationality}, at ${Foals.formed}.</p>
+    <p>Foals has ${Foals.members} members now, ${Foals.split === true ? "splited" : "never splited"} of course.<p>
+    <p>Foals made many major albums.
+      <ol>
+        <li>${Foals.albums[0].name}, released in ${Foals.albums[0].released}</li>
+        <li>${Foals.albums[1].name}, released in ${Foals.albums[1].released}</li>
+        <li>${Foals.albums[2].name}, released in ${Foals.albums[2].released} </li>
+      </ol>
+    </p>
+    `;
 
     const section2 = document.querySelector(".section2");
     let para2_1 = document.createElement("p");
-    para2_1.textContent = bandInfo;
+    para2_1.innerHTML = bandInfo;
     section2.appendChild(para2_1);
   </script>
 
@@ -116,6 +139,40 @@
   <!------------------------------------------------------------------------->
   <!------------------------------------------------------------------------->
   <!------------------------------------------------------------------------->
+
+  <h1> Object basics 3 </h1>
+  <p>Finally for our object basics assessment, we want you to return to the&nbsp;<code>cat</code>&nbsp;object literal
+    from Task #1. We want you to rewrite the&nbsp;<code>greeting()</code>&nbsp;method so that it
+    logs&nbsp;<code>"Hello, said Bertie the Cymric."</code>&nbsp;to the browser DevTools' console, but in a way that
+    will work across&nbsp;<em>any</em>&nbsp;cat object of the same structure, regardless of its name or breed.</p>
+  <p>When you are done, write your own object called&nbsp;<code>cat2</code>, which has the same structure, exactly the
+    same&nbsp;<code>greeting()</code>&nbsp;method, but a different&nbsp;<code>name</code>,&nbsp;<code>breed</code>,
+    and&nbsp;<code>color</code>.</p>
+  <p>Call both&nbsp;<code>greeting()</code>&nbsp;methods to check that they log appropriate greetings to the console.
+  </p>
+  <p>The code is not very&nbsp;<a class="external" href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself"
+      rel="noopener">DRY</a>&nbsp;(each bit of code should only be defined once) &mdash; you've got the same method
+    defined twice, for example. Describe how you'd make it less DRY? If you are not sure, then don't worry &mdash; this
+    is what we'll be looking at in future articles in the series!</p>
+  <p>Try updating the live code below to recreate the finished example:</p>
+
+  <script>
+    let cat2 = {
+      name: 'Bertie',
+      breed: 'Cymric',
+      color: 'white',
+      greeting: function () {
+        console.log('Meow!');
+      }
+    }
+    cat2.name = "Bertie";
+    cat2.breed = "Cymric";
+    cat.greeting = function () {
+      console.log(`Hello, said ${cat2.name} the ${cat2.breed}`);
+    }
+
+  </script>
+
 
 </body>
 
