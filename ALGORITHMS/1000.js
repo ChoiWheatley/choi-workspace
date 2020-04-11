@@ -14,8 +14,6 @@
 예제 출력 1 
 3
 */
-//어쩔 수 없지만... 변수 선언은 여기에다가 해야 한다... 
-var a, b, c;
 var readline = require("readline");
 var lines = [];
 
@@ -29,16 +27,15 @@ r.on("line", function(line){
     }
     // 이제 lines에서 원하는 정보를 가져오면 된다.
     lines.push(line);
-
-    //여기부터 원하는 알고리즘을 작성해보자
-    a = Number(lines[0].split(" ")[0]);
-    b = Number(lines[0].split(" ")[1]);
-    c = a + b;
     
 });
 r.on("close", function(){
-    // 이 아리에 출력값을 console.log() 
-    //하는 식으로 넣으면 된다.
+    //여기부터 원하는 알고리즘을 작성해보자
+    var a, b, c;
+    a = Number(lines[0].split(" ")[0]);
+    b = Number(lines[0].split(" ")[1]);
+    c = a + b;
+
     console.log(c);
     process.exit;
 });
