@@ -81,11 +81,7 @@ r.on("close", function(){
     //탐색 (brute force)
     //어차피 sampleTable에서 잘 섞어놨으니 순서대로 접근하면 된다.
     for (var i = 0; i < n; i++){ watcher[i] = 0; }
-    while (watcher[0] <= sampleTable[0].length){
-        
-    }
-
-
+    
 
 
     
