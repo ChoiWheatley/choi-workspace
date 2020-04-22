@@ -28,14 +28,15 @@
 */
 
 /*
-a(n) = 
-1. n이 홀수면, 2a(n-1)
-2. n이 짝수면, 2(a(n-1) + a(n-2))
+a(1) = 1
+a(2) = 2
+a(n) = a(n-1) + a(n-2)
 */
 
 let input = [];
 let dynamicArray = [0,1,2];
-const x = 15746;
+let modArray = [0,1,2];
+const N = 15746;
 let rl = require("readline");
 let r = rl.createInterface({
     input: process.stdin,
@@ -47,24 +48,12 @@ r.on("line", line => {
 });
 r.on("close", () => {
     let n = Number(input[0]);
-    let mod;
-    let instant = recurr(n);
 
-    mod = instant - (x * Math.floor(instant / x));
 
-    console.log(mod);   
+    console.log(recurr(n));
 
-    //debug
-    let dbgStr = "";
-    let i = 0;
-    dynamicArray.some(e => {
-        if (i >= 10) { dbgStr += "\n"; i = 0;}
-        if (e === mod) { return true; }
-        dbgStr += e - (x * Math.floor(e / x)) + "\t";
-        i++;
-    });
-    console.log(dbgStr);
 
+    
 
     process.exit();
 });
@@ -74,6 +63,8 @@ function recurr(n){
     else if (n === 2) { return 2; }
     for (let i = 3; i <= n; i++){
         dynamicArray[i] = dynamicArray[i-1] + dynamicArray[i-2];
+        modArray[i] = ((modArray[i-1] % N) + (modArray[i-2] % N)) % N;
+        //console.log(modArray[i]);
     }
-    return dynamicArray[n];
+    return modArray[n];
 }
