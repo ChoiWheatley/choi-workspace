@@ -15,12 +15,13 @@
 소수점 셋째 자리까지 출력한다.
 
 예제 입력 1 
-5
+6
 5 50 50 70 80 100
 7 100 95 90 80 70 60 50
 3 70 90 80
 3 70 90 81
 9 100 99 98 97 96 95 94 93 91
+1 0
 예제 출력 1 
 40.000%
 57.143%
@@ -42,23 +43,36 @@ r.on("line", function(line){
 r.on("close", function(){
     var caseCount = Number(input[0]);
     for (var i = 1; i <= caseCount; i++){
-        var str, num, avr, cnt;
-        var rec = [];
+        var str, numStudent, avr, cnt, ratio;
+        str = "";
+        numStudent = 0;
         avr = 0;
         cnt = 0;
+        ratio = 0;
         str = input[i].split(" ");
-        num = str[0];
+        numStudent = str[0];
         //평균을 먼저 구한다
         for (var j = 1; j < str.length; j++){
             //console.log(str[j]);
             avr += Number(str[j]);
         }
-        avr /= num;
+        avr /= numStudent;
         //console.log("avr = " + avr.toFixed(3)); //toFixed(n)은 실수의 소수점 자리를 반올림해준다.
         //평균 이상인 값의 개수를 구한다
-        str.forEach(student => { if(Number(student) > avr) { cnt++; }});
-        console.log((Math.round(cnt / num * 100 * 1000) / 1000).toFixed(3) + "%\n");
+        //--forEach 는 Range Based Loop이기 때문에 1명에 0점인 경우 100%로 반례를 가지게 된다.
+        //--str.forEach(grade => { if(Number(grade) > avr) { cnt++; }});
+        for (var j = 1; j < str.length; j++){
+            if (Number(str[j]) > avr) { cnt++; }
+        }
+        ratio = cnt / numStudent * 100;
+        console.log(`${fixToThree(ratio)}%`);
+        
     }
     
     process.exit();
 });
+
+function fixToThree(number){
+    let tmpNum = (Math.round(number * 1000) / 1000).toFixed(3);
+    return tmpNum;
+}
