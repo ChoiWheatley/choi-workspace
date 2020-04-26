@@ -31,6 +31,9 @@ V(0 ≤ V ≤ 1,000)가 주어진다.
 예제 출력 1 
 14
 */
+
+let n, k, nitem, crtMax, stack;
+
 let input = [];
 let rl = require("readline");
 let r = rl.createInterface({
@@ -42,8 +45,61 @@ r.on("line", (line) => {
     else { input.push(line); }
 });
 r.on("close", () => {
+    let tmp;
+    tmp = input[0].split(" ");
+    n = Number(tmp[0]);
+    k = Number(tmp[1]);
+    nitem = new Array(n);
+    crtMax = new Nitem(0, 0);
+    stack = new Nitem(0, 0);
     
+    
+    tmp = "";
+    for (let j = 1; j <= n; j++){
+        tmp = input[j].split(" ");
+        tmp[0] = Number(tmp[0]);
+        tmp[1] = Number(tmp[1]);
+        nitem[j-1] = new Nitem(tmp[0], tmp[1]);
+    }
+    //debug
+    //console.log(`n = ${n}, k = ${k}, nitem = ${nitem}`);
+    //console.log(stack);
+    for (let i = 0; i < n; i++){
+        traversal(i, stack);
+        stack.change(new Nitem(0, 0));
+    }
+    console.log(crtMax.v);
 
-
+    
     process.exit();
 });
+
+
+class Nitem {
+    constructor(w, v) {
+        this.w = w;
+        this.v = v;
+    }
+    add(item){
+        this.w += item.w;
+        this.v += item.v;
+    }
+    change(item){
+        this.w = item.w;
+        this.v = item.v;
+    }
+}
+
+function traversal(m, stack){
+    //console.log(`m = ${m} /// stack = {${stack.w}, ${stack.v}}`);
+    if (stack.w + nitem[m].w >= k) { return; }
+    stack.add(nitem[m]);
+    if (stack.v > crtMax.v) { crtMax.change(stack); }
+    //debug
+    console.log(`m = ${m}, crtMax = {${crtMax.w}, ${crtMax.v}} //// stack = {${stack.w}, ${stack.v}}`);
+    //gubed
+    for (let j = m+1; j < n; j++){
+        if (stack.w + nitem[j].w >= k) { continue; }
+        traversal(j, stack);
+    }
+}
