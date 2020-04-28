@@ -30,6 +30,24 @@ V(0 ≤ V ≤ 1,000)가 주어진다.
 5 12
 예제 출력 1 
 14
+예제 입력 2
+5 5
+1 1
+1 2
+1 3
+1 4
+1 5
+예제 출력 2
+15
+예제입력 3
+5 104
+3 90
+103 89
+2 87
+99 86
+98 85
+예제출력 3
+263
 */
 
 let n, k, nitem, crtMax, stack;
@@ -45,30 +63,24 @@ r.on("line", (line) => {
     else { input.push(line); }
 });
 r.on("close", () => {
-    let tmp;
+    let tmp, max;
     tmp = input[0].split(" ");
     n = Number(tmp[0]);
     k = Number(tmp[1]);
     nitem = new Array(n);
-    crtMax = new Nitem(0, 0);
     stack = new Nitem(0, 0);
-    
-    
-    tmp = "";
-    for (let j = 1; j <= n; j++){
-        tmp = input[j].split(" ");
-        tmp[0] = Number(tmp[0]);
-        tmp[1] = Number(tmp[1]);
-        nitem[j-1] = new Nitem(tmp[0], tmp[1]);
-    }
-    //debug
-    //console.log(`n = ${n}, k = ${k}, nitem = ${nitem}`);
-    //console.log(stack);
+    max = new Nitem(0, 0);
+
+    //nitem initialize
     for (let i = 0; i < n; i++){
-        traversal(i, stack);
-        stack.change(new Nitem(0, 0));
+        tmp = input[i+1].split(" ");
+        nitem[i] = new Nitem(Number(tmp[0]), Number(tmp[1]));
     }
-    console.log(crtMax.v);
+    //console.log(nitem);
+
+   
+    console.log(max.v);
+    
 
     
     process.exit();
@@ -83,23 +95,18 @@ class Nitem {
     add(item){
         this.w += item.w;
         this.v += item.v;
+        return this;
     }
     change(item){
         this.w = item.w;
         this.v = item.v;
+        return this;
+    }
+    show(){
+        return `{${this.w}, ${this.v}}`;
     }
 }
 
-function traversal(m, stack){
-    //console.log(`m = ${m} /// stack = {${stack.w}, ${stack.v}}`);
-    if (stack.w + nitem[m].w >= k) { return; }
-    stack.add(nitem[m]);
-    if (stack.v > crtMax.v) { crtMax.change(stack); }
-    //debug
-    console.log(`m = ${m}, crtMax = {${crtMax.w}, ${crtMax.v}} //// stack = {${stack.w}, ${stack.v}}`);
-    //gubed
-    for (let j = m+1; j < n; j++){
-        if (stack.w + nitem[j].w >= k) { continue; }
-        traversal(j, stack);
-    }
+function traversary(){
+
 }
