@@ -50,7 +50,7 @@ V(0 ≤ V ≤ 1,000)가 주어진다.
 263
 */
 
-let n, k, nitem, crtMax, stack;
+let n, k, nitem, stack, visit, ans_v;
 
 let input = [];
 let rl = require("readline");
@@ -70,6 +70,7 @@ r.on("close", () => {
     nitem = new Array(n);
     stack = new Nitem(0, 0);
     max = new Nitem(0, 0);
+    visit = new Array(n);
 
     //nitem initialize
     for (let i = 0; i < n; i++){
@@ -77,9 +78,10 @@ r.on("close", () => {
         nitem[i] = new Nitem(Number(tmp[0]), Number(tmp[1]));
     }
     //console.log(nitem);
+    DFS(0);
 
    
-    console.log(max.v);
+    console.log(ans_v);
     
 
     
@@ -107,6 +109,23 @@ class Nitem {
     }
 }
 
-function traversary(){
+function DFS(x){
+    for (let i = x; i < n; i++){
+        if (!visit[i] && stack.w + nitem[i].w <= k){
+            visit[i] = true;
+            stack.w += nitem[i].w;
+            stack.v += nitem[i].v;
+            console.log(`stack = {${stack.w}, ${stack.v}} /// nitem[${i}] = {${nitem[i].w}, ${nitem[i].v}}`);
+            DFS(i);
+            //초기화
+            stack.w -= nitem[i].w;
+            stack.v -= nitem[i].v;
+        }
+    }
+    ans_v = max(ans_v, stack.v);
+}   
 
+function max(a, b){
+    if (a > b){ return a; }
+    else { return b; }
 }
