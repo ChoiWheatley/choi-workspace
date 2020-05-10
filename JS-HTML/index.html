@@ -1,39 +1,63 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Object-oriented JavaScript example</title>
-</head>
+  <head>
+    <meta charset="utf-8" />
+    <title>Object-oriented JavaScript example</title>
+  </head>
 
-<body>
-  <p>This example requires you to enter commands in your browser's JavaScript console (see <a href="https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools">What are browser developer tools</a> for more information).</p>
-  
-</body>
+  <body>
+    <p>
+      This example requires you to enter commands in your browser's JavaScript
+      console (see
+      <a
+        href="https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools"
+        >What are browser developer tools</a
+      >
+      for more information).
+    </p>
+  </body>
 
-<script>
-  class Shape {
-    constructor(name, sides, sideLength){
-      this.name = name;
-      this.sides = sides;
-      this.sideLength = sideLength;
+  <script>
+    /*
+OOJS 1
+Add a new method to the Shape class's prototype, calcPerimeter(), which calculates its perimeter (the length of the shape's outer edge) and logs the result to the console.
+Create a new instance of the Shape class called square. Give it a name of square and a sideLength of 5.
+Call your calcPerimeter() method on the instance, to see whether it logs the calculation result to the browser DevTools' console as expected.
+Create a new instance of Shape called triangle, with a name of triangle and a sideLength of 3.
+Call triangle.calcPerimeter() to check that it works OK.
+
+OOJS 2
+Next up we want you to take the Shape class you saw in Task #1 (including the calcPerimeter() method) and recreate it using ES class syntax instead.
+Test that it works by creating the square and triangle object instances as before (using new Shape() for both), and then calling their calcPerimeter() methods.
+Try updating the live code below to recreate the finished example:
+
+OOJS 3
+Finally, we'd like you to start with the ES Shape class you created in the last task.
+We'd like you to create a Square class that inherits from Shape, and adds a calcArea() method that calculates the square's area. Also set up the constructor so that the name property of Square object instances is automatically set to square, and the sides property is automatically set to 4. When invoking the constructor, you should therefore just need to provide the sideLength property.
+Create a instance of the Square class called square with appropriate property values, and call its calcPerimeter() and calcArea() methods to show that it works ok.
+Try updating the live code below to recreate the finished example:
+*/
+    class Shape {
+      constructor(name, sides, sideLength) {
+        this.name = name;
+        this.sides = sides;
+        this.sideLength = sideLength;
+      }
+      calcPerimeter() {
+        console.log(this.sides * this.sideLength);
+      }
     }
-    calcPerimeter() {
-      console.log(this.sides * this.sideLength);
+
+    class Square extends Shape {
+      constructor(sideLength) {
+        super("square", 4, sideLength);
+      }
+      calcArea() {
+        console.log(this.sideLength ** 2);
+      }
     }
-  }
-  class Square extends Shape {
-    constructor(sideLength){
-      super(name);
-      this.name = "square";
-      this.sides = 4;
-      this.sideLength = sideLength;
-    }
-    calcArea() {
-      console.log(this.sidelength * this.sideLength);
-    }
-  }
-  const square = new Square(4);
-  square.calcPerimeter();
-  square.calcArea();
-</script>
+    let square = new Square(6);
+    square.calcPerimeter();
+    square.calcArea();
+  </script>
 </html>
