@@ -47,219 +47,177 @@ diri 의 방향으로 머리를 회전하며,
 let input = [];
 let readline = require("readline");
 let r = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
+  input: process.stdin,
+  output: process.stdout,
 });
 r.on("line", function (line) {
-    if (line === "exit") {
-        r.close();
-    }
-    input.push(line);
+  if (line === "exit") {
+    r.close();
+  }
+  input.push(line);
 });
 r.on("close", function () {
-    const UP = 1,
-        RIGHT = 2,
-        DOWN = 3,
-        LEFT = 4;
-    let l,
-        n,
-        t = new Array(n),
-        dir = new Array(n);
-    let head, tail;
-    let die = false;
-    class Snake {
-        constructor(x, y, dir) {
-            this.x = x;
-            this.y = y;
-            this.dir = dir; // 1=Up, 2=Right, 3=Down, 4=Left
-        }
-        turn(dir) {
-            if (dir === "L") {
-                if (--this.dir < 1) {
-                    this.dir = 4;
-                }
-            } else if (dir === "R") {
-                if (++this.dir > 4) {
-                    this.dir = 1;
-                }
-            }
-        }
-        moveForward(n) {
-            switch (this.dir) {
-                case UP:
-                    this.y += n;
-                    break;
-
-                case RIGHT:
-                    this.x += n;
-                    break;
-
-                case DOWN:
-                    this.y -= n;
-                    break;
-
-                case LEFT:
-                    this.x -= n;
-                    break;
-            }
-        }
+  const UP = 1,
+    RIGHT = 2,
+    DOWN = 3,
+    LEFT = 4;
+  let l,
+    n,
+    t = new Array(n),
+    dir = new Array(n);
+  let head, tail;
+  let die = false;
+  class Snake {
+    constructor(x, y, dir) {
+      this.x = x;
+      this.y = y;
+      this.dir = dir; // 1=Up, 2=Right, 3=Down, 4=Left
     }
-    //input
-    l = Number(input[0]);
-    n = Number(input[1]);
-    for (let i = 0; i < n; i++) {
-        let tmp = input[i + 2].split(" ");
-        t[i] = Number(tmp[0]);
-        dir[i] = tmp[1];
+    turn(dir) {
+      if (dir === "L") {
+        if (--this.dir < 1) {
+          this.dir = 4;
+        }
+      } else if (dir === "R") {
+        if (++this.dir > 4) {
+          this.dir = 1;
+        }
+      }
     }
-    //
-    head = new Snake(0, 0, RIGHT);
-    tail = new Array(new Snake(0, 0, RIGHT)); //tail에 모든 경로를 집어넣지 말고 꺾인점만 넣는다.
-    let i = 0; //뱀의 생존시간
-    let ti = t.shift() + 1; //다음 회전까지 남은 시간
+    moveForward(n) {
+      switch (this.dir) {
+        case UP:
+          this.y += n;
+          break;
+
+        case RIGHT:
+          this.x += n;
+          break;
+
+        case DOWN:
+          this.y -= n;
+          break;
+
+        case LEFT:
+          this.x -= n;
+          break;
+      }
+    }
+  }
+  //input
+  l = Number(input[0]);
+  n = Number(input[1]);
+  for (let i = 0; i < n; i++) {
+    let tmp = input[i + 2].split(" ");
+    t[i] = Number(tmp[0]);
+    dir[i] = tmp[1];
+  }
+  //
+  head = new Snake(0, 0, RIGHT);
+  tail = new Array(); //tail에 모든 경로를 집어넣지 말고 꺾인점만 넣는다.
+  let i = 0; //뱀의 생존시간
+  let ti = t.shift(); //다음 회전까지 남은 시간
+
+  //debug
+  let flag = 7;
+  while (!die) {
+    //head ~ head+ti 사이에 tail직선이나 boundary가 닿는지 확인
+    let tmpHead = new Snake(head.x, head.y, head.dir);
+    head.moveForward(ti);
+    head.turn(dir.shift());
+    let headTi = head;
+    head = tmpHead;
+
+    console.log("head, headTi :");
+    console.log(head);
+    console.log(headTi);
+
+    //경계면에 닿는지부터 판단.
+    if (Math.abs(headTi.x) > l) {
+      console.log("bumped into boundary");
+      die = true;
+      i += ti - (Math.abs(headTi.x) - l);
+    } else if (Math.abs(headTi.y) > l) {
+      console.log("bumped into boundary");
+      die = true;
+      i += ti - (Math.abs(headTi.y) - l);
+    }
+
+    //자기 몸에 닿아 죽는지 판단.
+    for (let j = 0; j < tail.length - 1; j++) {
+      if (isSuicide(head, headTi, tail[j], tail[j + 1])) {
+        if (head.x === headTi.x) {
+          die = true;
+          i += Math.abs(head.y - tail[j].y);
+        } else {
+          die = true;
+          i += Math.abs(head.x - tail[j].x);
+        }
+      }
+    }
+
+    if (!die){
+        i += ti;
+    }
+    ti = t.shift();
+    tail.push(new Snake(head.x, head.y, head.dir));   
+    head = headTi;
 
     //debug
-    let flag = 7;
-    while (flag) {
-        //head ~ head+ti 사이에 tail직선이나 boundary가 닿는지 확인
-        let tmpHead = new Snake(head.x, head.y, head.dir);
-        head.moveForward(ti - 1);
-        let headTi = head;
-        head = tmpHead;
+    flag--;
+    console.log(`i = ${i}`);
+  }
+  console.log(i);
 
-        console.log("head, headTi :");
-        console.log(head);
-        console.log(headTi);
-        let n = isSuicide(head, headTi, tail); //여기에서 문제가 발생한다.
-        if (n) {
-            console.log("bumped into itself");
-            i += n;
-            die = true;
-        } else if (Math.abs(headTi.x) > l) {
-            console.log("bumped into boundary");
-            die = true;
-            i += ti - (Math.abs(headTi.x) - l);
-        } else if (Math.abs(headTi.y) > l) {
-            console.log("bumped into boundary");
-            die = true;
-            i += ti - (Math.abs(headTi.y) - l);
-        }
-
-        ti = t.shift();
-        headTi.turn(dir.shift());
-        head = headTi;
-
-        //debug
-        flag--;
-    }
-    console.log(i);
-
-    process.exit();
+  process.exit();
 });
 
-
-function isSuicide(head, headTi, tail) {
-    //여기에서 시간초과가 발생하는 듯 하다.
-    //바뀐 tail에 따르면 두 꺾인점 A와 B 사이에 head와 headTi가 지나가는지 조사하면 된다.
-
-    if (head.y === headTi.y) {
-        //가로
-        for (let i = 0; i < tail.length - 1; i++) {
-            if (tail[i].x === tail[i + 1].x) {
-                let tmpTail1 = min(
-                    tail[i],
-                    tail[i + 1],
-                    true
-                );
-                let tmpTail2 = max(
-                    tail[i],
-                    tail[i + 1],
-                    true
-                );
-                if (head.y <= tmpTail2.y && head.y >= tmpTail1.y) {
-                    return Math.abs(tail[i].x - head.x);
-                }
-            }
-        }
-    } else {
-        //세로
-        for (let i = 0; i < tail.length - 1; i++) {
-            if (tail[i].y === tail[i + 1].y) {
-                let tmpTail1 = min(
-                    tail[i],
-                    tail[i + 1],
-                    false
-                );
-                let tmpTail2 = max(
-                    tail[i],
-                    tail[i + 1],
-                    false
-                );
-                if (head.x <= tmpTail2.x && head.x >= tmpTail1.x) {
-                    return Math.abs(tail[i].y - head.y);
-                }
-            }
-        }
+function isSuicide(head1, head2, tail1, tail2) {
+  if (head1.x === head2.x && tail1.y === tail2.y) {
+    if (
+      head1.x <= max(tail1, tail2, true).x &&
+      head1.x >= min(tail1, tail2, true).x
+    ) {
+      return true;
     }
-    return 0;
-
-    function max(snk1, snk2, isHori) {
-        if (isHori) {
-            if (snk1.x > snk2.x) {
-                return snk2;
-            } else {
-                return snk1;
-            }
-        } else {
-            if (snk1.y > snk2.y) {
-                return snk2;
-            } else {
-                return snk1;
-            }
-        }
+  } else if (head1.y === head2.y && tail1.x === tail2.x) {
+    if (
+      head1.y <= max(tail1, tail2, false).y &&
+      head1.y >= min(tail1, tail2, false).y
+    ) {
+      return true;
     }
-    function min(snk1, snk2, isHori) {
-        if (isHori) {
-            if (snk1.x < snk2.x) {
-                return snk2;
-            } else {
-                return snk1;
-            }
-        } else {
-            if (snk1.y < snk2.y) {
-                return snk2;
-            } else {
-                return snk1;
-            }
-        }
-    }
+  }
+  return false;
 }
 
-function isTouch(head, a, b) {
-    //가로방향일 경우
-    if (a.x === b.x) {
-        if (a.x > b.x) {
-            let tmp = a.x;
-            a = b;
-            b = tmp;
-        }
-        if (head.x >= a.x && head.x <= b.x) {
-            return true;
-        } else {
-            return false;
-        }
+function max(snk1, snk2, isHori) {
+  if (isHori) {
+    if (snk1.x > snk2.x) {
+      return snk1;
+    } else {
+      return snk2;
     }
-    //세로방향일 경우
-    else {
-        if (a.y > b.y) {
-            let tmp = a.y;
-            a = b;
-            b = tmp;
-        }
-        if (head.y >= a.y && head.y <= b.y) {
-            return true;
-        } else {
-            return false;
-        }
+  } else {
+    if (snk1.y > snk2.y) {
+      return snk1;
+    } else {
+      return snk2;
     }
+  }
+}
+function min(snk1, snk2, isHori) {
+  if (isHori) {
+    if (snk1.x < snk2.x) {
+      return snk1;
+    } else {
+      return snk2;
+    }
+  } else {
+    if (snk1.y < snk2.y) {
+      return snk1;
+    } else {
+      return snk2;
+    }
+  }
 }
