@@ -65,7 +65,7 @@ r.on("close", function () {
         n,
         t = new Array(n),
         dir = new Array(n);
-    let head, trace;
+    let head, tail;
     let die = false;
     class Snake {
         constructor(x, y, dir) {
@@ -118,39 +118,45 @@ r.on("close", function () {
     let i = 0; //뱀의 생존시간
     let ti = t.shift() + 1; //다음 회전까지 남은 시간
 
-    while (!die) {
+    //debug
+    let flag = 7;
+    while (flag) {
         //head ~ head+ti 사이에 tail직선이나 boundary가 닿는지 확인
-        let tmpHead = head;
-        head.moveForward(ti);
+        let tmpHead = new Snake(head.x, head.y, head.dir);
+        head.moveForward(ti - 1);
         let headTi = head;
         head = tmpHead;
 
+        console.log("head, headTi :");
         console.log(head);
-        i += isSuicide(head, headTi, tail)
-        if (i) {
+        console.log(headTi);
+        let n = isSuicide(head, headTi, tail); //여기에서 문제가 발생한다.
+        if (n) {
             console.log("bumped into itself");
+            i += n;
             die = true;
         } else if (Math.abs(headTi.x) > l) {
             console.log("bumped into boundary");
             die = true;
-            i += ti - Math.abs(headTi.x) - l;
+            i += ti - (Math.abs(headTi.x) - l);
         } else if (Math.abs(headTi.y) > l) {
             console.log("bumped into boundary");
             die = true;
-            i += ti - Math.abs(headTi.y) - l;
+            i += ti - (Math.abs(headTi.y) - l);
         }
 
         ti = t.shift();
         headTi.turn(dir.shift());
         head = headTi;
 
-        console.log(head);
-        console.log(tail);
+        //debug
+        flag--;
     }
     console.log(i);
 
     process.exit();
 });
+
 
 function isSuicide(head, headTi, tail) {
     //여기에서 시간초과가 발생하는 듯 하다.
@@ -163,12 +169,12 @@ function isSuicide(head, headTi, tail) {
                 let tmpTail1 = min(
                     tail[i],
                     tail[i + 1],
-                    tail[i].x === tail[i + 1].x
+                    true
                 );
                 let tmpTail2 = max(
                     tail[i],
                     tail[i + 1],
-                    tail[i].x === tail[i + 1].x
+                    true
                 );
                 if (head.y <= tmpTail2.y && head.y >= tmpTail1.y) {
                     return Math.abs(tail[i].x - head.x);
@@ -182,15 +188,15 @@ function isSuicide(head, headTi, tail) {
                 let tmpTail1 = min(
                     tail[i],
                     tail[i + 1],
-                    tail[i].x === tail[i + 1].y
+                    false
                 );
                 let tmpTail2 = max(
                     tail[i],
                     tail[i + 1],
-                    tail[i].x === tail[i + 1].y
+                    false
                 );
                 if (head.x <= tmpTail2.x && head.x >= tmpTail1.x) {
-                    return Math.abs(tail[i].x - head.x);
+                    return Math.abs(tail[i].y - head.y);
                 }
             }
         }
