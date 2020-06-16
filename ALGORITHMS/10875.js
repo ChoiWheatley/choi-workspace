@@ -44,6 +44,11 @@ diri 의 방향으로 머리를 회전하며,
 출력3
 899999997
 */
+const UP = 0,
+RIGHT = 1,
+DOWN = 2,
+LEFT = 3;
+let lastTime;
 let input = [];
 let readline = require("readline");
 let r = readline.createInterface({
@@ -57,167 +62,151 @@ r.on("line", function (line) {
   input.push(line);
 });
 r.on("close", function () {
-  const UP = 1,
-    RIGHT = 2,
-    DOWN = 3,
-    LEFT = 4;
-  let l,
-    n,
-    t = new Array(n),
-    dir = new Array(n);
-  let head, tail;
-  let die = false;
-  class Snake {
-    constructor(x, y, dir) {
-      this.x = x;
-      this.y = y;
-      this.dir = dir; // 1=Up, 2=Right, 3=Down, 4=Left
-    }
-    turn(dir) {
-      if (dir === "L") {
-        if (--this.dir < 1) {
-          this.dir = 4;
-        }
-      } else if (dir === "R") {
-        if (++this.dir > 4) {
-          this.dir = 1;
-        }
-      }
-    }
-    moveForward(n) {
-      switch (this.dir) {
-        case UP:
-          this.y += n;
-          break;
 
-        case RIGHT:
-          this.x += n;
-          break;
+  let l, //격자의 크기
+    n, //회전수
+    t, //회전에 대한 정보 - 시간
+    dir; //회전에 대한 정보 - 방향
+  let time = 0; //전체 생존시간
+  let head, body; //대가리와 몸통
 
-        case DOWN:
-          this.y -= n;
-          break;
-
-        case LEFT:
-          this.x -= n;
-          break;
-      }
-    }
-  }
-  //input
-  l = Number(input[0]);
-  n = Number(input[1]);
+  l = Number(input.shift());
+  n = Number(input.shift());
+  t = new Array(n);
+  dir = new Array(n);
   for (let i = 0; i < n; i++) {
-    let tmp = input[i + 2].split(" ");
+    let tmp = input.shift();
+    tmp = tmp.split(" ");
     t[i] = Number(tmp[0]);
     dir[i] = tmp[1];
   }
-  //
+
   head = new Snake(0, 0, RIGHT);
-  tail = new Array(); //tail에 모든 경로를 집어넣지 말고 꺾인점만 넣는다.
-  let i = 0; //뱀의 생존시간
-  let ti = t.shift(); //다음 회전까지 남은 시간
-
-  //debug
-  let flag = 7;
-  while (!die) {
-    //head ~ head+ti 사이에 tail직선이나 boundary가 닿는지 확인
-    let tmpHead = new Snake(head.x, head.y, head.dir);
-    head.moveForward(ti);
-    head.turn(dir.shift());
-    let headTi = head;
-    head = tmpHead;
-
-    console.log("head, headTi :");
-    console.log(head);
-    console.log(headTi);
-
-    //경계면에 닿는지부터 판단.
-    if (Math.abs(headTi.x) > l) {
-      console.log("bumped into boundary");
-      die = true;
-      i += ti - (Math.abs(headTi.x) - l);
-    } else if (Math.abs(headTi.y) > l) {
-      console.log("bumped into boundary");
-      die = true;
-      i += ti - (Math.abs(headTi.y) - l);
+  body = new Array(n + 1);
+  body[0] = new Snake(0, 0, RIGHT);
+  for (let i = 0; i < n; i++) {
+    head = move(head, t[i], dir[i]);
+    if (isSuicide(body, head)) {
+      //마지막 time 구하고 break
+      time += lastTime;
+      break;
     }
-
-    //자기 몸에 닿아 죽는지 판단.
-    for (let j = 0; j < tail.length - 1; j++) {
-      if (isSuicide(head, headTi, tail[j], tail[j + 1])) {
-        if (head.x === headTi.x) {
-          die = true;
-          i += Math.abs(head.y - tail[j].y);
-        } else {
-          die = true;
-          i += Math.abs(head.x - tail[j].x);
-        }
-      }
-    }
-
-    if (!die){
-        i += ti;
-    }
-    ti = t.shift();
-    tail.push(new Snake(head.x, head.y, head.dir));   
-    head = headTi;
-
-    //debug
-    flag--;
-    console.log(`i = ${i}`);
+    //
+    //벽에 부딪히는 경우를 안따졌다!!!!!
+    //
+    body.push(new Snake(head.x, head.y, head.dir));
+    time += t[i];
   }
-  console.log(i);
+  console.log(time);
 
   process.exit();
 });
 
-function isSuicide(head1, head2, tail1, tail2) {
-  if (head1.x === head2.x && tail1.y === tail2.y) {
-    if (
-      head1.x <= max(tail1, tail2, true).x &&
-      head1.x >= min(tail1, tail2, true).x
-    ) {
-      return true;
+class Snake {
+  constructor(x, y, dir) {
+    this.x = x;
+    this.y = y;
+    this.dir = dir;
+  }
+}
+
+function rotate(snake, dir) {
+  if (dir === "L") {
+    if (--snake.dir < 0) {
+      snake.dir = LEFT;
     }
-  } else if (head1.y === head2.y && tail1.x === tail2.x) {
-    if (
-      head1.y <= max(tail1, tail2, false).y &&
-      head1.y >= min(tail1, tail2, false).y
-    ) {
+  } else {
+    if (++snake.dir > 3) {
+      snake.dir = UP;
+    }
+  }
+  return snake;
+}
+
+function move(head, t, dir) {
+  let tmpHead = new Snake(head.x, head.y, head.dir);
+  switch (tmpHead.dir) {
+    case UP:
+      tmpHead.y += t;
+      break;
+    case RIGHT:
+      tmpHead.x += t;
+      break;
+    case DOWN:
+      tmpHead.y -= t;
+      break;
+    case LEFT:
+      tmpHead.x -= t;
+      break;
+  }
+  tmpHead.dir = dir;
+  return tmpHead;
+}
+
+function isSuicide(body, head) {
+  for (let i = 0; i < body.length - 1; i++) {
+    if (isHit(body[i], body[i + 1], body[body.length - 1], head)) {
       return true;
     }
   }
   return false;
 }
 
-function max(snk1, snk2, isHori) {
-  if (isHori) {
-    if (snk1.x > snk2.x) {
-      return snk1;
-    } else {
-      return snk2;
+function isHit(body1, body2, head1, head2) {
+  if (body1.y === body2.y && head1.x === head2.x) {
+    if (
+      body1.y >= min(head1, head2, 1) &&
+      body1.y <= max(head1, head2, 1) &&
+      head1.x >= min(body1, body2, 0) &&
+      head1.x <= max(body1, body2, 0)
+    ) {
+      lastTime = Math.abs(head1.y - body1.y);
+      return true;
+    }
+  } else if (body1.x === body2.x && head1.y === head2.y) {
+    if (
+      body1.x >= min(head1, head2, 0) &&
+      body1.x <= max(head1, head2, 0) &&
+      head1.y >= min(body1, body2, 1) &&
+      head1.y <= max(body1, body2, 1)
+    ) {
+      lastTime = Math.abs(head1.x - body1.x);
+      return true;
     }
   } else {
-    if (snk1.y > snk2.y) {
-      return snk1;
+    return false;
+  }
+}
+
+function min(snake1, snake2, xOrY) {
+  //xOrY : x = 0, y = 1
+  if (xOrY) {
+    if (snake1.y < snake2.y) {
+      return snake1.y;
     } else {
-      return snk2;
+      return snake2.y;
+    }
+  } else {
+    if (snake1.x < snake2.x) {
+      return snake1.x;
+    } else {
+      return snake2.x;
     }
   }
 }
-function min(snk1, snk2, isHori) {
-  if (isHori) {
-    if (snk1.x < snk2.x) {
-      return snk1;
+
+function max(snake1, snake2, xOrY) {
+  if (xOrY) {
+    if (snake1.y < snake2.y) {
+      return snake2.y;
     } else {
-      return snk2;
+      return snake1.y;
     }
   } else {
-    if (snk1.y < snk2.y) {
-      return snk1;
+    if (snake1.x < snake2.x) {
+      return snake2.x;
     } else {
-      return snk2;
+      return snake1.x;
     }
   }
 }
