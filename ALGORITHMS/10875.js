@@ -45,9 +45,9 @@ diri 의 방향으로 머리를 회전하며,
 899999997
 */
 const UP = 0,
-RIGHT = 1,
-DOWN = 2,
-LEFT = 3;
+  RIGHT = 1,
+  DOWN = 2,
+  LEFT = 3;
 let lastTime;
 let input = [];
 let readline = require("readline");
@@ -62,7 +62,6 @@ r.on("line", function (line) {
   input.push(line);
 });
 r.on("close", function () {
-
   let l, //격자의 크기
     n, //회전수
     t, //회전에 대한 정보 - 시간
@@ -82,11 +81,12 @@ r.on("close", function () {
   }
 
   head = new Snake(0, 0, RIGHT);
-  body = new Array(n + 1);
-  body[0] = new Snake(0, 0, RIGHT);
+  body = new Array(1);
+  body.fill(new Snake(0, 0, RIGHT));
   for (let i = 0; i < n; i++) {
     head = move(head, t[i], dir[i]);
-    if (isSuicide(body, head)) {
+
+    if (i && isSuicide(body, head)) {
       //마지막 time 구하고 break
       time += lastTime;
       break;
@@ -94,9 +94,19 @@ r.on("close", function () {
     //
     //벽에 부딪히는 경우를 안따졌다!!!!!
     //
+    if (Math.abs(head.x) > l) {
+      time += t[i] - Math.abs(l - head.x) + 1;
+      break;
+    } else if (Math.abs(head.y) > l) {
+      time += t[i] - Math.abs(l - head.y) + 1;
+      break;
+    }
     body.push(new Snake(head.x, head.y, head.dir));
     time += t[i];
+    //console.log(`${head.x}, ${head.y}`);
+    //console.log(time);
   }
+ // console.log(`${head.x}, ${head.y}`);
   console.log(time);
 
   process.exit();
@@ -139,12 +149,12 @@ function move(head, t, dir) {
       tmpHead.x -= t;
       break;
   }
-  tmpHead.dir = dir;
+  tmpHead = rotate(tmpHead, dir);
   return tmpHead;
 }
 
 function isSuicide(body, head) {
-  for (let i = 0; i < body.length - 1; i++) {
+  for (let i = 0; i < body.length - 2; i++) {
     if (isHit(body[i], body[i + 1], body[body.length - 1], head)) {
       return true;
     }
@@ -171,6 +181,34 @@ function isHit(body1, body2, head1, head2) {
       head1.y <= max(body1, body2, 1)
     ) {
       lastTime = Math.abs(head1.x - body1.x);
+      return true;
+    }
+    //평행이지만 서로 겹치는 경우
+    //1. 꼬리물기
+    //2. 앞대가리물기
+    //의 경우가 있다.
+  } else if (
+    body1.y === body2.y &&
+    head1.y === head2.y &&
+    body1.y === head1.y
+  ) {
+    if (
+      min(head1, head2, 0) <= min(body1, body2, 0) &&
+      min(body1, body2, 0) <= max(head1, head2, 0)
+    ) {
+      lastTime = Math.abs(min(head1, head2, 0) - min(body1, body2, 0));
+      return true;
+    }
+  } else if (
+    body1.x === body2.x &&
+    head1.x === head2.x &&
+    body1.x === head1.x
+  ) {
+    if (
+      min(head1, head2, 1) <= min(body1, body2, 1) &&
+      min(body1, body2, 1) <= max(head1, head2, 1)
+    ) {
+      lastTime = Math.abs(min(head1, head2, 1) - min(body1, body2, 1));
       return true;
     }
   } else {
