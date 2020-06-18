@@ -48,7 +48,7 @@ const UP = 0,
   RIGHT = 1,
   DOWN = 2,
   LEFT = 3;
-let lastTime;
+let lastTime = 0;
 let input = [];
 let readline = require("readline");
 let r = readline.createInterface({
@@ -83,8 +83,16 @@ r.on("close", function () {
   head = new Snake(0, 0, RIGHT);
   body = new Array(1);
   body.fill(new Snake(0, 0, RIGHT));
-  for (let i = 0; i < n; i++) {
-    head = move(head, t[i], dir[i]);
+  let i = 0;
+  for (; i <= n; i++) {
+    if (i === n) {
+      //회전정보가 끝났다고 뱀이 뒤진게 아니다. 죽을 때까지 직진하자.
+      t.push(2 * l + 1);
+      dir.push("L");
+      head = move(head, t[i], dir[i]);
+    } else {
+      head = move(head, t[i], dir[i]);
+    }
 
     if (i && isSuicide(body, head)) {
       //마지막 time 구하고 break
@@ -103,10 +111,12 @@ r.on("close", function () {
     }
     body.push(new Snake(head.x, head.y, head.dir));
     time += t[i];
-    //console.log(`${head.x}, ${head.y}`);
-    //console.log(time);
+    console.log(`${head.x}, ${head.y}`);
+    console.log(time);
   }
- // console.log(`${head.x}, ${head.y}`);
+
+  console.log(`lastTime : ${lastTime}`);
+  console.log(`${head.x}, ${head.y}`);
   console.log(time);
 
   process.exit();
@@ -163,6 +173,7 @@ function isSuicide(body, head) {
 }
 
 function isHit(body1, body2, head1, head2) {
+  //서로 수직인 경우
   if (body1.y === body2.y && head1.x === head2.x) {
     if (
       body1.y >= min(head1, head2, 1) &&
@@ -184,19 +195,16 @@ function isHit(body1, body2, head1, head2) {
       return true;
     }
     //평행이지만 서로 겹치는 경우
-    //1. 꼬리물기
-    //2. 앞대가리물기
-    //의 경우가 있다.
   } else if (
     body1.y === body2.y &&
     head1.y === head2.y &&
     body1.y === head1.y
   ) {
-    if (
-      min(head1, head2, 0) <= min(body1, body2, 0) &&
-      min(body1, body2, 0) <= max(head1, head2, 0)
-    ) {
-      lastTime = Math.abs(min(head1, head2, 0) - min(body1, body2, 0));
+    if (head1.x < min(body1, body2, 0)) {
+      lastTime = Math.abs(head1.x - min(body1, body2, 0));
+      return true;
+    } else if (head1.x > max(body1, body2, 0)) {
+      lastTime = Math.abs(head1.x - max(body1, body2, 0));
       return true;
     }
   } else if (
@@ -204,11 +212,11 @@ function isHit(body1, body2, head1, head2) {
     head1.x === head2.x &&
     body1.x === head1.x
   ) {
-    if (
-      min(head1, head2, 1) <= min(body1, body2, 1) &&
-      min(body1, body2, 1) <= max(head1, head2, 1)
-    ) {
-      lastTime = Math.abs(min(head1, head2, 1) - min(body1, body2, 1));
+    if (head1.y < min(body1, body2, 1)) {
+      lastTime = Math.abs(head1.y - min(body1, body2, 1));
+      return true;
+    } else if (head1.y > max(body1, body2, 1)) {
+      lastTime = Math.abs(head1.y - max(body1, body2, 0));
       return true;
     }
   } else {
