@@ -54,7 +54,7 @@ diri 의 방향으로 머리를 회전하며,
 1 L
 2 R
 예제 출력
-14
+17
 
 //이 아래 예제에서는 head가 여러번 몸통을 거칠 때 생기는 예외에 대해서 다루고 있다.
 예제 입력
@@ -79,7 +79,7 @@ const UP = 0,
   RIGHT = 1,
   DOWN = 2,
   LEFT = 3;
-let lastTime = 0;
+let lastTime = new Array();
 let input = [];
 let readline = require("readline");
 let r = readline.createInterface({
@@ -127,7 +127,8 @@ r.on("close", function () {
 
     if (i && isSuicide(body, head)) {
       //마지막 time 구하고 break
-      time += lastTime;
+      //lastTime이 여러개일 경우 최소값을 더해준다.
+      time += min(lastTime);
       break;
     }
     //
@@ -142,12 +143,12 @@ r.on("close", function () {
     }
     body.push(new Snake(head.x, head.y, head.dir));
     time += t[i];
-    console.log(`${head.x}, ${head.y} (${head.dir})`);
-    console.log(time);
+    //console.log(`${head.x}, ${head.y} (${head.dir})`);
+    //console.log(time);
   }
 
-  console.log(`lastTime : ${lastTime}`);
-  console.log(`${head.x}, ${head.y} (${head.dir})`);
+  //console.log(`lastTime : ${min(lastTime)}`);
+  //console.log(`${head.x}, ${head.y} (${head.dir})`);
   console.log(time);
 
   process.exit();
@@ -195,34 +196,36 @@ function move(head, t, dir) {
 }
 
 function isSuicide(body, head) {
-  for (let i = body.length - 2; i > 0; i--) {
-    if (isHit(body[i - 1], body[i], body[body.length - 1], head)) {
-      return true;
+  let out = false;
+  for (let i = 0; i < body.length - 2; i++) {
+    if (isHit(body[i], body[i + 1], body[body.length - 1], head)) {
+      //return true;
+      out = true;
     }
   }
-  return false;
+  return out;
 }
 
 function isHit(body1, body2, head1, head2) {
   //서로 수직인 경우
   if (body1.y === body2.y && head1.x === head2.x) {
     if (
-      body1.y >= min(head1, head2, 1) &&
-      body1.y <= max(head1, head2, 1) &&
-      head1.x >= min(body1, body2, 0) &&
-      head1.x <= max(body1, body2, 0)
+      body1.y >= minSnake(head1, head2, 1) &&
+      body1.y <= maxSnake(head1, head2, 1) &&
+      head1.x >= minSnake(body1, body2, 0) &&
+      head1.x <= maxSnake(body1, body2, 0)
     ) {
-      lastTime = Math.abs(head1.y - body1.y);
+      lastTime.push(Math.abs(head1.y - body1.y));
       return true;
     }
   } else if (body1.x === body2.x && head1.y === head2.y) {
     if (
-      body1.x >= min(head1, head2, 0) &&
-      body1.x <= max(head1, head2, 0) &&
-      head1.y >= min(body1, body2, 1) &&
-      head1.y <= max(body1, body2, 1)
+      body1.x >= minSnake(head1, head2, 0) &&
+      body1.x <= maxSnake(head1, head2, 0) &&
+      head1.y >= minSnake(body1, body2, 1) &&
+      head1.y <= maxSnake(body1, body2, 1)
     ) {
-      lastTime = Math.abs(head1.x - body1.x);
+      lastTime.push(Math.abs(head1.x - body1.x));
       return true;
     }
     //평행이지만 서로 겹치는 경우
@@ -231,14 +234,17 @@ function isHit(body1, body2, head1, head2) {
     head1.y === head2.y &&
     body1.y === head1.y
   ) {
-    if (head1.x < min(body1, body2, 0) && head2.x >= min(body1, body2, 0)) {
-      lastTime = Math.abs(head1.x - min(body1, body2, 0));
+    if (
+      head1.x < minSnake(body1, body2, 0) &&
+      head2.x >= minSnake(body1, body2, 0)
+    ) {
+      lastTime.push(Math.abs(head1.x - minSnake(body1, body2, 0)));
       return true;
     } else if (
-      head1.x > max(body1, body2, 0) &&
-      head2.x <= max(body1, body2, 0)
+      head1.x > maxSnake(body1, body2, 0) &&
+      head2.x <= maxSnake(body1, body2, 0)
     ) {
-      lastTime = Math.abs(head1.x - max(body1, body2, 0));
+      lastTime.push(Math.abs(head1.x - maxSnake(body1, body2, 0)));
       return true;
     }
   } else if (
@@ -246,14 +252,17 @@ function isHit(body1, body2, head1, head2) {
     head1.x === head2.x &&
     body1.x === head1.x
   ) {
-    if (head1.y < min(body1, body2, 1) && head2.y >= min(body1, body2, 1)) {
-      lastTime = Math.abs(head1.y - min(body1, body2, 1));
+    if (
+      head1.y < minSnake(body1, body2, 1) &&
+      head2.y >= minSnake(body1, body2, 1)
+    ) {
+      lastTime.push(Math.abs(head1.y - minSnake(body1, body2, 1)));
       return true;
     } else if (
-      head1.y > max(body1, body2, 1) &&
-      head2.y <= max(body1, body2, 1)
+      head1.y > maxSnake(body1, body2, 1) &&
+      head2.y <= maxSnake(body1, body2, 1)
     ) {
-      lastTime = Math.abs(head1.y - max(body1, body2, 0));
+      lastTime.push(Math.abs(head1.y - maxSnake(body1, body2, 0)));
       return true;
     }
   } else {
@@ -261,7 +270,7 @@ function isHit(body1, body2, head1, head2) {
   }
 }
 
-function min(snake1, snake2, xOrY) {
+function minSnake(snake1, snake2, xOrY) {
   //xOrY : x = 0, y = 1
   if (xOrY) {
     if (snake1.y < snake2.y) {
@@ -278,7 +287,7 @@ function min(snake1, snake2, xOrY) {
   }
 }
 
-function max(snake1, snake2, xOrY) {
+function maxSnake(snake1, snake2, xOrY) {
   if (xOrY) {
     if (snake1.y < snake2.y) {
       return snake2.y;
@@ -292,4 +301,14 @@ function max(snake1, snake2, xOrY) {
       return snake1.x;
     }
   }
+}
+
+function min(intArr) {
+  let minimum = intArr[0];
+  for (let i = 1; i < intArr.length; i++) {
+    if (intArr[i] < minimum) {
+      minimum = intArr[i];
+    }
+  }
+  return minimum;
 }
