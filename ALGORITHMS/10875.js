@@ -22,9 +22,9 @@ diri 의 방향으로 머리를 회전하며,
 2 L
 1 L
 5 R
-
 예제 출력 1 
 7
+
 예제 입력 2 
 3
 3
@@ -33,6 +33,7 @@ diri 의 방향으로 머리를 회전하며,
 4 R
 예제 출력 2 
 6
+
 예제3
 100000000
 5
@@ -43,6 +44,36 @@ diri 의 방향으로 머리를 회전하며,
 199999999 L
 출력3
 899999997
+
+예제 입력 
+3
+5
+3 L
+1 L
+6 L
+1 L
+2 R
+예제 출력
+14
+
+//이 아래 예제에서는 head가 여러번 몸통을 거칠 때 생기는 예외에 대해서 다루고 있다.
+예제 입력
+8
+11
+1 L
+4 R
+1 R
+8 L
+1 L
+8 R
+1 R
+8 L
+1 L
+6 L
+10 R
+예제 출력
+40
+
 */
 const UP = 0,
   RIGHT = 1,
@@ -103,20 +134,20 @@ r.on("close", function () {
     //벽에 부딪히는 경우를 안따졌다!!!!!
     //
     if (Math.abs(head.x) > l) {
-      time += t[i] - Math.abs(l - head.x) + 1;
+      time += t[i] - Math.abs(l - Math.abs(head.x)) + 1;
       break;
     } else if (Math.abs(head.y) > l) {
-      time += t[i] - Math.abs(l - head.y) + 1;
+      time += t[i] - Math.abs(l - Math.abs(head.y)) + 1;
       break;
     }
     body.push(new Snake(head.x, head.y, head.dir));
     time += t[i];
-    console.log(`${head.x}, ${head.y}`);
+    console.log(`${head.x}, ${head.y} (${head.dir})`);
     console.log(time);
   }
 
   console.log(`lastTime : ${lastTime}`);
-  console.log(`${head.x}, ${head.y}`);
+  console.log(`${head.x}, ${head.y} (${head.dir})`);
   console.log(time);
 
   process.exit();
@@ -164,8 +195,8 @@ function move(head, t, dir) {
 }
 
 function isSuicide(body, head) {
-  for (let i = 0; i < body.length - 2; i++) {
-    if (isHit(body[i], body[i + 1], body[body.length - 1], head)) {
+  for (let i = body.length - 2; i > 0; i--) {
+    if (isHit(body[i - 1], body[i], body[body.length - 1], head)) {
       return true;
     }
   }
@@ -200,10 +231,13 @@ function isHit(body1, body2, head1, head2) {
     head1.y === head2.y &&
     body1.y === head1.y
   ) {
-    if (head1.x < min(body1, body2, 0)) {
+    if (head1.x < min(body1, body2, 0) && head2.x >= min(body1, body2, 0)) {
       lastTime = Math.abs(head1.x - min(body1, body2, 0));
       return true;
-    } else if (head1.x > max(body1, body2, 0)) {
+    } else if (
+      head1.x > max(body1, body2, 0) &&
+      head2.x <= max(body1, body2, 0)
+    ) {
       lastTime = Math.abs(head1.x - max(body1, body2, 0));
       return true;
     }
@@ -212,10 +246,13 @@ function isHit(body1, body2, head1, head2) {
     head1.x === head2.x &&
     body1.x === head1.x
   ) {
-    if (head1.y < min(body1, body2, 1)) {
+    if (head1.y < min(body1, body2, 1) && head2.y >= min(body1, body2, 1)) {
       lastTime = Math.abs(head1.y - min(body1, body2, 1));
       return true;
-    } else if (head1.y > max(body1, body2, 1)) {
+    } else if (
+      head1.y > max(body1, body2, 1) &&
+      head2.y <= max(body1, body2, 1)
+    ) {
       lastTime = Math.abs(head1.y - max(body1, body2, 0));
       return true;
     }
