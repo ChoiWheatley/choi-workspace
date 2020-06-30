@@ -30,8 +30,8 @@
 */
 
 let input = [];
-let r = require("readline");
-let rl = r.createInterface({
+let readline = require("readline");
+let r = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
@@ -41,4 +41,41 @@ r.on("line", function (line) {
   }
   input.push(line);
 });
-r.on("close", function () {});
+r.on("close", function () {
+  let t, a, b;
+  let an, bn; //a와 b의 자릿수
+  let out;
+  t = input.shift();
+  for (let i = 0; i < t; i++) {
+    let tmpInput = input.shift().split(" ");
+    a = tmpInput[0];
+    b = tmpInput[1];
+    an = a.length;
+    bn = b.length;
+    out = 0;
+
+    a = Number(a);
+    b = Number(b);
+    if (an === bn) {
+      out = b - a + 1;
+    } else if (an < bn) {
+      if (a * 10 ** (bn - an) <= b) {
+        //a가 b보다 먼저 밝혀지는 경우
+        out = Math.floor(b / 10 ** (bn - an)) - a + 1;
+        for (let n = 1; n <= bn - an; n++) {
+          out += Math.floor(b / (10 ** (bn - (an + n)))) - (10 ** (an + n - 1));
+        }
+        out += bn - an + 1;
+      } else {
+        //b가 a보다 먼저 밝혀지는 경우
+        for (let n = 1; n <= bn - an; n++) {
+          out += Math.floor(b / (10 ** (bn - (an + n)))) - (10 ** (an + n - 1));
+        }
+        out += bn - an + 1;
+      }
+    }
+    console.log(out);
+  }
+
+  process.exit();
+});
