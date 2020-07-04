@@ -93,3 +93,21 @@
 예제 출력 7 
 -1
 */
+
+let input = [];
+let r = require("readline");
+let rl = r.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+});
+r.on("line", function (line) {
+    if (line === "exit") {
+        r.close();
+    }
+    input.push(line);
+});
+r.on("close", function () {
+    //write down your code below this line
+    
+    process.exit();
+});
