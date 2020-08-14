@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 	   But before submission, you must remove the freopen function or rewrite comment symbols(//).
 	 */	
 
-	//freopen("input.txt", "r", stdin);
+	freopen("input.txt", "r", stdin);
 
 	cin >> T;
     cin.ignore(1);
