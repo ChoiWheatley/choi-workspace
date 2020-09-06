@@ -18,6 +18,7 @@ int main() {
         wcout << name[i] << " ";
     }
     wcout << endl;
+    
 
 
     return 0;
