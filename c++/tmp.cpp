@@ -9,26 +9,37 @@
 //
 int main()
 {
+	vector<double> temps;
+	for (double temp; cin >> temp; )
+		temps.push_back(temp);
 	try
 	{
-		vector<int> v;
-		for (int x; cin >> x; )
+		double sum = 0;
+		double high_temp = temps[0];
+		double low_temp = temps[0];
+
+		for (auto x : temps)
 		{
-			v.push_back(x);
+			if (x > high_temp)
+				high_temp = x;
+			if (x < low_temp)
+				low_temp = x;
+			sum += x;
 		}
-		for (int i = 0; i <= v.size(); ++i)
-		{
-			cout << "v[" << i << "] == " << v[i] << endl;
-		}
+		cout << "High temperature : " << high_temp << endl;
+		cout << "Low temperature : " << low_temp << endl;
+		cout << "Average temperature : " << sum / temps.size() << endl;
 	}
-	catch(out_of_range e)
+	catch (runtime_error &e)
 	{
-		cerr << "Ooops! Range Error!!!!\n";
-		cerr << e.what() << endl;
-		return 1;
+		cerr << "hiiiiiiiiiiiii " << e.what() << endl;
 	}
-	
-	
+	catch (const std::exception &e)
+	{
+		std::cerr << "WARNING\nyou should input more than 0 value ::: " << e.what() << '\n';
+	}
+
+
 	return 0;
 }
 //
