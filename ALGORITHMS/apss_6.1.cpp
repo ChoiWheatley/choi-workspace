@@ -1,30 +1,27 @@
 /*
- * 자연수 n이 주어졌을 때 1부터 n까지의 합을 구하는 함수를 각각
- * 반복함수와 재귀호출로 구현해보자 
-*/
+ * <재귀호출과 완전탐색>
+ * reculsive function을 활용하여 1부터 N까지의
+ * 수를 더하는 함수를 구현하시오.
+ */
 
 #include <iostream>
+#include <string>
+#include <vector>
+
 using namespace std;
 
-int sum(int n) {
-    int ret = 0;
-    for (int i = 0; i <= n; i++)
-        ret += i;
-    return ret;
-}
-int recur_sum(int n) {
-    if (!n) return 0;
-    if (n == 1) 
-    {
-        return 1;
-    }
-    return recur_sum(n - 1) + n;
-}
+inline int sum(int);
 
-int main() {
-    int input = 100000000;
-    cout << "반복함수sum : " << sum(input) << endl;
-    cout << "재귀함수sum : " << recur_sum(input) << endl;
-
+int main(void)
+{
+    int n = 10000;
+    cout << "summation among 1 to " << n << " = " << sum(n) << endl;
     return 0;
+}
+
+inline int sum(int s)
+{
+    // base case
+    if (s == 0) return 0;
+    return (s + sum(s - 1));
 }
