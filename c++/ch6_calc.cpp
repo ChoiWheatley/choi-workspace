@@ -22,12 +22,8 @@ vector<Token> tok;
 constexpr char T_Num = 'n';
 
 // function to read a token from cin object
-void get_token(vector<Token> & tok);
-void show_token(const vector<Token> & tok);
-int find_next_operator(const string & str, int start);
-bool is_operator(char c);
-Token next_token(const string & str, int & start);
-
+Token get_token();
+void show_tok();
 /*
 
 ███    ███  █████  ██ ███    ██ 
@@ -39,62 +35,37 @@ Token next_token(const string & str, int & start);
 */
 int main()
 {
-	// 클래스의 신기한 생성자로 새 변수를 초기화 하는 방법
-    Token a1 {'+'};
-    Token a2 {'0', 3.14e+2};
-    Token a3 {a1};
-    // Token a4;        // Token 클래스의 기본 생성자를 표기하지 않아 오류를 발생시킨다.
-
-    get_token(tok);
-    show_token(tok);
-
+    while (cin)
+    {
+        Token t = get_token();
+        tok.push_back(t);
+    }
+    show_tok();
 	return 0;
 }
 //
 //
 
-void get_token(vector<Token> & tok)
+Token get_token()
 {
-    string line;
-    getline(cin, line, '\n');
-    for (int i = 0; i < line.size(); i++)
-    {
-        if (is_operator(line[i]))
-            tok.push_back(Token {line[i]});
-        else
-        {
-            tok.push_back(next_token(line, i));
-            i = find_next_operator(line, i) - 1;
-        }
-    }
+    char tok_char;
+    double tok_num; 
+    Token ret {T_Num, 0.0};
+    if (cin >> tok_num) {
+        ret.kind = T_Num;
+        ret.value = tok_num;
+    } else if (cin >> tok_char) {
+        ret.kind = tok_char;
+    } else { throw runtime_error("invalid input\n"); }
+    return ret;
 }
-void show_token(const vector<Token> & tok)
+
+void show_tok()
 {
     for (auto i : tok)
-        cout << "(" << i.kind << ") ";
+        cout << i.kind << " ";
     cout << endl;
     for (auto i : tok)
-        cout << "(" << i.value << ") ";
+        cout << i.value << " ";
     cout << endl;
-}
-int find_next_operator(const string & str, int start)
-{
-    for (int i = start; i < str.size(); i++)
-        if (is_operator(str[i])) return i;
-    return str.size();
-}
-bool is_operator(char c)
-{
-    switch (c)
-    {
-        case '+': case '-': case '*': case '/': //case '(': case ')':
-            return true;
-        default:
-            return false;
-    }
-}
-Token next_token(const string & str, int & start)
-{
-    int next = find_next_operator(str, start) - start;
-    return Token {T_Num, stod(str.substr(start, next))};
 }
