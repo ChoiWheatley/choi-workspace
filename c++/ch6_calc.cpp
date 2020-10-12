@@ -18,12 +18,17 @@ public:
     Token(char k, double v) : kind{k}, value{v} {}
 };
 
+const vector<char> operands {
+    '+', '-', '*', '/', '%', '(', ')'
+};
+
 vector<Token> tok;
 constexpr char T_Num = 'n';
 
 // function to read a token from cin object
 Token get_token();
 void show_tok();
+bool is_operand(char);
 /*
 
 ███    ███  █████  ██ ███    ██ 
@@ -37,35 +42,43 @@ int main()
 {
     while (cin)
     {
-        Token t = get_token();
-        tok.push_back(t);
+        tok.push_back(get_token());
+        show_tok();
     }
     show_tok();
-	return 0;
+    return 0;
 }
 //
 //
 
+bool is_operand(char c)
+{
+    for (auto i : operands)
+        if (c == i) return true;
+    return false;
+}
 Token get_token()
 {
+    double tok_num = 0;
     char tok_char;
-    double tok_num; 
-    Token ret {T_Num, 0.0};
-    if (cin >> tok_num) {
-        ret.kind = T_Num;
-        ret.value = tok_num;
-    } else if (cin >> tok_char) {
-        ret.kind = tok_char;
-    } else { throw runtime_error("invalid input\n"); }
+    static char prev_tok;
+    string num_chunk = "";
+    Token ret {'x', 0.0};
+    
+    if (is_operand(prev_tok)) { ret = Token {prev_tok}; }
+    else {
+        tok_char = cin.get();
+        for ( ; !is_operand(tok_char) && tok_char != '\n'; tok_char = cin.get())
+            num_chunk.push_back(tok_char);
+        ret = Token {T_Num, stod(num_chunk)};
+    }
+    prev_tok = tok_char;
     return ret;
 }
 
 void show_tok()
 {
     for (auto i : tok)
-        cout << i.kind << " ";
-    cout << endl;
-    for (auto i : tok)
-        cout << i.value << " ";
+        cout << i.kind << " = " << i.value << endl;
     cout << endl;
 }
