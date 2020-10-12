@@ -26,7 +26,7 @@ vector<Token> tok;
 constexpr char T_Num = 'n';
 
 // function to read a token from cin object
-inline Token get_token();
+Token get_token();
 void show_tok();
 bool is_operand(char);
 bool is_number(char);
@@ -63,7 +63,7 @@ bool is_operand(char c)
         if (c == i) return true;
     return false;
 }
-inline Token get_token()
+Token get_token()
 {
     double tok_num = 0;
     char tok_char;
@@ -74,10 +74,13 @@ inline Token get_token()
     if (is_operand(prev_tok)) { ret = Token {prev_tok}; }
     else {
         cin >> tok_char;
-        //if (tok_char == cin.eof()) return ret;
-        //if (tok_char == '\n') cin.clear();
-        for ( ; !is_operand(tok_char); tok_char = cin.get() )
+        if (is_operand(tok_char)) { return Token {tok_char}; }
+        for ( ; !is_operand(tok_char) && tok_char != '\n'; tok_char = cin.get() )
+        {
             num_chunk.push_back(tok_char);
+            cout << "debug" << endl;
+            sleep(1);
+        }
         cout << "num_chunk : " << num_chunk << endl;
         ret = Token {T_Num, stod(num_chunk)};
     }
