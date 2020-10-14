@@ -158,6 +158,13 @@ double term()
     {
         switch (t.kind)
         {
+        case '!':
+        {
+            if (left == 0) return 1;
+            double ret = 1;
+            for (int i = 1; i <= left; i++) ret *= i;
+            return ret;
+        }
         case '*':
             left *= primary();
             break;
