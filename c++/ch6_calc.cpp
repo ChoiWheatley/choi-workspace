@@ -15,8 +15,6 @@
 // function to read a token from cin object
 class Token;
 class Token_Stream;
-bool is_operand(char);
-bool is_number(string);
 double expression();
 double term();
 double primary();
@@ -42,9 +40,6 @@ public:
     Token_Stream() : stack{} {}
 private:
     vector<Token> stack;
-};
-const vector<char> operands {
-    '+', '-', '*', '/', '%', '(', ')'
 };
 
 // global variables
@@ -108,22 +103,26 @@ Token Token_Stream::get(){// ts.size()를 먼저 보고 최근걸 꺼내주거�
         stack.pop_back();
         return ret;
     }
-    try {
-        double tok_num = 0;
-        char tok_char = 0;
-        string num_chunk = "";
-        tok_char = cin.get();
-        if (is_operand(tok_char)) {
-            return Token{tok_char};
-        } else {
-            for (; !is_operand(tok_char); tok_char = cin.get()) 
-                num_chunk.push_back(tok_char);
-            if (is_number(num_chunk)) return Token {'n', stod(num_chunk)};
-        }
-    }
-    catch(const std::exception& e)
+    char tok_char = 0;
+    cin >> tok_char;
+    switch (tok_char) {
+    case ';': {}    // for print the result
+    case 'q': {}    // for print the result and exit
+
+    case '+': case '-': case '*': case '/': case '%': case '!': 
+    case '(': case ')': case '{': case '}':
+        return Token {tok_char};
+
+    case '.': case '0': case '1': case '2': case '3': case '4':
+    case '5': case '6': case '7': case '8': case '9': 
     {
-        std::cerr << e.what() << '\n';
+        cin.putback(tok_char);
+        double tok_num;
+        cin >> tok_num;
+        return Token {T_Num, tok_num};
+    }
+    default:
+        error ("Invalid Token");
     }
     return Token{0};
 }
@@ -169,6 +168,7 @@ double term()
             left /= d;
             break;
         }
+        // case '%':
         default:
             ts.putback(t);
             return left;
@@ -191,6 +191,13 @@ double primary()
         if (t.kind != ')') error ("<><><> ')' expected! <><><>\n");
         return d;
     }
+    case '{':
+    {
+        double d = expression();
+        t = ts.get();
+        if (t.kind != '}') error ("<><><> '}' expected! <><><>\n");
+        return d;
+    }
     default:
         error ("<><><> Primary Expected!!!!!! <><><>\n");
     }
@@ -211,12 +218,6 @@ void show_token(Token t, string caller = "")
     cout << "SHOW_TOKEN()\n";
     cout << "'" << t.kind << "' = " << t.value << endl;
 }
-bool is_operand(char c)
-{
-    for (auto i : operands)
-        if (c == i) return true;
-    return false;
-}
 bool is_number(string s)
 {
     try { if (stod(s) != 0) return true; }
@@ -235,6 +236,7 @@ bool is_number(string s)
 
 
 //DEPRICATED!
+/*
 Token get_token()
 {
     double tok_num = 0;
@@ -265,3 +267,4 @@ Token get_token()
     prev_tok = tok_char;
     return ret;
 }
+*/
