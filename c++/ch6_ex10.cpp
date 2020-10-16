@@ -81,7 +81,7 @@ ullint combination (ullint a, ullint b){
 ullint product (ullint n, ullint m){
     if (n > m) error ("ERROR (product()) : lvalue should not bigger than rvalue\n");
     ullint ret = 1;
-    for (ullint i = n; i < m; i++)
+    for (ullint i = n; i <= m; i++)
     {
         if (ret > UINT64_MAX / i) error ("ERROR (product()) : return value is too big (Unsigned int 64 bit)\n");
         ret *= i;
