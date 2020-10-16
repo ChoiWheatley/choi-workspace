@@ -19,6 +19,7 @@ double expression();
 double term();
 double primary();
 void show_token(Token, string);
+int factorial(int);
 Token get_token(); // depricated
 
 class Token{
@@ -183,7 +184,12 @@ double primary()
     switch (t.kind)
     {
     case 'n':
+    {
+        Token sample = ts.get();
+        if (sample.kind == '!') return (double)factorial((int)t.value);
+        ts.putback(sample);
         return t.value;
+    }
     case '(':
     {
         double d = expression();
@@ -223,6 +229,13 @@ bool is_number(string s)
     try { if (stod(s) != 0) return true; }
     catch(...) { return false; }
     return false;
+}
+int factorial(int a)
+{
+    if (a == 0) return 1;
+    int ret = 1;
+    for (int i = 1; i <= a; i++) ret *= i;
+    return ret;
 }
 
 
