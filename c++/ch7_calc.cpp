@@ -46,21 +46,50 @@ as ts
 // function to read a token from cin object
 class Token;
 class Token_Stream;
+double statement();
+double declaration();
 double expression();
 double term();
 double primary();
 void show_token(Token, string);
 void calculate();
+double get_value(string);
+void set_value(string, double);
+int is_exist(string);
+bool is_declared(string s);
+double define_var(string s, double d);
+double find_var(string s);
 // Token get_token(); // depricated
+
+// global variables
+
+constexpr char T_num = 'n';
+constexpr char T_quit = 'q';
+constexpr char T_print = ';';
+constexpr char T_assign = '=';
+constexpr char T_let_token = 'L';
+constexpr char T_name = 'a';
+const string T_prompt = "> ";
+const string T_result = "= ";
+const string T_let_keyword = "let";
+//vector<Token> tok;
+
 
 class Token{
 public:
     char kind;
     double value;
+    string name;
     Token(char k) : kind{k}, value{0} {}        // C++11 인가? 처음 보는 생성자의 구현모습이다...
     Token(char k, double v) : kind{k}, value{v} {}
-    Token() : kind{0}, value{0} {}
-};
+    Token(double v) : kind{T_num}, value{v} {}
+    Token(string s) : name{s}, value{0} {
+        if (s == T_let_keyword) kind = T_let_token;
+        else kind = T_name;
+    }
+    Token() : kind{0}, value{0}, name{""} {}
+}; 
+
 // as Token Stream
 class Token_Stream{
 public:
@@ -74,6 +103,8 @@ public:
 private:
     vector<Token> stack;
 };
+Token_Stream ts{};
+
 // User can define variables 
 // you can access variables by a glabal variable 'var_table'
 class Variable{
@@ -82,21 +113,11 @@ public:
     double value;
     Variable(string s, double v) : name{s}, value{v} {}
 };
-
-// global variables
-
-Token_Stream ts{};
 vector<Variable> var_table;
-constexpr char T_Num = 'n';
-constexpr char T_Quit = 'q';
-constexpr char T_Print = ';';
-const string T_Prompt = "> ";
-const string T_Result = "= ";
-//vector<Token> tok;
 
 
 
-/*
+/* main function
 
 ███    ███  █████  ██ ███    ██ 
 ████  ████ ██   ██ ██ ████   ██ 
@@ -107,49 +128,102 @@ const string T_Result = "= ";
 */
 int main()
 {
-    calculate();
+    try
+    {
+        define_var("pi", 3.1415926535);
+        define_var("e", 2.7182818284);
+        calculate();
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+        return 1;
+    }
+    catch (...)
+    {
+        cerr << "excpetion detected!\n";
+        cout << "Please type 'q' to close the window\n";
+        for (char exitCode; cin >> exitCode;)
+            if (exitCode == T_quit)
+                return 2;
+    }
     return 0;
 }
-//
-//
+double statement()
+{
+    Token t = ts.get();
+    if (t.kind == T_let_token) return declaration();
+    ts.putback(t);
+    return expression();
+}
 
+// assume Token_Stream::get() already ate "let" keyword
+// get name from token stream and find out if '=' is exist
+double declaration()
+{
+    string ret_str;
+    double ret_d;
+    Token t = ts.get();
+    if (t.kind != T_name) error ("name expected in declaration!");
+    ret_str = t.name;
+    t = ts.get();
+    if (t.kind != T_assign) error ("No '=' sign in declaration! ", ret_str);
+    ts.putback(t);
+    ret_d = expression();
+    define_var(ret_str, ret_d);
+    return ret_d;
+}
 void calculate()
 {
     while (cin) {
-        try
-        {
-            cout << T_Prompt;
+        try {
+            cout << T_prompt;
             Token t = ts.get();
-            while (t.kind == T_Print)
-                t = ts.get(); // eats ';'
-            if (t.kind == T_Quit)
+            while (t.kind == T_print)
+                t = ts.get(); // eats ';', as T_quit
+            if (t.kind == T_quit)
                 return;
             ts.putback(t);
-            cout << T_Result << expression() << endl;
+            cout << T_result << statement() << endl;
         }
         catch (const std::exception &e)
         {
-            std::cerr << e.what() << " ";
+            std::cerr << e.what() << '\n';
             cout << "Please type ';' to continue or 'q' to quit\n";
-            ts.ignore(';');
+            ts.ignore(T_print);
         }
         catch (...)
         {
             cerr << "excpetion detected!\n";
             cout << "Please type 'q' to close the window\n";
             for (char exitCode; cin >> exitCode;)
-                if (exitCode == T_Quit)
+                if (exitCode == T_quit)
                     return;
         }
     }
 }
 
-Token Token_Stream::get(){// ts.size()를 먼저 보고 최근걸 꺼내주거나 cin에서 새로 꺼내오거나
-                          // 해당 토큰을 사용하지 않으면 직접 집어넣어야 한다.
-/*
- * ㅁ 음수인 경우 (-1) 문제를 해결하지 못하는 버그 발생.
- * ㅁ pppuc++ 교재에서는 cin.putback() 함수를 활용하여 숫자를 입력받으려고 하고 있다.
- */
+double find_var(string s)
+{
+    for (auto i : var_table)
+        if (i.name == s) return i.value;
+    error ("no variable found.\n");
+    return 0;
+}
+
+/* ts as token stream 
+
+████████ ███████ 
+   ██    ██      
+   ██    ███████ 
+   ██         ██ 
+   ██    ███████ 
+                 
+
+*/ 
+//ts.size()를 먼저 보고 최근걸 꺼내주거나 cin에서 새로 꺼내오거나
+// 해당 토큰을 사용하지 않으면 직접 집어넣어야 한다.
+Token Token_Stream::get(){
     if (!stack.empty()) {
         Token ret = stack.back();
         stack.pop_back();
@@ -158,9 +232,8 @@ Token Token_Stream::get(){// ts.size()를 먼저 보고 최근걸 꺼내주거�
     char tok_char = 0;
     cin >> tok_char;
     switch (tok_char) {
-    case T_Print:     // for print the result
-    case T_Quit:      // for print the result and exit
-
+    case T_print:     // for print the result
+    case T_quit:      // for print the result and exit
     case '+': 
     case '-': 
     case '*': 
@@ -171,6 +244,7 @@ Token Token_Stream::get(){// ts.size()를 먼저 보고 최근걸 꺼내주거�
     case ')': 
     case '{': 
     case '}':
+    case '=':
         return Token {tok_char};
 
     case '.': case '0': case '1': case '2': case '3': case '4':
@@ -179,13 +253,26 @@ Token Token_Stream::get(){// ts.size()를 먼저 보고 최근걸 꺼내주거�
         cin.putback(tok_char);
         double tok_num;
         cin >> tok_num;
-        return Token {T_Num, tok_num};
+        return Token {T_num, tok_num};
     }
     default:
-        error ("Invalid Token");
+        // variable name, 첫 글자는 알파벳, 나머지는 알파벳과 숫자, underscore만 사용
+        if (isalpha(tok_char)) {
+            string s;
+            s += tok_char;
+            while (cin.get(tok_char) &&
+                   isalpha(tok_char) ||
+                   isdigit(tok_char) ||
+                   tok_char == '_')
+                s += tok_char;
+            cin.putback(tok_char);
+            return Token{s};
+        }
+        error ("Invalid Token : ", to_string(tok_char));
     }
-    return Token{0};
+    return Token{};
 }
+// ignore token stream until the parameter is found
 void Token_Stream::ignore(char c)
 {
     if (!stack.empty() && c == stack.back().kind) {
@@ -195,15 +282,17 @@ void Token_Stream::ignore(char c)
     while(cin >> ch)
         if (ch == c) return;
 }
-void Variable::set_value(string s, double v)
-{
-    
-}
-double Variable::get_value (string s)
-{
 
-}
+/* calc
 
+ ██████  █████  ██       ██████ 
+██      ██   ██ ██      ██      
+██      ███████ ██      ██      
+██      ██   ██ ██      ██      
+ ██████ ██   ██ ███████  ██████ 
+                                
+                                
+*/
 
 double expression()
 {
@@ -266,8 +355,12 @@ double primary()
     //show_token(t, "Primary");
     switch (t.kind)
     {
-    case 'n':
+    case T_num:
         return t.value;
+    case T_name:
+        return find_var(t.name);
+    case T_assign:
+        return expression();
     case '(':
     {
         double d = expression();
@@ -292,10 +385,32 @@ double primary()
     return 0;
 }
 
+/* var
 
+██    ██  █████  ██████  
+██    ██ ██   ██ ██   ██ 
+██    ██ ███████ ██████  
+ ██  ██  ██   ██ ██   ██ 
+  ████   ██   ██ ██   ██ 
+                         
+*/
+double get_value(string s)
+{
+    for (auto i : var_table)   
+        if (i.name == s) return i.value;
+    error ("get_value : undefined value name\n", s);
+    return 0;
+}
+void set_value(string s, double d)
+{
+    // pre condition : if there is already a given name,
+    // reallocate with new value
+    for (auto i : var_table)
+        if (i.name == s) i.value = d;
+    var_table.push_back(Variable(s, d));    
+}
 /*
  *
- * 
  * 
  * 
  */
@@ -303,8 +418,7 @@ double primary()
 void show_token(Token t, string caller = "")
 {
     if (!caller.empty()) { cout << "DEBUG : in " << caller << ", "; }
-    cout << "SHOW_TOKEN()\n";
-    cout << "'" << t.kind << "' = " << t.value << endl;
+    cout << "kind : '" << t.kind << "', value : '" << t.value << "', name : '" << t.name << "'\n";
 }
 bool is_number(string s)
 {
@@ -312,17 +426,19 @@ bool is_number(string s)
     catch(...) { return false; }
     return false;
 }
-
-
-
-
-
-
-
-
-
-
-
+bool is_declared(string s) 
+{
+    for (const Variable & i : var_table) {
+        if (s == i.name) return true;
+    }
+    return false;
+}
+double define_var(string s, double d) 
+{
+    if (is_declared(s)) { error(s, " declared twice"); }
+    var_table.push_back(Variable{s, d});
+    return d;
+}
 //DEPRICATED!
 /*
 Token get_token()
@@ -343,7 +459,7 @@ Token get_token()
             if (is_operand(tok_char))    return Token{tok_char};
             for (; !is_operand(tok_char) && tok_char != '\n'; tok_char = cin.get())
                 num_chunk.push_back(tok_char);
-            ret = Token{T_Num, stod(num_chunk)};
+            ret = Token{T_num, stod(num_chunk)};
         }
     }
     catch(const std::exception& e)
