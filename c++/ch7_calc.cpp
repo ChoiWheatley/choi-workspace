@@ -58,7 +58,7 @@ as ts
 class Token;
 class Token_Stream;
 double statement();
-double declaration();
+double declaration(char c);
 double assignment(string s);
 double expression();
 double term();
@@ -66,10 +66,12 @@ double primary();
 void show_token(Token, string);
 void calculate();
 double get_value(string);
-void set_value(string, double);
+double set_value(string, double);
 bool is_declared(string s);
 double define_var(string s, double d);
-double find_var(string s);
+double define_const(string s, double d);
+double find_value(string s);
+bool is_constant(string s);
 // Token get_token(); // depricated
 
 // global variables
@@ -79,10 +81,12 @@ constexpr char T_quit = 'q';
 constexpr char T_print = ';';
 constexpr char T_assign = '=';
 constexpr char T_let_token = 'L';
+constexpr char T_const_token = 'C';
 constexpr char T_name = 'a';
 const string T_prompt = "> ";
 const string T_result = "= ";
 const string T_let_keyword = "let";
+const string T_cosnt_keyword = "const";
 const string T_quit_keyword = "quit";
 const string T_exit_keyword = "exit";
 //vector<Token> tok;
@@ -98,6 +102,7 @@ public:
     Token(double v) : kind{T_num}, value{v} {}
     Token(string s) : name{s}, value{0} {
         if (s == T_let_keyword) kind = T_let_token;
+        else if (s == T_cosnt_keyword) kind = T_const_token;
         else if (s == T_quit_keyword ||
                 s == T_exit_keyword
         ) kind = T_quit;
@@ -130,6 +135,14 @@ public:
     Variable(string s, double v) : name{s}, value{v} {}
 };
 vector<Variable> var_table;
+class Constant {
+public:
+    string name;
+    double value;
+    Constant(string s, double v) : name{s}, value{v} {}
+};
+vector<Constant> const_table;
+
 
 
 
@@ -146,8 +159,8 @@ int main()
 {
     try
     {
-        define_var("pi", 3.1415926535);
-        define_var("e", 2.7182818284);
+        define_const("pi", 3.1415926535);
+        define_const("e", 2.7182818284);
         calculate();
     }
     catch (const std::exception &e)
@@ -168,7 +181,9 @@ int main()
 double statement()
 {
     Token t = ts.get();
-    if (t.kind == T_let_token) return declaration();
+    if (t.kind == T_let_token ||
+        t.kind == T_const_token)
+        return declaration(t.kind);
     if (t.kind == T_name) {
         Token t2 = ts.get();
         if (t2.kind == T_assign) return assignment(t.name);
@@ -180,7 +195,7 @@ double statement()
 
 // assume Token_Stream::get() already ate "let" keyword
 // get name from token stream and find out if '=' is exist
-double declaration()
+double declaration(char c)
 {
     string ret_str;
     double ret_d;
@@ -188,10 +203,18 @@ double declaration()
     if (t.kind != T_name) error ("name expected in declaration!");
     ret_str = t.name;
     t = ts.get();
-    if (t.kind != T_assign) error ("No '=' sign in declaration! ", ret_str);
+    if (t.kind != T_assign) error ("No '=' sign in declaration!, ", ret_str);
     ts.putback(t);
     ret_d = expression();
-    return define_var(ret_str, ret_d);
+    switch (c) {
+    case T_let_token:
+        return define_var(ret_str, ret_d);
+    case T_const_token:
+        return define_const(ret_str, ret_d);
+    default:
+        error ("unknown error in declaration");
+    }
+    return 0;
 }
 void calculate()
 {
@@ -223,11 +246,13 @@ void calculate()
     }
 }
 
-double find_var(string s)
+double find_value(string s)
 {
     for (auto i : var_table)
         if (i.name == s) return i.value;
-    error ("no variable found.\n");
+    for (auto i : const_table)
+        if (i.name == s) return i.value;
+    error ("no variable / constant found.\n");
     return 0;
 }
 
@@ -236,15 +261,10 @@ double find_var(string s)
 double assignment(string s)
 {
     // assume we already met T_assign keyword
-    // pre-condition : if not declared, error
-    for (int i = 0; i < var_table.size(); i++) {
-        if (var_table[i].name == s) {
-            var_table[i].value = expression();
-            return var_table[i].value;
-        }
-    }
-    error (s + " is not declared.");
-    return 1;
+    // pre-condition : if user wants to change value from constant,
+    // print error message 
+    if (is_constant(s)) error ("you cannot change constant. : ", s);
+    return set_value(s, expression());
 }
 
 /* ts as token stream 
@@ -419,7 +439,7 @@ double primary()
             }
             
         }
-        return find_var(t.name);
+        return find_value(t.name);
     }
     case T_assign:
         return expression();
@@ -469,13 +489,15 @@ double get_value(string s)
     return 0;
 }
 // set variable from var_table
-void set_value(string s, double d)
+double set_value(string s, double d)
 {
     // pre condition : if there is already a given name,
     // reallocate with new value
-    for (auto i : var_table)
-        if (i.name == s) i.value = d;
+    for (int i = 0; i < var_table.size(); i++) {
+        if (var_table[i].name == s) var_table[i].value = d;
+    }
     var_table.push_back(Variable(s, d));    
+    return d;
 }
 
 /*
@@ -500,6 +522,9 @@ bool is_declared(string s)
     for (const Variable & i : var_table) {
         if (s == i.name) return true;
     }
+    for (const Constant & i : const_table) {
+        if (s == i.name) return true;
+    }
     return false;
 }
 double define_var(string s, double d) 
@@ -507,6 +532,18 @@ double define_var(string s, double d)
     if (is_declared(s)) { error(s, " declared twice"); }
     var_table.push_back(Variable{s, d});
     return d;
+}
+double define_const(string s, double d)
+{
+    if (is_declared(s)) { error(s, " declared twice"); }
+    const_table.push_back(Constant{s, d});
+    return d;
+}
+bool is_constant(string s)
+{
+    for (auto i : const_table) 
+        if (i.name == s) return true;
+    return false;
 }
 //DEPRICATED!
 /*
