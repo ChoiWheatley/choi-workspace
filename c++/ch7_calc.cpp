@@ -6,10 +6,19 @@
  * Input from cin and output from cout object
  * 
  * grammer {
- * Statements:
- *      Expression
+ * Calculation:
+ *      Statements
  *      Print
  *      Quit
+ *      Expression
+ * Statements:
+ *      Declaration
+ *      Assignment
+ * Declaration:
+ *      "let" Name '=' Expression
+ *      "const" Name '=' Expression
+ * Assignment:
+ *      Name '=' Expression
  * Print:
  *      ;
  * Quit:
@@ -28,6 +37,8 @@
  *      '(' Expression ')'
  *      '+' Primary
  *      '-' Primary
+ *      "sqrt" '(' Expression ')'
+ *      "pow" '(' Expression ',' Expression ');
  * Number:
  *      a floating point literals
  *} 
@@ -55,7 +66,6 @@ void show_token(Token, string);
 void calculate();
 double get_value(string);
 void set_value(string, double);
-int is_exist(string);
 bool is_declared(string s);
 double define_var(string s, double d);
 double find_var(string s);
@@ -189,7 +199,7 @@ void calculate()
         catch (const std::exception &e)
         {
             std::cerr << e.what() << '\n';
-            cout << "Please type ';' to continue or 'q' to quit\n";
+            cout << "Please type ';' to continue or 'q' to quit ";
             ts.ignore(T_print);
         }
         catch (...)
@@ -245,6 +255,7 @@ Token Token_Stream::get(){
     case '{': 
     case '}':
     case '=':
+    case ',':
         return Token {tok_char};
 
     case '.': case '0': case '1': case '2': case '3': case '4':
@@ -336,8 +347,8 @@ double term()
         }
         case '%':
         {
-            int int_left = narrow_cast<int> (left);
-            int int_right = narrow_cast<int> (primary());
+            int int_left = static_cast<int> (left);
+            int int_right = static_cast<int> (primary());
             if (int_right == 0) error("Cannot divided by zero!\n");
             left = int_left % int_right;
             break;
@@ -358,13 +369,42 @@ double primary()
     case T_num:
         return t.value;
     case T_name:
+    {
+        if (t.name == "sqrt") {
+            //sqrt(double arg);
+            double ret = expression();
+            if (ret < 0) error ("cannot be negative in sqrt()!");
+            return sqrt(ret);
+        }
+        if (t.name == "pow") {
+            //pow(double arg1, int arg2);
+            // ','로 두 개의 인자를 받아들여야 한다. 
+            // 인자의 개수가 모자란 경우 오류를 출력.
+            try
+            {
+                double arg1 = expression();
+                int arg2 = static_cast<int>(expression());
+                return pow(arg1, arg2);
+            }
+            catch(const std::exception& e)
+            {
+                cout << e.what() << ' ';
+                error("invalid arguments");
+            }
+            
+        }
         return find_var(t.name);
+    }
     case T_assign:
         return expression();
     case '(':
     {
         double d = expression();
         t = ts.get();
+        if (t.kind == ',') {
+            ts.putback(Token{'('});
+            return d;
+        }
         if (t.kind != ')') error ("<><><> ')' expected! <><><>\n");
         return d;
     }
@@ -394,6 +434,7 @@ double primary()
   ████   ██   ██ ██   ██ 
                          
 */
+// get from var_table
 double get_value(string s)
 {
     for (auto i : var_table)   
@@ -401,6 +442,7 @@ double get_value(string s)
     error ("get_value : undefined value name\n", s);
     return 0;
 }
+// set variable from var_table
 void set_value(string s, double d)
 {
     // pre condition : if there is already a given name,
@@ -409,6 +451,7 @@ void set_value(string s, double d)
         if (i.name == s) i.value = d;
     var_table.push_back(Variable(s, d));    
 }
+
 /*
  *
  * 
