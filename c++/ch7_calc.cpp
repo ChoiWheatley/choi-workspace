@@ -82,6 +82,8 @@ constexpr char T_name = 'a';
 const string T_prompt = "> ";
 const string T_result = "= ";
 const string T_let_keyword = "let";
+const string T_quit_keyword = "quit";
+const string T_exit_keyword = "exit";
 //vector<Token> tok;
 
 
@@ -95,6 +97,9 @@ public:
     Token(double v) : kind{T_num}, value{v} {}
     Token(string s) : name{s}, value{0} {
         if (s == T_let_keyword) kind = T_let_token;
+        else if (s == T_quit_keyword ||
+                s == T_exit_keyword
+        ) kind = T_quit;
         else kind = T_name;
     }
     Token() : kind{0}, value{0}, name{""} {}
@@ -267,7 +272,7 @@ Token Token_Stream::get(){
         return Token {T_num, tok_num};
     }
     default:
-        // variable name, 첫 글자는 알파벳, 나머지는 알파벳과 숫자, underscore만 사용
+        // name, 첫 글자는 알파벳, 나머지는 알파벳과 숫자, underscore만 사용
         if (isalpha(tok_char)) {
             string s;
             s += tok_char;
