@@ -65,7 +65,6 @@ double term();
 double primary();
 void show_token(Token, string);
 void calculate();
-double get_value(string);
 double set_value(string, double);
 bool is_declared(string s);
 double define_var(string s, double d);
@@ -480,14 +479,6 @@ double primary()
   ████   ██   ██ ██   ██ 
                          
 */
-// get from var_table
-double get_value(string s)
-{
-    for (auto i : var_table)   
-        if (i.name == s) return i.value;
-    error ("get_value : undefined value name\n", s);
-    return 0;
-}
 // set variable from var_table
 double set_value(string s, double d)
 {
