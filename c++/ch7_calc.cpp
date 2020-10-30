@@ -59,6 +59,7 @@ class Token;
 class Token_Stream;
 double statement();
 double declaration();
+double assignment(string s);
 double expression();
 double term();
 double primary();
@@ -168,6 +169,11 @@ double statement()
 {
     Token t = ts.get();
     if (t.kind == T_let_token) return declaration();
+    if (t.kind == T_name) {
+        Token t2 = ts.get();
+        if (t2.kind == T_assign) return assignment(t.name);
+        else ts.putback(t2);
+    }
     ts.putback(t);
     return expression();
 }
@@ -185,8 +191,7 @@ double declaration()
     if (t.kind != T_assign) error ("No '=' sign in declaration! ", ret_str);
     ts.putback(t);
     ret_d = expression();
-    define_var(ret_str, ret_d);
-    return ret_d;
+    return define_var(ret_str, ret_d);
 }
 void calculate()
 {
@@ -224,6 +229,22 @@ double find_var(string s)
         if (i.name == s) return i.value;
     error ("no variable found.\n");
     return 0;
+}
+
+// find variable from var_table and change it 
+// to expression
+double assignment(string s)
+{
+    // assume we already met T_assign keyword
+    // pre-condition : if not declared, error
+    for (int i = 0; i < var_table.size(); i++) {
+        if (var_table[i].name == s) {
+            var_table[i].value = expression();
+            return var_table[i].value;
+        }
+    }
+    error (s + " is not declared.");
+    return 1;
 }
 
 /* ts as token stream 
