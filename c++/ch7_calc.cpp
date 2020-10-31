@@ -58,7 +58,7 @@ as ts
 class Token;
 class Token_Stream;
 double statement();
-double declaration(char c);
+double declare(char c);
 double assignment(string s);
 double expression();
 double term();
@@ -131,16 +131,38 @@ class Variable{
 public:
     string name;
     double value;
+    inline bool is_constant() {return const_checkbox;}
+    Variable() : name{}, value{0} {}
     Variable(string s, double v) : name{s}, value{v} {}
+    Variable(string s, double v, char token) : name{s}, value{v} {
+        if (token == T_const_token) const_checkbox = true;
+        else if (token == T_let_token) const_checkbox = false;
+        else error ("Unknown const token.");
+    }
+private:
+    bool const_checkbox = false;
 };
 vector<Variable> var_table;
+// deprecated 
 class Constant {
 public:
     string name;
     double value;
     Constant(string s, double v) : name{s}, value{v} {}
 };
+// deprecated 
 vector<Constant> const_table;
+class Symbol_table {
+public:
+    double get(string s);
+    double set(string s, double d);
+    double declare(char c);
+    bool is_declared(string s);
+    Variable find_var(string s);
+private:
+    vector<Variable> var_table;
+};
+Symbol_table st;
 
 
 
@@ -182,7 +204,7 @@ double statement()
     Token t = ts.get();
     if (t.kind == T_let_token ||
         t.kind == T_const_token)
-        return declaration(t.kind);
+        return st.declare(t.kind);
     if (t.kind == T_name) {
         Token t2 = ts.get();
         if (t2.kind == T_assign) return assignment(t.name);
@@ -191,29 +213,14 @@ double statement()
     ts.putback(t);
     return expression();
 }
-
-// assume Token_Stream::get() already ate "let" keyword
-// get name from token stream and find out if '=' is exist
-double declaration(char c)
+// find variable from ts.var_table and change it 
+// to expression
+double assignment(string s)
 {
-    string ret_str;
-    double ret_d;
-    Token t = ts.get();
-    if (t.kind != T_name) error ("name expected in declaration!");
-    ret_str = t.name;
-    t = ts.get();
-    if (t.kind != T_assign) error ("No '=' sign in declaration!, ", ret_str);
-    ts.putback(t);
-    ret_d = expression();
-    switch (c) {
-    case T_let_token:
-        return define_var(ret_str, ret_d);
-    case T_const_token:
-        return define_const(ret_str, ret_d);
-    default:
-        error ("unknown error in declaration");
-    }
-    return 0;
+    // assume we already met T_assign keyword
+    // pre-condition : if user wants to change value from constant, error
+    if (st.find_var(s).is_constant()) error ("you cannot change constant. : ", s);
+    return set_value(s, expression());
 }
 void calculate()
 {
@@ -245,26 +252,8 @@ void calculate()
     }
 }
 
-double find_value(string s)
-{
-    for (auto i : var_table)
-        if (i.name == s) return i.value;
-    for (auto i : const_table)
-        if (i.name == s) return i.value;
-    error ("no variable / constant found.\n");
-    return 0;
-}
 
-// find variable from var_table and change it 
-// to expression
-double assignment(string s)
-{
-    // assume we already met T_assign keyword
-    // pre-condition : if user wants to change value from constant,
-    // print error message 
-    if (is_constant(s)) error ("you cannot change constant. : ", s);
-    return set_value(s, expression());
-}
+
 
 /* ts as token stream 
 
@@ -324,7 +313,7 @@ Token Token_Stream::get(){
             cin.putback(tok_char);
             return Token{s};
         }
-        error ("Invalid Token : ", to_string(tok_char));
+        error ("Invalid Token : '"+ to_string(tok_char)+ "'");
     }
     return Token{};
 }
@@ -470,33 +459,55 @@ double primary()
     return 0;
 }
 
-/* var
+/* symbol_table
 
-██    ██  █████  ██████  
-██    ██ ██   ██ ██   ██ 
-██    ██ ███████ ██████  
- ██  ██  ██   ██ ██   ██ 
-  ████   ██   ██ ██   ██ 
-                         
+███████ ██    ██ ███    ███ ██████   ██████  ██      
+██       ██  ██  ████  ████ ██   ██ ██    ██ ██      
+███████   ████   ██ ████ ██ ██████  ██    ██ ██      
+     ██    ██    ██  ██  ██ ██   ██ ██    ██ ██      
+███████    ██    ██      ██ ██████   ██████  ███████ 
+
 */
-// set variable from var_table
-double set_value(string s, double d)
+double Symbol_table::get(string s) { return find_var(s).value; }
+double Symbol_table::set(string s, double d) { find_var(s).value = d; }
+// declare variable from token stream input
+double Symbol_table::declare(char tok)
 {
-    // pre condition : if there is already a given name,
-    // reallocate with new value
-    for (int i = 0; i < var_table.size(); i++) {
-        if (var_table[i].name == s) var_table[i].value = d;
-    }
-    var_table.push_back(Variable(s, d));    
-    return d;
+    string newname;
+    double newvalue;
+    Token t = ts.get();
+    if (t.kind != T_name) error ("name expected in declaration!");
+    if (is_declared(t.name)) error ("given name already declared");
+    newname = t.name;
+    t = ts.get();
+    if (t.kind != T_assign) error ("No '=' sign in declaration!");
+    ts.putback(t);
+    newvalue = expression();
+    var_table.push_back(Variable{newname, newvalue, tok});
+    return newvalue;
+}
+bool Symbol_table::is_declared(string s)
+{
+    for (auto i : var_table)
+        if (i.name == s) return true;
+    return false;
+}
+Variable Symbol_table::find_var(string s)
+{
+    for (int i = 0; i < var_table.size(); i++)
+        if (var_table[i].name == s) return var_table[i];
+    error ("no symbol found");
+    return Variable{};
 }
 
-/*
- *
- * 
- * 
- */
 
+/* miscellaneous
+███    ███ ██ ███████  ██████ ███████ ██      ██       █████  ███    ██ ███████  ██████  ██    ██ ███████ 
+████  ████ ██ ██      ██      ██      ██      ██      ██   ██ ████   ██ ██      ██    ██ ██    ██ ██      
+██ ████ ██ ██ ███████ ██      █████   ██      ██      ███████ ██ ██  ██ █████   ██    ██ ██    ██ ███████ 
+██  ██  ██ ██      ██ ██      ██      ██      ██      ██   ██ ██  ██ ██ ██      ██    ██ ██    ██      ██ 
+██      ██ ██ ███████  ██████ ███████ ███████ ███████ ██   ██ ██   ████ ███████  ██████   ██████  ███████ 
+*/
 void show_token(Token t, string caller = "")
 {
     if (!caller.empty()) { cout << "DEBUG : in " << caller << ", "; }
@@ -536,6 +547,69 @@ bool is_constant(string s)
         if (i.name == s) return true;
     return false;
 }
+/* deprecated
+██████  ███████ ██████  ██████  ██  ██████  █████  ████████ ███████ ██████  
+██   ██ ██      ██   ██ ██   ██ ██ ██      ██   ██    ██    ██      ██   ██ 
+██   ██ █████   ██████  ██████  ██ ██      ███████    ██    █████   ██   ██ 
+██   ██ ██      ██      ██   ██ ██ ██      ██   ██    ██    ██      ██   ██ 
+██████  ███████ ██      ██   ██ ██  ██████ ██   ██    ██    ███████ ██████  
+
+*/
+// <IMPORTANT> Might deprecated because of Symbol_table
+
+// assume Token_Stream::get() already ate "let" keyword
+// get name from token stream and find out if '=' is exist
+double declare(char c)
+{
+    string ret_str;
+    double ret_d;
+    Token t = ts.get();
+    if (t.kind != T_name) error ("name expected in declaration!");
+    ret_str = t.name;
+    t = ts.get();
+    if (t.kind != T_assign) error ("No '=' sign in declaration!, ", ret_str);
+    ts.putback(t);
+    ret_d = expression();
+    switch (c) {
+    case T_let_token:
+        return define_var(ret_str, ret_d);
+    case T_const_token:
+        return define_const(ret_str, ret_d);
+    default:
+        error ("unknown error in declaration");
+    }
+    return 0;
+}
+double find_value(string s)
+{
+    for (auto i : var_table)
+        if (i.name == s) return i.value;
+    for (auto i : const_table)
+        if (i.name == s) return i.value;
+    error ("no variable / constant found.\n");
+    return 0;
+}
+// set variable from var_table 
+double set_value(string s, double d)
+{
+    // pre condition : if there is already a given name,
+    // reallocate with new value
+    for (int i = 0; i < var_table.size(); i++) {
+        if (var_table[i].name == s) var_table[i].value = d;
+    }
+    var_table.push_back(Variable(s, d));    
+    return d;
+}
+double find_value(string s)
+{
+    for (auto i : var_table)
+        if (i.name == s) return i.value;
+    for (auto i : const_table)
+        if (i.name == s) return i.value;
+    error ("no variable / constant found.\n");
+    return 0;
+}
+
 //DEPRICATED!
 /*
 Token get_token()
