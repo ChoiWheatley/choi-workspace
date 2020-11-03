@@ -280,6 +280,9 @@ Token Token_Stream::get(){
         return ret;
     }
     char tok_char = 0;
+    // 개행문자 만나면 print
+    for (cin.get(tok_char); isspace(tok_char); cin.get(tok_char)) 
+        if (tok_char == '\n') return T_print;
     cin >> tok_char;
     switch (tok_char) {
     case T_print:     // for print the result
