@@ -319,9 +319,6 @@ Token Token_Stream::get(){
             cin.putback(tok_char);
             return Token{s};
         }
-        // 개행문자를 만나면 print
-        for (cin.get(tok_char); isspace(tok_char);) 
-            { if (tok_char == '\n') return Token{T_print}; }
         error ("Invalid Token : '"+ to_string(tok_char)+ "'");
     }
     return Token{};
