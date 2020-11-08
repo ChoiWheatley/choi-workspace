@@ -1,6 +1,6 @@
 /*
 Chapter8 Drill1.
 */
-extern int my_foo;
+int my_foo = 0;
 void print_foo();
 void print(int);
