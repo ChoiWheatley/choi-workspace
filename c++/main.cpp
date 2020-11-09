@@ -3,8 +3,8 @@ Chapter 8 Drill 1
 */
 
 #include "my.h"
-extern int my_foo;
 
+int my_foo = 0;
 int main(void)
 {
     my_foo = 7;
