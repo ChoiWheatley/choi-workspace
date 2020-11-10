@@ -120,11 +120,11 @@ public:
                         // 해당 토큰을 사용하지 않으면 직접 집어넣어야 한다.
     void putback(Token t){ stack.push_back(t); }        // put a token back
     void ignore(char c);                                // discard charactor up to and including an argument
-    Token_stream(char k) : stack{Token{k}} {}
-    Token_stream(char k, double v) : stack{Token{k,v}} {}
-    Token_stream() : stack{} {}
+    Token_stream() : stack{}, tstream{cin} {}
+    const istream& get_stream() { return tstream; }
 private:
     vector<Token> stack;
+    istream& tstream;
 };
 //Token_stream ts{};
 
@@ -231,7 +231,7 @@ double assignment(string s, Token_stream& ts)
 }
 void calculate(Token_stream& ts)
 {
-    while (cin) {
+    while (ts.get_stream()) {
         try {
             cout << T_prompt;
             Token t = ts.get();
@@ -281,7 +281,7 @@ Token Token_stream::get(){
         return ret;
     }
     char tok_char = 0;
-    cin >> tok_char;
+    tstream >> tok_char;
     switch (tok_char) {
     case T_print:     // for print the result
     case T_quit:      // for print the result and exit
@@ -302,9 +302,9 @@ Token Token_stream::get(){
     case '.': case '0': case '1': case '2': case '3': case '4':
     case '5': case '6': case '7': case '8': case '9': 
     {
-        cin.putback(tok_char);
+        tstream.putback(tok_char);
         double tok_num;
-        cin >> tok_num;
+        tstream >> tok_num;
         return Token {T_num, tok_num};
     }
     default:
@@ -312,16 +312,16 @@ Token Token_stream::get(){
         if (isalpha(tok_char)) {
             string s;
             s += tok_char;
-            while (cin.get(tok_char) &&
+            while (tstream.get(tok_char) &&
                    isalpha(tok_char) ||
                    isdigit(tok_char) ||
                    tok_char == '_')
                 s += tok_char;
-            cin.putback(tok_char);
+            tstream.putback(tok_char);
             return Token{s};
         }
         // 개행문자를 만나면 print
-        for (cin.get(tok_char); isspace(tok_char);) 
+        for (tstream.get(tok_char); isspace(tok_char);) 
             { if (tok_char == '\n') return Token{T_print}; }
         error ("Invalid Token : '"+ to_string(tok_char)+ "'");
     }
@@ -334,7 +334,7 @@ void Token_stream::ignore(char c)
         return;
     }
     char ch = 0;
-    while(cin >> ch)
+    while(tstream>> ch)
         if (ch == c) return;
 }
 
