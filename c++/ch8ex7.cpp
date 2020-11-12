@@ -34,13 +34,14 @@ void prompt(vector<string>& names, vector<int>& ages)
 {
     string tmpStr;
     int tmpInt;
-    cout << "Please input five names divided by whitespace.\n>> ";
-    for (int i = 0; i < 5; i++) {
+    cout << "Please input names divided by whitespace.\n>> ";
+    while(cin) {
         cin >> tmpStr;
+        if (tmpStr == ";" || tmpStr == "q" || tmpStr == "quit" || tmpStr == "exit") break;
         names.push_back(tmpStr);
     }
-    cout << "Please enter five ages divided by whitespace. \n>> ";
-    for (int i = 0; i < 5; i++) {
+    cout << "Please enter ages divided by whitespace. \n>> ";
+    for (int i = 0; i < names.size(); i++) {
         cin >> tmpInt;
         ages.push_back(tmpInt);
     }
@@ -51,6 +52,7 @@ void printPair(const vector<string>& names, const vector<int>& ages)
     if (names.size() != ages.size()) { error("no matching array sizes!"); }
     for (int i = 0; i < names.size(); i++) {
         cout << "( " << names[i] << " , " << ages[i] << " ), ";
+        if (!((i+1)%10)) cout << '\n';
     }
     cout << "\b\b\n";
 }
