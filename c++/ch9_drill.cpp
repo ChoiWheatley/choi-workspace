@@ -20,8 +20,11 @@ struct Date {
 	int d;	// day
 	Date(int y, int m, int d);
 	void add_day(int n);
-	int month_day();
+	int month_day() {return month_day(m);}
+	int month_day(int m);
 	bool is_valid();
+	bool is_leap_year() {return is_leap_year(y);}
+	bool is_leap_year(int y);
 };
 
 Date::Date(int yy, int mm, int dd) {
@@ -31,14 +34,20 @@ Date::Date(int yy, int mm, int dd) {
 	if (!is_valid()) throw Invalid_Date{};
 }
 void Date::add_day(int n) {
-	d += n;
 	int md = month_day();
-	if (d > md) {
-		m += static_cast<int>(d / md);
-		d = (d+n) % md;
+	if (d + n > md) {
+		m++;
+		n -= md - d;
+		d = md;
+	}
+	for (d += n; d > md; ) {
+		m++;
+		d -= md;
+		if (m > 12) { m = 1; y++; }
+		md = month_day(m);
 	}
 }
-int Date::month_day(){
+int Date::month_day(int m) {
 	int month_day = 30;
 	switch (m) {
 		case 1: case 3: case 5: case 7: case 8: case 10: case 12:
@@ -48,7 +57,8 @@ int Date::month_day(){
 			month_day = 30;
 			break;
 		case 2:
-			month_day = 28;
+			if (is_leap_year()) month_day = 29;
+			else month_day = 28;
 			break;
 		default:
 			throw Invalid_Date{};
@@ -59,6 +69,12 @@ int Date::month_day(){
 bool Date::is_valid() {
 	if (!(d >= 1 && d <= month_day())) return false;
 	return true;
+}
+bool Date::is_leap_year(int y) {
+	if (y%400 == 0) return true;
+	if (y%100 == 0) return false;
+	if (y%4 == 0) return true;
+	return false;
 }
 
 void print_date(Date date) {
