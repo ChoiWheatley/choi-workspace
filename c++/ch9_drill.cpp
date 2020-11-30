@@ -14,6 +14,9 @@
 
 #include "std_lib_facilities.h"
 class Invalid_Date{};
+class Date;
+
+/*
 struct Date {
 	int y;	// year
 	int m; 	// month
@@ -26,12 +29,54 @@ struct Date {
 	bool is_leap_year() {return is_leap_year(y);}
 	bool is_leap_year(int y);
 };
+*/
 
-Date::Date(int yy, int mm, int dd) {
-	y = yy;
-	m = mm;
-	d = dd;
-	if (!is_valid()) throw Invalid_Date{};
+
+class Date {
+	private:
+		int y, m, d;
+	public:
+		Date(int yy, int mm, int dd) 
+			: y{yy}, m{mm}, d{dd} 
+		{
+			if (!is_valid()) throw Invalid_Date{};
+		};
+		void add_day(int n);
+		int month() {return m;}
+		int day() {return d;}
+		int year() {return y;}
+		bool is_valid();
+		bool is_leap_year(int y);
+		bool is_leap_year() {return is_leap_year(y);}
+		int month_day(int m);
+		int month_day() {return month_day(m);}
+};
+int Date::month_day(int m) 
+{
+	int month_day = 30;
+	switch (m) {
+		case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+			month_day = 31;
+			break;
+		case 4: case 6: case 9: case 11:
+			month_day = 30;
+			break;
+		case 2:
+			if (is_leap_year(y)) month_day = 29;
+			else month_day = 28;
+			break;
+		default:
+			throw Invalid_Date{};
+	}
+	return month_day;
+}
+bool Date::is_leap_year(int y)
+{
+	bool flag = false;
+	if (y%400 == 0) flag = true;
+	if (y%100 == 0) flag = false;
+	if (y%4 == 0) flag = true;
+	return flag;
 }
 void Date::add_day(int n) {
 	int md = month_day();
@@ -49,44 +94,13 @@ void Date::add_day(int n) {
 		md = month_day(m);
 	}
 }
-int Date::month_day(int m) {
-	int month_day = 30;
-	switch (m) {
-		case 1: case 3: case 5: case 7: case 8: case 10: case 12:
-			month_day = 31;
-			break;
-		case 4: case 6: case 9: case 11:
-			month_day = 30;
-			break;
-		case 2:
-			if (is_leap_year()) month_day = 29;
-			else month_day = 28;
-			break;
-		default:
-			throw Invalid_Date{};
-	}
-	return month_day;
-}
-
 bool Date::is_valid() {
 	if (!(d >= 1 && d <= month_day())) return false;
 	if (!(m >= 1 && m <= 12)) return false;
 	return true;
 }
-bool Date::is_leap_year(int y) {
-	bool flag = false;
-	if (y%400 == 0) flag = true;
-	if (y%100 == 0) flag = false;
-	if (y%4 == 0) flag = true;
-	return flag;
-}
-
-void print_date(Date date) {
-	cout << date.y << ". " << date.m << ". " << date.d << endl;
-}
-
 ostream& operator<< (ostream& os, Date& date) {
-	os << date.y << ". " << date.m << ". " << date.d << endl;
+	os << date.year() << ". " << date.month() << ". " << date.day() << endl;
 	return os;
 }
 
@@ -95,17 +109,17 @@ ostream& operator<< (ostream& os, Date& date) {
 int main()
 {
 	int yy, mm, dd;
-	cout << "Please input three integers : ";
-	cin >> yy >> mm >> dd;
-	Date today{yy, mm, dd};
-	cout << today << '\n';
-	int ad = 0;
-	cout << "Please input number you want to add day : ";
-	cin >> ad;
-	today.add_day(ad);
-	cout << today << '\n';
-
-	
+	while(cin) {
+		cout << "Please input three integers : ";
+		cin >> yy >> mm >> dd;
+		Date today{yy, mm, dd};
+		cout << today << '\n';
+		int ad = 0;
+		cout << "Please input number you want to add day : ";
+		cin >> ad;
+		today.add_day(ad);
+		cout << today << '\n';
+	}
 	return 0;
 }
 //
