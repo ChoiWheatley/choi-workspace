@@ -37,8 +37,10 @@ void Date::add_day(int n) {
 	int md = month_day();
 	if (d + n > md) {
 		m++;
+		if (m > 12) { m = 1; y++; }
 		n -= md - d;
-		d = md;
+		md = month_day(m);
+		d = 0;
 	}
 	for (d += n; d > md; ) {
 		m++;
@@ -68,13 +70,15 @@ int Date::month_day(int m) {
 
 bool Date::is_valid() {
 	if (!(d >= 1 && d <= month_day())) return false;
+	if (!(m >= 1 && m <= 12)) return false;
 	return true;
 }
 bool Date::is_leap_year(int y) {
-	if (y%400 == 0) return true;
-	if (y%100 == 0) return false;
-	if (y%4 == 0) return true;
-	return false;
+	bool flag = false;
+	if (y%400 == 0) flag = true;
+	if (y%100 == 0) flag = false;
+	if (y%4 == 0) flag = true;
+	return flag;
 }
 
 void print_date(Date date) {
