@@ -13,56 +13,20 @@
  */
 
 #include "std_lib_facilities.h"
-class Invalid_Date{};
-class Date;
+#include "ch9_drill.h"
 
-/*
-struct Date {
-	int y;	// year
-	int m; 	// month
-	int d;	// day
-	Date(int y, int m, int d);
-	void add_day(int n);
-	int month_day() {return month_day(m);}
-	int month_day(int m);
-	bool is_valid();
-	bool is_leap_year() {return is_leap_year(y);}
-	bool is_leap_year(int y);
-};
-*/
-
-
-class Date {
-	private:
-		int y, m, d;
-	public:
-		Date(int yy, int mm, int dd) 
-			: y{yy}, m{mm}, d{dd} 
-		{
-			if (!is_valid()) throw Invalid_Date{};
-		};
-		void add_day(int n);
-		int month() {return m;}
-		int day() {return d;}
-		int year() {return y;}
-		bool is_valid();
-		bool is_leap_year(int y);
-		bool is_leap_year() {return is_leap_year(y);}
-		int month_day(int m);
-		int month_day() {return month_day(m);}
-};
-int Date::month_day(int m) 
+int month_day(Date d) 
 {
 	int month_day = 30;
-	switch (m) {
-		case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+	switch (d.month()) {
+		case Month::jan: case Month::mar: case Month::may: case Month::jul: case Month::aug: case Month::oct: case Month::dec:
 			month_day = 31;
 			break;
-		case 4: case 6: case 9: case 11:
+		case Month::apr: case Month::jun: case Month::sep: case Month::nov:
 			month_day = 30;
 			break;
-		case 2:
-			if (is_leap_year(y)) month_day = 29;
+		case Month::feb:
+			if (leap_year(d.year())) month_day = 29;
 			else month_day = 28;
 			break;
 		default:
@@ -70,39 +34,41 @@ int Date::month_day(int m)
 	}
 	return month_day;
 }
-bool Date::is_leap_year(int y)
+bool leap_year(Year y)
 {
 	bool flag = false;
-	if (y%400 == 0) flag = true;
-	if (y%100 == 0) flag = false;
-	if (y%4 == 0) flag = true;
+	if (y.to_int()%400 == 0) flag = true;
+	if (y.to_int()%100 == 0) flag = false;
+	if (y.to_int()%4 == 0) flag = true;
 	return flag;
 }
 void Date::add_day(int n) {
-	int md = month_day();
-	if (d + n > md) {
-		m++;
-		if (m > 12) { m = 1; y++; }
+	// pre-condition : 날짜를 더했는데 달을 넘어간다
+	int md = month_day(today());
+	for (; d + n > md; ) {
+		add_month(1);
 		n -= md - d;
-		md = month_day(m);
 		d = 0;
+		md = month_day(today());
 	}
-	for (d += n; d > md; ) {
-		m++;
-		d -= md;
-		if (m > 12) { m = 1; y++; }
-		md = month_day(m);
-	}
+	d = n;
 }
-bool Date::is_valid() {
-	if (!(d >= 1 && d <= month_day())) return false;
-	if (!(m >= 1 && m <= 12)) return false;
-	return true;
+void Date::add_month(int n) {
+	// pre-condition : above december
+	int month = static_cast<int>(m);
+	if ((month+n) % 12 == 0) m = Month::dec;
+	else { m = static_cast<Month>((month+n) % 12); }
+	add_year(floor((month+n)) / 13);
+	// DEBUG
+	cout << now();
 }
+
 ostream& operator<< (ostream& os, Date& date) {
-	os << date.year() << ". " << date.month() << ". " << date.day() << endl;
+	os << date.year().to_int() << ". " << static_cast<int>(date.month()) << ". " << date.day() << endl;
 	return os;
 }
+
+
 
 //
 //
@@ -112,15 +78,22 @@ int main()
 	while(cin) {
 		cout << "Please input three integers : ";
 		cin >> yy >> mm >> dd;
-		Date today{yy, mm, dd};
+		Date today{Year{yy}, static_cast<Month>(mm), dd};
 		cout << today << '\n';
 		int ad = 0;
 		cout << "Please input number you want to add day : ";
 		cin >> ad;
 		today.add_day(ad);
 		cout << today << '\n';
+		cout << "Please input number you want to add month: ";
+		cin >> ad;
+		today.add_month(ad);
+		cout << today << '\n';
+		cout << "Please input number you want to add year: ";
+		cin >> ad;
+		today.add_year(ad);
+		cout << today << '\n';
 	}
 	return 0;
 }
-//
 //
