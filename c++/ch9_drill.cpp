@@ -51,16 +51,15 @@ void Date::add_day(int n) {
 		d = 0;
 		md = month_day(today());
 	}
-	d = n;
+	d += n;
 }
 void Date::add_month(int n) {
-	// pre-condition : above december
 	int month = static_cast<int>(m);
 	if ((month+n) % 12 == 0) m = Month::dec;
-	else { m = static_cast<Month>((month+n) % 12); }
-	add_year(floor((month+n)) / 13);
-	// DEBUG
-	cout << now();
+	else { 
+		m = static_cast<Month>((month+n) % 12);
+		add_year(floor((month + n)) / 12);
+	}
 }
 
 ostream& operator<< (ostream& os, Date& date) {
