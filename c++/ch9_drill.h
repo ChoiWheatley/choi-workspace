@@ -24,9 +24,9 @@ class Date {
 		void add_day(int n);
         void add_month(int n);
         void add_year(int n) {y.addyear(n);}
-		Month month() {return m;}
-		int day() {return d;}
-		Year year() {return y;}
+		int day() const {return d;}
+		Month month() const {return m;}
+		Year year() const {return y;}
         Date& today() {return *this;}
         Date& now() {return *this;}
 };

@@ -59,8 +59,6 @@ void Date::add_month(int n) {
 	if ((month+n) % 12 == 0) m = Month::dec;
 	else { m = static_cast<Month>((month+n) % 12); }
 	add_year(floor((month+n)) / 13);
-	// DEBUG
-	cout << now();
 }
 
 ostream& operator<< (ostream& os, Date& date) {
