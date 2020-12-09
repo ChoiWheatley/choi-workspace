@@ -3,7 +3,10 @@ PPPUC++ Chapter 9 "Technicalities, classes and etc" 의 Date class 구현하면�
 만든 파일입니다. Helper Function 디자인 컨셉에 맞추어 코드를 구현하도록 
 노력해보았습니다.
 */
+#ifndef STD_LIB_FACILITIES
+#define STD_LIB_FACILITIES
 #include "std_lib_facilities.h"
+#endif
 
 namespace Chrono {
     enum class Month {
@@ -37,9 +40,13 @@ namespace Chrono {
 
     bool is_date(int y, Month m, int d);    // true for valid date
     bool leapyear(int y);                   // true for leap year (윤년)
+    int month_day(int y, Month m, int d);
+    int month_day(Date d);
     bool operator==(const Date&, const Date& b);
     bool operator!=(const Date&, const Date& b);
+    ostream& operator<<(ostream& os, const Month& m);
     ostream& operator<<(ostream& os, const Date& d);
-    istream& operator>>(istream& is, const Date& d);
+    istream& operator>>(ostream& is, const Month& m);
+    istream& operator>>(istream& is, Date& d);
 };
 // Chrono
