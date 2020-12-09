@@ -46,7 +46,7 @@ namespace Chrono {
     bool operator!=(const Date&, const Date& b);
     ostream& operator<<(ostream& os, const Month& m);
     ostream& operator<<(ostream& os, const Date& d);
-    istream& operator>>(ostream& is, const Month& m);
+    istream& operator>>(ostream& is, Month& m);
     istream& operator>>(istream& is, Date& d);
 };
 // Chrono
