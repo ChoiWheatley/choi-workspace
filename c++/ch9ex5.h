@@ -30,17 +30,11 @@ namespace Libre {
         string author() const {return author_;};
         Chrono::Date copyright_date() const {return copyright_date_;};
         bool is_checked() const {return checked_;};
+		const Book& default_book();
 
     /* Operators */
         // in = true, out = false
         void check_to(bool in_out) {checked_ = in_out;}
-
-    private:
-    /* Default values */
-        string default_isbn = "";
-        string default_title = "please change title";
-        string default_author = "please change author name";
-        Chrono::Date default_copy_date = Chrono::Date{};
     };
     // class Book
 

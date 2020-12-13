@@ -6,10 +6,10 @@
 
 namespace Libre {
     Book::Book() : 
-    ISBN_{default_isbn},
-    title_{default_title},
-    author_{default_author},
-    copyright_date_{default_copy_date} 
+    ISBN_{default_book().isbn()},
+    title_{default_book().title()},
+    author_{default_book().author()},
+    copyright_date_{default_book().copyright_date()} 
     {};
     Book::Book(string isbn, string title, string author, Chrono::Date copydate) :
     ISBN_{isbn},
@@ -19,6 +19,14 @@ namespace Libre {
     {
         if (!validate(*this)) throw INVALID{};
     };
+	const Book& default_book() {
+		static Book book{"0-0-0-x", 
+			"please change title", 
+			"please change author name",
+			Chrono::Date{}
+		};
+		return book;
+	}
 
     bool checking(Book& book, bool in_out) {
         if (in_out == true && book.is_checked()) return false;
@@ -26,16 +34,42 @@ namespace Libre {
         return true;
     }
     bool validate(const Book& book) {
-        
+		if (!valid_isbn(book.isbn())) return false;
+		if (!Chrono::is_date(book.copyright_date().year(),
+							book.copyright_date().month(),
+							book.copyright_date().day())) return false;
+		return true;
     }
     bool valid_isbn(string isbn) {
-
+		constexpr int ascii_0 = 48;
+		constexpr int ascii_9 = 57;
+		constexpr int max_count = 3;
+		constexpr char dash = '-';
+		for (char& c : isbn) {
+			static int cnt_flag = 0;
+			if (cnt_flag < max_count &&
+				ascii_0 <= c && c <= ascii_9) continue;
+			if (cnt_flag < max_count &&
+				c == dash) { 
+				cnt_flag++; 
+				continue; 
+			}
+			return false;
+		}
+		return true;
     }
     bool operator== (const Book& a, const Book& b) {
-
+		return (a.isbn() == b.isbn() &&
+				a.author() == b.author() &&
+				a.copyright_date() == b.copyright_date() &&
+				a.title() == b.title());
     }
     bool operator!= (const Book& a, const Book& b) { return !(a==b); }
     ostream& operator<< (ostream& os, const Book& book) {
-
+		os << "[\n";
+		os << book.title() << "\n";
+		os << book.author() << "\n";
+		os << book.isbn() << "\n]\n";
+		return os;
     }
 }
