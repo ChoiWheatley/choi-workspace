@@ -37,14 +37,18 @@ namespace Libre {
 		constexpr int ascii_9 = 57;
 		constexpr int max_count = 3;
 		constexpr char dash = '-';
+		int cnt_flag = 0;
 		for (char& c : isbn) {
-			static int cnt_flag = 0;
 			if (cnt_flag < max_count &&
 				ascii_0 <= c && c <= ascii_9) continue;
 			if (cnt_flag < max_count &&
 				c == dash) { 
 				cnt_flag++; 
 				continue; 
+			}
+			if (cnt_flag == max_count) {
+				cnt_flag++;
+				continue;
 			}
 			return false;
 		}
@@ -59,9 +63,32 @@ namespace Libre {
     bool operator!= (const Book& a, const Book& b) { return !(a==b); }
     ostream& operator<< (ostream& os, const Book& book) {
 		os << "[\n";
-		os << book.title() << "\n";
-		os << book.author() << "\n";
-		os << book.isbn() << "\n]\n";
+		os << '\t' << book.title() << "\n";
+		os << '\t' << book.author() << "\n";
+		os << '\t' << book.isbn() << "\n]\n";
 		return os;
     }
+	void Book::init_book(Book& book) {
+		char answer = 'n';
+		string isbn;
+		string title;
+		string author;
+		Chrono::Date copyright_date;
+		while (cin) {
+			cout << "Hello! Please input isbn serial code : ";
+			cin >> isbn;
+			cout << "Please input title : ";
+			cin >> title;
+			cout << "Please input author : ";
+			cin >> author;
+			cout << "Please input copyright date,\n Three integers that represents year, month, day\n : ";
+			cin >> copyright_date;
+			Book *newBook = new Book{ isbn, title, author,copyright_date };
+			cout << *newBook;
+			cout << "did you write all the contents properly? (y/n) : ";
+			cin >> answer;
+			if (answer == 'Y' || answer == 'y') { book = *newBook; return; }
+			if (answer == 'N' || answer == 'n') continue;
+		}
+	}
 }

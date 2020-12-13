@@ -50,6 +50,7 @@
 int main() {
 	using namespace Libre;
 	Book newBook{};
+	newBook.init_book(newBook);
 	cout << newBook;
     return 0;
 }

@@ -34,6 +34,7 @@ namespace Libre {
     /* Operators */
         // in = true, out = false
         void check_to(bool in_out) {checked_ = in_out;}
+		void init_book(Book& book);
     };
     // class Book
 
@@ -51,6 +52,7 @@ namespace Libre {
     bool operator!= (const Book&, const Book&);
     // print out the title, author, ISBN on separate lines
     ostream& operator<< (ostream&, const Book&);
+	// initialize Book class
 
 /* enumeration */
 
