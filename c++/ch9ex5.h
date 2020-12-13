@@ -30,7 +30,6 @@ namespace Libre {
         string author() const {return author_;};
         Chrono::Date copyright_date() const {return copyright_date_;};
         bool is_checked() const {return checked_;};
-		const Book& default_book();
 
     /* Operators */
         // in = true, out = false

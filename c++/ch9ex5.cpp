@@ -6,10 +6,10 @@
 
 namespace Libre {
     Book::Book() : 
-    ISBN_{default_book().isbn()},
-    title_{default_book().title()},
-    author_{default_book().author()},
-    copyright_date_{default_book().copyright_date()} 
+    ISBN_{"0-0-0-x"},
+    title_{"please change title"},
+    author_{"please change author name"},
+    copyright_date_{Chrono::Date{}}
     {};
     Book::Book(string isbn, string title, string author, Chrono::Date copydate) :
     ISBN_{isbn},
@@ -19,14 +19,6 @@ namespace Libre {
     {
         if (!validate(*this)) throw INVALID{};
     };
-	const Book& default_book() {
-		static Book book{"0-0-0-x", 
-			"please change title", 
-			"please change author name",
-			Chrono::Date{}
-		};
-		return book;
-	}
 
     bool checking(Book& book, bool in_out) {
         if (in_out == true && book.is_checked()) return false;

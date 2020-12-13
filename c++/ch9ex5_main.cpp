@@ -38,6 +38,7 @@
                                    
  * <TO DO LIST>
  * <> Make file is neccessary because I have to compile both Chrono*.cpp and ch9ex5*.cpp files
+ * <> enum class Genre 만들기
  */
 
 #include "ch9ex5.h"
@@ -47,5 +48,8 @@
 #endif
  
 int main() {
+	using namespace Libre;
+	Book newBook{};
+	cout << newBook;
     return 0;
 }
