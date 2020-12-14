@@ -11,11 +11,12 @@ namespace Libre {
     author_{"please change author name"},
     copyright_date_{Chrono::Date{}}
     {};
-    Book::Book(string isbn, string title, string author, Chrono::Date copydate) :
+    Book::Book(string isbn, string title, string author, Chrono::Date copydate, Genre genre) :
     ISBN_{isbn},
     title_{title},
     author_{author},
-    copyright_date_{copydate} 
+    copyright_date_{copydate},
+	genre_{genre}
     {
         if (!validate(*this)) throw INVALID{};
     };
@@ -65,6 +66,8 @@ namespace Libre {
 		os << "[\n";
 		os << '\t' << book.title() << "\n";
 		os << '\t' << book.author() << "\n";
+		os << '\t' << book.copyright_date() << "\n";
+		os << '\t' << book.genre() << "\n";
 		os << '\t' << book.isbn() << "\n]\n";
 		return os;
     }
@@ -73,22 +76,52 @@ namespace Libre {
 		string isbn;
 		string title;
 		string author;
+		Genre genre;
 		Chrono::Date copyright_date;
-		while (cin) {
-			cout << "Hello! Please input isbn serial code : ";
-			cin >> isbn;
-			cout << "Please input title : ";
-			cin >> title;
-			cout << "Please input author : ";
-			cin >> author;
-			cout << "Please input copyright date,\n Three integers that represents year, month, day\n : ";
-			cin >> copyright_date;
-			Book *newBook = new Book{ isbn, title, author,copyright_date };
-			cout << *newBook;
-			cout << "did you write all the contents properly? (y/n) : ";
-			cin >> answer;
-			if (answer == 'Y' || answer == 'y') { book = *newBook; return; }
-			if (answer == 'N' || answer == 'n') continue;
+		try {
+			 while (cin) {
+				cout << "Hello! Please input isbn serial code : ";
+				cin >> isbn;
+				cout << "Please input title : ";
+				cin >> title;
+				cout << "Please input author : ";
+				cin >> author;
+				cout << "Please input copyright date,\n Three integers that represents year, month, day\n : ";
+				cin >> copyright_date;
+				genre = init_genre();
+				Book *newBook = new Book{ isbn, title, author, copyright_date, genre };
+				cout << *newBook;
+				cout << "did you write all the contents properly? (y/n) : ";
+				cin >> answer;
+				if (answer == 'Y' || answer == 'y') { book = *newBook; return; }
+				if (answer == 'N' || answer == 'n') continue;
+			}
 		}
+		catch (INVALID e){
+		 	error("incorrect isbn format!\n");
+		}
+		catch (NOGENRE e){
+		 	error("incorrect genre selection!\n");
+		}
+		catch (Chrono::Date::Invalid e){
+		 	error("incorrect date format!\n");
+		}
+		
+	}
+	Genre init_genre() {
+	 	string genre;
+		cout << "Please choose what genre is (";
+		for (auto i : genre_str){ cout << i << ", "; }
+		cout << "\b\b)\n>>";
+		cin >> genre;
+		for (int i = 0; i < static_cast<int>(Genre::LAST); i++) {
+		 	if (genre == genre_str[i]) return static_cast<Genre>(i);
+		}
+		throw NOGENRE{};
+		return Genre::fiction;
+	}
+	ostream& operator<< (ostream& os, Genre gen) {
+		os << genre_str[static_cast<int>(gen)];
+		return os;
 	}
 }

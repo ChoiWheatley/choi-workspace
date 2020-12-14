@@ -100,7 +100,7 @@ namespace Chrono {
         return os;
     }
     ostream& operator<<(ostream& os, const Date &d) {
-        os << d.year() << ". " << static_cast<int>(d.month()) << ". " << d.day() << endl;
+        os << d.year() << ". " << static_cast<int>(d.month()) << ". " << d.day();
         return os;
     }
     istream &operator>>(istream &is, Month& m) {

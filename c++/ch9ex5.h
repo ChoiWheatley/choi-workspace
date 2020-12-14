@@ -5,10 +5,10 @@
 #endif
 
 namespace Libre {
-/* definitions */
-    enum class Genre;
+ 	enum class Genre;
 /* error classes */
     class INVALID{};
+	class NOGENRE{};
 
     class Book
     {
@@ -17,12 +17,12 @@ namespace Libre {
         string title_;
         string author_;
         Chrono::Date copyright_date_;
-        //Genre genre;
+        Genre genre_;
         bool checked_ = false;
     public:
     /* Constructors */
         Book();
-        Book(string, string, string, Chrono::Date);
+        Book(string, string, string, Chrono::Date, Genre);
 
     /* Getters */
         string isbn() const {return ISBN_;};
@@ -30,6 +30,7 @@ namespace Libre {
         string author() const {return author_;};
         Chrono::Date copyright_date() const {return copyright_date_;};
         bool is_checked() const {return checked_;};
+		Genre genre() const {return genre_;}
 
     /* Operators */
         // in = true, out = false
@@ -37,6 +38,14 @@ namespace Libre {
 		void init_book(Book& book);
     };
     // class Book
+
+/* Enum Class And By-products */
+    enum class Genre {
+        fiction, nonfiction, periodical, biography, children, LAST
+    };
+	static vector<string> genre_str {
+	 "fiction", "nonfiction", "periodical", "biography", "children"
+	};
 
 /* Miscellaneous */
 
@@ -52,12 +61,9 @@ namespace Libre {
     bool operator!= (const Book&, const Book&);
     // print out the title, author, ISBN on separate lines
     ostream& operator<< (ostream&, const Book&);
-	// initialize Book class
-
-/* enumeration */
-
-    enum class Genre {
-        fiction, nonfiction, periodical, biography, children
-    };
+	// print out the Genre
+	ostream& operator<< (ostream&, Genre);
+	//initialize Genre enum class
+	Genre init_genre();
 }
 // namespace Libre
