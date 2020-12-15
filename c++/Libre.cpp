@@ -5,12 +5,16 @@
 #endif
 
 namespace Libre {
+
+/* Constructors */
+
     Book::Book() : 
-    ISBN_{"0-0-0-x"},
-    title_{"please change title"},
-    author_{"please change author name"},
+    ISBN_{default_isbn},
+    title_{default_title},
+    author_{default_author},
     copyright_date_{Chrono::Date{}}
     {};
+
     Book::Book(string isbn, string title, string author, Chrono::Date copydate, Genre genre) :
     ISBN_{isbn},
     title_{title},
@@ -20,6 +24,11 @@ namespace Libre {
     {
         if (!validate(*this)) throw INVALID{};
     };
+	
+	Library::Library():
+	books_{}, patrons_{}, transactions_{}{};
+
+/* Book */
 
     bool checking(Book& book, bool in_out) {
         if (in_out == true && book.is_checked()) return false;
@@ -55,22 +64,6 @@ namespace Libre {
 		}
 		return true;
     }
-    bool operator== (const Book& a, const Book& b) {
-		return (a.isbn() == b.isbn() &&
-				a.author() == b.author() &&
-				a.copyright_date() == b.copyright_date() &&
-				a.title() == b.title());
-    }
-    bool operator!= (const Book& a, const Book& b) { return !(a==b); }
-    ostream& operator<< (ostream& os, const Book& book) {
-		os << "[\n";
-		os << '\t' << book.title() << "\n";
-		os << '\t' << book.author() << "\n";
-		os << '\t' << book.copyright_date() << "\n";
-		os << '\t' << book.genre() << "\n";
-		os << '\t' << book.isbn() << "\n]\n";
-		return os;
-    }
 	void Book::init_book(Book& book) {
 		char answer = 'n';
 		string isbn;
@@ -78,8 +71,8 @@ namespace Libre {
 		string author;
 		Genre genre;
 		Chrono::Date copyright_date;
-		try {
-			 while (cin) {
+		while (cin) {
+			try {
 				cout << "Hello! Please input isbn serial code : ";
 				cin >> isbn;
 				cout << "Please input title : ";
@@ -96,18 +89,66 @@ namespace Libre {
 				if (answer == 'Y' || answer == 'y') { book = *newBook; return; }
 				if (answer == 'N' || answer == 'n') continue;
 			}
-		}
-		catch (INVALID e){
-		 	error("incorrect isbn format!\n");
-		}
-		catch (NOGENRE e){
-		 	error("incorrect genre selection!\n");
-		}
-		catch (Chrono::Date::Invalid e){
-		 	error("incorrect date format!\n");
+			catch (INVALID e){
+				cout << "incorrect isbn format! try again\n";
+				continue;
+			}
+			catch (NOGENRE e){
+				cout << "incorrect genre selection! try again\n";
+				continue;
+			}
+			catch (Chrono::Date::Invalid e){
+				cout << "incorrect date format! try again\n";
+				continue;
+			}
+			catch (...){
+				error ("Something bad happens! Sorry\n");
+			}
 		}
 		
+
 	}
+/* end of Book */
+	
+/* Library */
+	// no duplicate!
+	void Library::add_book(Book& book) {
+		for (auto i : books_) {
+			if (i == book) throw INV_BOOK{};
+		}
+	}
+	// no duplicate!
+	void Library::add_patron(LibreUser::Patron& patron) {
+	}
+	// 1. Is book available in the Library?
+	// 2. Is patron exist?
+	// finally, add Transaction into a transactions_
+	void Library::check_out(Book& book, LibreUser::Patron& patron) {
+	}
+
+	/* end of Library */
+
+
+
+/* Miscellaneous */
+
+    bool operator== (const Book& a, const Book& b) {
+		return (a.isbn() == b.isbn() &&
+				a.author() == b.author() &&
+				a.copyright_date() == b.copyright_date() &&
+				a.title() == b.title());
+    }
+    bool operator!= (const Book& a, const Book& b) { return !(a==b); }
+    ostream& operator<< (ostream& os, const Book& book) {
+		os << "[\n";
+		os << '\t' << book.title() << "\n";
+		os << '\t' << book.author() << "\n";
+		os << '\t' << book.copyright_date() << "\n";
+		os << '\t' << book.genre() << "\n";
+		os << '\t' << book.isbn() << "\n]\n";
+		return os;
+    }
+	
 	Genre init_genre() {
 	 	string genre;
 		cout << "Please choose what genre is (";
@@ -117,7 +158,7 @@ namespace Libre {
 		for (int i = 0; i < static_cast<int>(Genre::LAST); i++) {
 		 	if (genre == genre_str[i]) return static_cast<Genre>(i);
 		}
-		throw NOGENRE{};
+		throw Book::NOGENRE{};
 		return Genre::fiction;
 	}
 	ostream& operator<< (ostream& os, Genre gen) {
