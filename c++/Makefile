@@ -1,8 +1,8 @@
-CC = g++-10		# CC := mips-openwrt-linux-gcc
+# CC = g++-10		# CC := mips-openwrt-linux-gcc
 CXX = g++-10	# CXX := mips-openwrt-linux-g++
 CFLAGS = -W -Wall
 TARGET = Book.out
-OBJECTS = Chrono.o ch9ex5.o ch9ex5_main.o 
+OBJECTS = Chrono.o Libre.o Libre_main.o 
 
 all : $(TARGET)
 
