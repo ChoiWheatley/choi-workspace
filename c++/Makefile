@@ -2,7 +2,7 @@
 CXX = g++-10	# CXX := mips-openwrt-linux-g++
 CFLAGS = -W -Wall
 TARGET = Book.out
-OBJECTS = Chrono.o Libre.o Libre_main.o 
+OBJECTS = Chrono.o Libre.o Libre_main.o Patron.o
 
 all : $(TARGET)
 

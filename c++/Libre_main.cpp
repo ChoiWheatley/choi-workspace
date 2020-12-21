@@ -37,11 +37,23 @@
    ██     ██████  ██████   ██████  
                                    
  * <TO DO LIST>
- * <> Make file is neccessary because I have to compile both Chrono*.cpp and ch9ex5*.cpp files
- * <> enum class Genre 만들기
- */
+<> 기본 Book, Patron들 만들어놓고 확인해보기
+<> Genre undefined option
+<> 명령어 추가하기 { add book, add patron, who owes}
+<> Libre.cpp 에서 checkout() 함수 구현하기
 
+ * <WANNA DO LIST>
+<> 텍스트파일에서 Books, Patrons 받아오기, 혹은 쓰기
+<> 책 이름만 나열하기, 저자만 나열하기 같은 필터링 옵션
+<> 책 이름, Patron 이름에 띄어쓰기 허용하기
+<> Chrono::today() 함수가 오늘날짜를 리턴하도록 만들어보자
+<> Chrono::randay() 함수가 아무날짜를 리턴하도록 만들어보자
+ */
+#include "Libre_predefined.h"
+#ifndef LIBRE_H
+#define LIBRE_H
 #include "Libre.h"
+#endif
 #ifndef STD_LIB_FACILITIES
 #define STD_LIB_FACILITIES
 #include "std_lib_facilities.h"
@@ -49,8 +61,17 @@
  
 int main() {
 	using namespace Libre;
-	Book newBook{};
-	newBook.init_book(newBook);
-	cout << newBook;
+  using namespace LibPat;
+  Library lib;
+  // predefined books and patrons
+  for (Book &i : LibPre::init_books()){
+    lib.add_book(i);
+  }
+  for (Patron &i : LibPre::init_patrons()){
+    lib.add_patron(i);
+  }
+  for (auto i : lib.books()) { cout << i; }
+  for (auto i : lib.patrons()) { cout << i; }
+
     return 0;
 }

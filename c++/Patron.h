@@ -29,7 +29,7 @@
 #include "std_lib_facilities.h"
 #endif
 
-namespace LibreUser {
+namespace LibPat {
     typedef unsigned int T_card;
     class INV_CARD_NUM{};
 
@@ -49,17 +49,20 @@ namespace LibreUser {
 		/* constructor */
 		Patron();
 		Patron(string name, T_card card_num, bool overdue = false);
+        static Patron& default_Patron();
 	};
     // class Patron
 
 	/* helper functions */
 	bool is_overdue(const Patron& patron);
-
+    // check whether Patron is duplicated
+    bool operator== (const Patron&, const Patron&);
+    bool operator!= (const Patron&, const Patron&);
     /* misselaneouses */
     const static string default_name = "please change name";
     constexpr static T_card default_card = 100000;
     constexpr static T_card card_min = 100000;
     constexpr static T_card card_max = 999999;
 }
-// namespace LibreUser
+// namespace LibPat
 
