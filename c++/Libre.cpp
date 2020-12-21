@@ -34,12 +34,12 @@ namespace Libre {
 
 	/* Book */
     //
-	void Book::init_book(Book& book) {
+	Book& init_book() {
 		char answer = 'n';
 		string isbn;
 		string title;
 		string author;
-        string genre_str;
+        string str_genre;
 		Genre genre;
 		Chrono::Date copyright_date;
 		while (cin) {
@@ -55,20 +55,20 @@ namespace Libre {
                 cout << "Please input genre kind (";
                 for (auto i : genre_str){cout << i << ", ";}
                 cout << "\b\b)\n>>";
-                cin >> genre_str;
-				genre = init_genre(genre_str);
+                cin >> str_genre;
+				genre = init_genre(str_genre);
 				Book *newBook = new Book{ isbn, title, author, copyright_date, genre };
 				cout << *newBook;
 				cout << "did you write all the contents properly? (y/n) : ";
 				cin >> answer;
-				if (answer == 'Y' || answer == 'y') { book = *newBook; return; }
+				if (answer == 'Y' || answer == 'y') { return *newBook; }
 				if (answer == 'N' || answer == 'n') continue;
 			}
-			catch (INVALID e){
+			catch (Book::INVALID e){
 				cout << "incorrect isbn format! try again\n";
 				continue;
 			}
-			catch (NOGENRE e){
+			catch (Book::NOGENRE e){
 				cout << "incorrect genre selection! try again\n";
 				continue;
 			}
@@ -80,6 +80,7 @@ namespace Libre {
 				error ("Something bad happens! Sorry\n");
 			}
 		}
+		return Book::default_book();
 	}
 	bool checking(Book& book, bool in_out) {
         if (in_out == true && book.is_checked()) return false;
@@ -158,10 +159,11 @@ namespace Libre {
 		throw ERR_WRONG_SEARCH{};
 		return Book::default_book();
 	}
-	// find patron for name
-	LibPat::Patron& find_patron_by_name(const Library& lib, string name){
+	// find patron for name or card number
+	LibPat::Patron& find_patron(const Library& lib, string name){
 		for (LibPat::Patron& i : lib.patrons()){
 			if (name == i.name()) return i;
+			if (name == to_string(static_cast<int>(i.card_num()))) return i;
 		}
 		throw ERR_WRONG_SEARCH{};
 		return LibPat::Patron::default_Patron();
@@ -178,13 +180,8 @@ namespace Libre {
 	
 /* genre */
 	Genre init_genre(string genrename) {
-	 	string genre;
-		cout << "Please choose what genre is (";
-		for (auto i : genre_str){ cout << i << ", "; }
-		cout << "\b\b)\n>>";
-		cin >> genre;
-		for (int i = 0; i < static_cast<int>(Genre::LAST); i++) {
-		 	if (genre == genre_str[i]) return static_cast<Genre>(i);
+		for (int i = 0; i < genre_str.size(); i++) {
+		 	if (genrename == genre_str[i]) return static_cast<Genre>(i);
 		}
 		throw Book::NOGENRE{};
 		return Genre::fiction;
@@ -220,14 +217,7 @@ namespace Libre {
 		os << '\t' << "checkoutdate:\t" << tran.check_date << '\n';
 		return os;
 	}
-	ostream& operator<< (ostream& os, LibPat::Patron& pat) {
-		os << "Patron [\n";
-		os << '\t' << "name :      \t" << pat.name() << '\n';
-		os << '\t' << "card number:\t" << pat.card_num() << '\n';
-		os << '\t' << "overdue? :  \t" << (pat.overdue() ? "yes" : "no") << '\n';
-		os << "]\n";
-		return os;
-	}
+	
 	//
 	/* end of Miscellaneous */
 }

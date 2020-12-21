@@ -31,7 +31,9 @@
 
 namespace LibPat {
     typedef unsigned int T_card;
+    /* error class */
     class INV_CARD_NUM{};
+    /* end of error class */
 
     class Patron {
         string name_;                // no whitespaces between name
@@ -55,9 +57,11 @@ namespace LibPat {
 
 	/* helper functions */
 	bool is_overdue(const Patron& patron);
+    Patron& init_Patron();
     // check whether Patron is duplicated
     bool operator== (const Patron&, const Patron&);
     bool operator!= (const Patron&, const Patron&);
+	ostream &operator<<(ostream &os, LibPat::Patron &pat);
     /* misselaneouses */
     const static string default_name = "please change name";
     constexpr static T_card default_card = 100000;

@@ -15,7 +15,7 @@ namespace Libre {
 
 /* Enum Class Genre and by-products */
     enum class Genre {
-        fiction, nonfiction, periodical, biography, children, undefined, LAST
+        fiction, nonfiction, periodical, biography, children, undefined
     };
 	const static vector<string> genre_str {
 	 "fiction", "nonfiction", "periodical", "biography", "children", "undefined"
@@ -58,7 +58,6 @@ namespace Libre {
     /* Operators */
         // in = true, out = false
         void check_to(bool in_out) {checked_ = in_out;}
-		void init_book(Book& book);
     };
     // class Book
 
@@ -70,6 +69,7 @@ namespace Libre {
     // especially isbn code
     bool validate(const Book&);
     bool valid_isbn(string isbn);
+    Book& init_book();
     /* default variables */
     const static string default_isbn = "0-0-0-x";
     const static string default_title = "Please_change_title";
@@ -120,8 +120,9 @@ namespace Libre {
 /* Library helper functions */
     // find book for isbn or title or author
     Book& find_book(const Library&, string);
-    // find patron for name
-    LibPat::Patron& find_patron_by_name(const Library&, string name);
+    // find patron for name or card number 
+    LibPat::Patron& find_patron(const Library&, string name);
+    // might be deprecated
     LibPat::Patron& find_patron_by_card(const Library&, LibPat::T_card card);
 /* end of Library helper functions */
 
@@ -137,7 +138,5 @@ namespace Libre {
 	ostream& operator<< (ostream&, Genre);
     // print out Transaction values
     ostream& operator<< (ostream&, Transaction);
-    // print out Patron values
-    ostream& operator<< (ostream&, LibPat::Patron&);
 }
 // namespace Libre
