@@ -88,6 +88,7 @@ namespace CMD{
     who_owes,
     print_books,
     print_patrons,
+    print_transactions,
     find_book,
     find_patron,
     checkout,
@@ -95,15 +96,15 @@ namespace CMD{
   };
   const static vector<string> command_sets{
       "add_book",
-      "add_patron", 
-      "who_owes", 
-      "print_books", 
+      "add_patron",
+      "who_owes",
+      "print_books",
       "print_patrons",
+      "print_transactions",
       "find_book",
       "find_patron",
       "checkout",
-      "help"
-  };
+      "help"};
   CommandSets cmdtoenum(string str){
     for (int i = 0; i < command_sets.size(); i++) {
       if (str == command_sets[i]) return (static_cast<CommandSets>(i));
@@ -137,8 +138,8 @@ int main() {
       /* command interpretation */
       string cmd;
       CommandSets cmdnum;
-      Book newbook{};
-      Patron newPatron{};
+      Book newbook;
+      Patron newPatron;
       cout << ">>";
       cin >> cmd;
       switch (cmdtoenum(cmd)){
@@ -149,8 +150,20 @@ int main() {
           lib.add_patron(init_Patron());
           break;
         case CommandSets::checkout :
-          cout << "nothing have implemented\n";
+        {
+          string input;
+          Chrono::Date input_day;
+          cout << "what book do you like to check out? :\n>>";
+          cin >> input;
+          newbook = find_book(lib, input);
+          cout << "who do you like to check out? : \n>>";
+          cin >> input;
+          newPatron = find_patron(lib, input);
+          cout << "when is the checkout day?\n>>";
+          cin >> input_day;
+          lib.check_out(newbook, newPatron, input_day);
           break;
+        }
         case CommandSets::find_book :
         {
           string input;
@@ -172,6 +185,9 @@ int main() {
           break;
         case CommandSets::print_patrons :
           for (auto i : lib.patrons()) cout << i;
+          break;
+        case CommandSets::print_transactions :
+          for (auto i : lib.transactions()) cout << i;
           break;
         case CommandSets::who_owes :
           for (auto i : lib.patrons()){

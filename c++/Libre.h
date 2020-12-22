@@ -56,15 +56,12 @@ namespace Libre {
 		Genre genre() const {return genre_;}
 
     /* Operators */
-        // in = true, out = false
+        // out = true, in = false
         void check_to(bool in_out) {checked_ = in_out;}
     };
     // class Book
 
 /* Book helper functions */    
-    // in = true, out = false
-    // return value as succession
-    bool checking(Book& book, bool in_out); 
     // validation of data entered into a Book
     // especially isbn code
     bool validate(const Book&);
@@ -88,6 +85,7 @@ namespace Libre {
         /* error codes */
         class INV_BOOK{};
         class INV_PATRON{};
+        class ERR_CHECKED_ALREADY{};
 
         /* getters */
         vector<Book> books() const{return books_;}
@@ -104,7 +102,7 @@ namespace Libre {
         // 1. Is book available in the Library?
         // 2. Is patron exist?
         // finally, add Transaction into a transactions_
-        void check_out(const Book& book, const LibPat::Patron& patron, const Chrono::Date& = Chrono::Date{}); 
+        void check_out(Book& book, LibPat::Patron& patron, const Chrono::Date& = Chrono::Date{}); 
 
         /* constructor */
         Library();

@@ -7,11 +7,15 @@ PPPUC++ Chapter 9 "Technicalities, classes and etc" 의 Date class 구현하면�
 #define STD_LIB_FACILITIES
 #include "std_lib_facilities.h"
 #endif
+#include <ctime>
 
 namespace Chrono {
     enum class Month {
         jan = 1, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec
     };
+    /* error class */
+    class INV_CMD{};    // for wrong command (today, randday)
+
     class Date {
     public:
         class Invalid{}; // to throw an exception
@@ -48,5 +52,11 @@ namespace Chrono {
     ostream& operator<<(ostream& os, const Date& d);
     istream& operator>>(ostream& is, Month& m);
     istream& operator>>(istream& is, Date& d);
+    Date prompt_date();
+    Date today();
+    Date randday();
+    const static string cmd_today = "today";
+    const static string cmd_randday = "randday";
+    const static string cmd_help = "help";
 };
 // Chrono

@@ -1,4 +1,7 @@
+#ifndef LIBRE_H
+#define LIBRE_H
 #include "Libre.h"
+#endif
 #ifndef STD_LIB_FACILITIES
 #define STD_LIB_FACILITIES
 #include "std_lib_facilities.h"
@@ -50,8 +53,8 @@ namespace Libre {
 				cin >> title;
 				cout << "Please input author : ";
 				cin >> author;
-				cout << "Please input copyright date,\n Three integers that represents year, month, day\n : ";
-				cin >> copyright_date;
+				cout << "Please input copyright date\n";
+				copyright_date = Chrono::prompt_date();
                 cout << "Please input genre kind (";
                 for (auto i : genre_str){cout << i << ", ";}
                 cout << "\b\b)\n>>";
@@ -82,11 +85,6 @@ namespace Libre {
 		}
 		return Book::default_book();
 	}
-	bool checking(Book& book, bool in_out) {
-        if (in_out == true && book.is_checked()) return false;
-        book.check_to(in_out);
-        return true;
-    }
 	bool validate(const Book& book) {
 		if (!valid_isbn(book.isbn())) return false;
 		if (!Chrono::is_date(book.copyright_date().year(),
@@ -143,11 +141,19 @@ namespace Libre {
 		}
 		patrons_.push_back(patron);
 	}
-	// 1. Is book available in the Library?
-	// 2. Is patron exist?
-	// finally, add Transaction into a transactions_
-	void Library::check_out(const Book& book, const LibPat::Patron& patron, const Chrono::Date& date) {
-		
+	// prerequisite :
+	// 1. Is book available in the Library? (not checked out)
+	// 2. Is patron available? (not owed)
+	// operation : 
+	// 1. add Transaction into transactions_
+	// 2. checkout book
+	// 3. owe patron (assume that user always overdue)
+	void Library::check_out(Book& book, LibPat::Patron& patron, const Chrono::Date& date) {
+		if (book.is_checked() || patron.overdue()) throw ERR_CHECKED_ALREADY{};
+		Transaction newcheck{book, patron, date};
+		book.check_to(true);
+		patron.set_overdue_to(true);
+		transactions_.push_back(newcheck);
 	}
 	// find book for isbn, title, or author
 	Book& find_book(const Library& lib, string k){
@@ -198,11 +204,12 @@ namespace Libre {
     bool operator!= (const Book& a, const Book& b) { return !(a==b); }
     ostream& operator<< (ostream& os, const Book& book) {
 		os << "Book [\n";
-		os << '\t' << "title:    \t"<< book.title() << "\n";
-		os << '\t' << "author:   \t" << book.author() << "\n";
-		os << '\t' << "copyright:\t" << book.copyright_date() << "\n";
-		os << '\t' << "genre :   \t" << book.genre() << "\n";
-		os << '\t' << "isbn :    \t" << book.isbn() << "\n";
+		os << '\t' << "title:     \t"<< book.title() << "\n";
+		os << '\t' << "author:    \t" << book.author() << "\n";
+		os << '\t' << "copyright: \t" << book.copyright_date() << "\n";
+		os << '\t' << "genre :    \t" << book.genre() << "\n";
+		os << '\t' << "isbn :     \t" << book.isbn() << "\n";
+		os << '\t' << "checked out\t" << (book.is_checked() ? "yes" : "no") << "\n";
 		os << "]\n";
 		return os;
     }

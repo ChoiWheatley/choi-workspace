@@ -46,7 +46,7 @@ namespace LibPat {
 		bool overdue() const {return overdue_;}
 
 		/* operator */
-		inline void set_overdue_to(bool in_out);
+		void set_overdue_to(bool in_out);
 
 		/* constructor */
 		Patron();

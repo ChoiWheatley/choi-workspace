@@ -109,10 +109,68 @@ namespace Chrono {
         m = static_cast<Month>(mm);
         return is;
     }
+    // command added : today, randday
     istream &operator>>(istream &is, Date& d) {
-        int yy, mm, dd;
-        is >> yy >> mm >> dd;
-        d = Date{yy, static_cast<Month>(mm), dd};
+		constexpr int ascii_0 = 48;
+		constexpr int ascii_9 = 57;
+        char isflag;
+        is >> isflag;
+        if (ascii_0 <= (int)isflag && isflag <= (int)ascii_9) {
+            is.putback(isflag);
+            int yy, mm, dd;
+            is >> yy >> mm >> dd;
+            d = Date{yy, static_cast<Month>(mm), dd};
+        }
+        else {
+            is.putback(isflag);
+            string command;
+            cin >> command;
+            if (command == cmd_today) d = today();
+            else if (command == cmd_randday) d = randday();
+            else if (command == cmd_help) d = prompt_date();
+            else throw INV_CMD{};
+        }
         return is;
+    }
+    Date prompt_date(){
+        Date input_date;
+        cout << "Please input date,\nThree integers that represents year, month, day\n";
+        cout << "other command : \"today\", \"randday\"\n>>";
+        cin >> input_date;
+        return input_date;
+    }
+    Date today(){
+        int yy, mm, dd;
+        time_t currentTime = time(NULL);
+        struct tm *pLocal = localtime(&currentTime);
+        yy = pLocal->tm_year + 1900;
+        mm = pLocal->tm_mon + 1;
+        dd = pLocal->tm_mday;
+        //DEBUG
+        cout << "DEBUG: yy-mm-dd : " << yy << "-" << mm << "-" << dd << endl;
+        return Date{yy, static_cast<Month>(mm), dd};
+    }
+    Date randday(){
+        time_t currentTime = time(NULL);
+        struct tm *pLocal = localtime(&currentTime);
+        int yy, mm, dd;
+        while (true){
+            try
+            {
+                yy = randint(pLocal->tm_year + 1901);
+                mm = randint(1, 12);
+                dd = randint(1, 31);
+                return Date{yy, static_cast<Month>(mm), dd};
+            }
+            catch (Date::Invalid e)
+            {
+                // leap year, feburary incorrect case
+                // just try one more time hahaha
+                continue;
+            }
+            catch (...) {
+                return Date{};
+            }
+        }
     }
 }; // namespace Chrono

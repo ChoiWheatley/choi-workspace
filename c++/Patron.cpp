@@ -5,7 +5,7 @@
 #endif
 
 namespace LibPat {
-	inline void Patron::set_overdue_to(bool in_out){ overdue_ = in_out; }
+	void Patron::set_overdue_to(bool in_out){ overdue_ = in_out; }
 
 	/* constructor */
 	Patron::Patron(): 
