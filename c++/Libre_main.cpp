@@ -24,10 +24,31 @@
  *      - enumerated type for the Book class called Genre. {
  *      fiction, nonfiction, periodical, biography, and children
  *      }
- * Later, we should create an
  * }  
- * And give each book a Genre and make appropriate changes to the Book 
- *      constructor and member functions
+ * 
+ * [ Error Flows ]
+ * 
+ * < namespace Libre >
+ * ┠ ERR_WRONG_SEARCH{} := throwed in find_book(), find_patron()  
+ * ┃                       / catched in main(), checkout()
+ * ┠ class Book
+ * ┃ ┠ INVALID{} := throwed in constructor Book() / catched in init_book()
+ * ┃ ┗ NOGENRE{} := throwed in init_genre() / catched in init_book()
+ * ┗ class Library
+ *   ┠ INV_BOOK{} := throwed in add_book(), catched in main()
+ *   ┗ INV_PATRON{} := throwed in add_patron(), catched in main()
+ * 
+ * < namespace LibPat >
+ * ┗ INV_CARD_NUM{} := throwed in constructor Patron() / catched in init_Patron()
+ * 
+ * < namespace Chrono >
+ * ┗ class Date
+ *   ┗ Invalid{} := throwed in constructor Date(), month_day() 
+ *               / catched in init_book(), checkout()
+ * 
+ * < namespace CMD >
+ * ┗ ERR_NO_COMMAND{} := throwed in cmdtoenum() / catched in main()
+ * 
   
 ████████  ██████  ██████   ██████  
    ██    ██    ██ ██   ██ ██    ██ 
