@@ -146,8 +146,6 @@ namespace Chrono {
         yy = pLocal->tm_year + 1900;
         mm = pLocal->tm_mon + 1;
         dd = pLocal->tm_mday;
-        //DEBUG
-        cout << "DEBUG: yy-mm-dd : " << yy << "-" << mm << "-" << dd << endl;
         return Date{yy, static_cast<Month>(mm), dd};
     }
     Date randday(){

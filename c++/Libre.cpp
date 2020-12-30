@@ -156,8 +156,14 @@ namespace Libre {
 		transactions_.push_back(newcheck);
 	}
 	// find book for isbn, title, or author
-	Book& find_book(const Library& lib, string k){
-		for (Book& i : lib.books()){
+	Book& Library::find_book(){
+		cout << "You can find book for author name, isbn, title\n\t>>";
+		string input;
+		cin >> input;
+		return find_book(input);
+	}
+	Book& Library::find_book(string k){
+		for (Book& i : books_){
 			if (k == i.isbn()) return i;
 			if (k == i.title()) return i;
 			if (k == i.author()) return i;
@@ -166,8 +172,14 @@ namespace Libre {
 		return Book::default_book();
 	}
 	// find patron for name or card number
-	LibPat::Patron& find_patron(const Library& lib, string name){
-		for (LibPat::Patron& i : lib.patrons()){
+	LibPat::Patron& Library::find_patron(){
+		cout << "You can find patron for patron name, card number\n\t>>";
+		string input;
+		cin >> input;
+		return find_patron(input);
+	}
+	LibPat::Patron& Library::find_patron(string name){
+		for (LibPat::Patron& i : patrons_){
 			if (name == i.name()) return i;
 			if (name == to_string(static_cast<int>(i.card_num()))) return i;
 		}

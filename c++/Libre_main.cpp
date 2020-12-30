@@ -92,7 +92,8 @@ namespace CMD{
     find_book,
     find_patron,
     checkout,
-    help
+    help, 
+    exit
   };
   const static vector<string> command_sets{
       "add_book",
@@ -104,7 +105,9 @@ namespace CMD{
       "find_book",
       "find_patron",
       "checkout",
-      "help"};
+      "help",
+      "exit"
+      };
   CommandSets cmdtoenum(string str){
     for (int i = 0; i < command_sets.size(); i++) {
       if (str == command_sets[i]) return (static_cast<CommandSets>(i));
@@ -138,8 +141,6 @@ int main() {
       /* command interpretation */
       string cmd;
       CommandSets cmdnum;
-      Book newbook;
-      Patron newPatron;
       cout << ">>";
       cin >> cmd;
       switch (cmdtoenum(cmd)){
@@ -151,35 +152,20 @@ int main() {
           break;
         case CommandSets::checkout :
         {
-          string input;
-          Chrono::Date input_day;
-          cout << "what book do you like to check out? :\n>>";
-          cin >> input;
-          newbook = find_book(lib, input);
-          cout << "who do you like to check out? : \n>>";
-          cin >> input;
-          newPatron = find_patron(lib, input);
-          cout << "when is the checkout day?\n>>";
-          cin >> input_day;
-          lib.check_out(newbook, newPatron, input_day);
+          cout << "which book do you like to check out? :\n";
+          Book& newbook = lib.find_book();
+          cout << "who do you like to check out? : \n";
+          Patron& newPatron = lib.find_patron();
+          cout << "when is the checkout day?\n";
+          lib.check_out(newbook, newPatron, Chrono::prompt_date());
           break;
         }
         case CommandSets::find_book :
-        {
-          string input;
-          cout << "please write down title or isbn code or author\n>>";
-          cin >> input; 
-          cout << find_book(lib, input);
+          cout << lib.find_book();
           break;
-        }
         case CommandSets::find_patron :
-        {
-          string input;
-          cout << "Please write down name or card number\n>>";
-          cin >> input;
-          cout << find_patron(lib, input);
+          cout << lib.find_patron();
           break;
-        }
         case CommandSets::print_books :
           for (auto i : lib.books()) cout << i;
           break;
@@ -197,6 +183,8 @@ int main() {
         case CommandSets::help :
           help();
           break;
+        case CommandSets::exit :
+          return 0;
         default:
           throw ERR_NO_COMMAND{};
       }
@@ -216,6 +204,10 @@ int main() {
     catch(CMD::ERR_NO_COMMAND e) {
       cout << "Wrong command. Please try again\n";
       continue;
+    }
+    catch(exception e){
+      cout << "Exception code : " << e.what() << '\n';
+      error("Ooooops... I cannot find out what have crashed\n");
     }
   };
 

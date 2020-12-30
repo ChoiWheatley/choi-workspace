@@ -93,6 +93,12 @@ namespace Libre {
         vector<Transaction> transactions() const{return transactions_;}
         // check all patrons who already have checked out a book
         vector<LibPat::Patron> who_owe() const;
+        // find book for isbn or title or author
+        Book& find_book();
+        Book& find_book(string);
+        // find patron for name or card number
+        LibPat::Patron& find_patron();
+        LibPat::Patron& find_patron(string);
         
         /* operations */
         // no duplicate!
@@ -116,11 +122,11 @@ namespace Libre {
         Chrono::Date check_date;
     } Transaction;
 /* Library helper functions */
+    /* might be deprecated */
     // find book for isbn or title or author
-    Book& find_book(const Library&, string);
+    // Book& find_book(const Library&, string);
     // find patron for name or card number 
-    LibPat::Patron& find_patron(const Library&, string name);
-    // might be deprecated
+    // LibPat::Patron& find_patron(const Library&, string name);
     LibPat::Patron& find_patron_by_card(const Library&, LibPat::T_card card);
 /* end of Library helper functions */
 
