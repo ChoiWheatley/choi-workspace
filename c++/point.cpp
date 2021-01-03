@@ -1,8 +1,4 @@
-#include <stdlib.h>
-#include <vector>
-#include <string>
-#include <iostream>
-
+#include "std_lib_facilities.h"
 using namespace std;
 
 struct Point {
@@ -17,9 +13,9 @@ Point prompt_point() {
     return *(new Point{x, y});
 }
 
-void print_point(vector<Point>& p) {
-    for (auto i : p) cout << "[" << i.x << ", " << i.y << "]\n";
-}
+ostream& operator<<(ostream& os, Point& p);
+ostream& operator<<(ostream& os, vector<Point>& p);
+
 
 int main(void) 
 {
@@ -27,7 +23,21 @@ int main(void)
     for (int i = 0; i < 7; i++) {
         original_points.push_back(prompt_point());
     }
-    print_point(original_points);
+    cout << original_points;
+
+    ofstream os{"mydata.txt"};
+    if (!os) error("cannot open file. please check if the file names isn't correct");
+    os << original_points;
+    
 
     return 0;
+}
+
+ostream& operator<<(ostream& os, Point& p) {
+    os << "[" << p.x << ", " << p.y << "]\n";
+    return os;
+}
+ostream& operator<<(ostream& os, vector<Point>& p) {
+    for (auto i : p) os << i;
+    return os;
 }
