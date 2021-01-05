@@ -5,7 +5,7 @@
  * 
  */
 
-#include "PPPUC++/std_lib_facilities.h"
+#include "std_lib_facilities.h"
 
 int sum_int(istream&);
 int mul_int(istream&);
