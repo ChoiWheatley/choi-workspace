@@ -4,27 +4,36 @@
  * a vector and then calculates the mean and median temperatures in your data set.
  * Call the program "temp_stats.cpp"
  * 
- * Thinking
- * - 
+ * << PPPUC++ Chapter10 Exercise4 >> add suffix 'c' and 'f' 
+ * Modify the store_temps.cpp program from exercise 2 to include a temperature suffix c for Celsius 
+ * or f for Fahrenheit temperatures. 
+ * Then modify the temp_stats.cpp program to test each temperature, 
+ * converting the Celsius readings to Fahrenheit before putting them into the vector.
  * 
  * Idea
  * ㅁ 메모리 통째로 파일에 옮겨넣을 수는 없는걸까? 
  */
 
-struct Reading{
-    int hour;
-    double temperature;
-};
-
-
 #include "std_lib_facilities.h"
 #include <unistd.h>
+
+struct Reading {
+    int hour;
+    double temperature;
+    char format;
+};
+constexpr char Celsius = 'c';
+constexpr char Fahrenheit = 'f';
 
 vector<Reading> get_readings(ifstream&);
 bool skip(ifstream&);
 double mean(vector<double>&);
 double median(vector<double>&);
 vector<double>& get_temperature(vector<Reading>&);
+void c_to_f(vector<Reading>& r);
+void f_to_c(vector<Reading>& r);
+inline double c_to_f(double c);
+inline double f_to_c(double f);
 istream& operator>> (istream& is, Reading& r);
 ostream& operator<< (ostream& os, vector<Reading>& r);
 ostream& operator<< (ostream& os, Reading& r);
@@ -35,11 +44,22 @@ int main(void) {
     if (!ifs) error("something wrong with opening the file");
     readings = get_readings(ifs);
     cout << readings;
+    f_to_c(readings);
+    cout << readings;
     cout << "mean : " << mean(get_temperature(readings)) << endl;
     cout << "median : " << median(get_temperature(readings)) << endl;
 
     return 0;
 }
+
+
+
+
+
+
+
+
+
 vector<Reading> get_readings(ifstream& ifs) {
     vector<Reading> ret;
 
@@ -49,7 +69,7 @@ vector<Reading> get_readings(ifstream& ifs) {
     for (Reading r; true; ) {
         ifs >> r;
         // DEBUG
-        //cout << "Debug : " << r << endl;
+        cout << "Debug : " << r << endl;
 
         if (ifs.eof()) {
             // you have to figure out how to get the last data when eof() hit
@@ -97,11 +117,50 @@ vector<double>& get_temperature(vector<Reading>& r) {
     }
     return temperatures;
 }
+void c_to_f(vector<Reading>& r) {
+    for (Reading& i : r) {
+        if (i.format == Celsius) {
+            i.format = Fahrenheit;
+            i.temperature = c_to_f(i.temperature);
+        }
+    }
+}
+void f_to_c(vector<Reading>& r) {
+    for (Reading& i : r) {
+        if (i.format == Fahrenheit) {
+            i.format = Celsius;
+            i.temperature = f_to_c(i.temperature);
+        }
+    }
+}
+// (1°C × 9/5) + 32 = 33.8°F
+inline double c_to_f(double c) {
+    return ((c * 9 / 5) + 32);
+}
+// (1°F − 32) × 5/9 = -17.22°C
+inline double f_to_c(double f) { 
+    return ((f - 32) * 5 / 9);
+}
+
+
+
+
+
+
+
+
+
+
 istream& operator>> (istream& is, Reading& r) {
     int hr;
     double temp;
-    is >> hr >> temp;
+    char fmt = 0;
+    is >> hr;
+    // get until suffix is found
+    for (; (is && fmt != Celsius && fmt != Fahrenheit); fmt = is.get());
+    is >> temp;
     r.hour = hr;
+    r.format = fmt;
     r.temperature = temp;
     return is;
 }
@@ -113,6 +172,6 @@ ostream& operator<< (ostream& os, vector<Reading>& r) {
     return os;
 }
 ostream& operator<< (ostream& os, Reading& r) {
-    os << r.hour << "\t:\t" << r.temperature;
+    os << r.hour << "\t:\t" << r.temperature << " (" << (r.format == Celsius ? "Celsius" : "Fahrenheit") << ")";
     return os;
 }
