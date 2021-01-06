@@ -17,10 +17,13 @@ int main() {
         double temp = random_double(3, -30, 100);
         of << hr << '\t' << temp << '\n';
     }
+    of << '\b';
     return 0;
 }
 double random_double(int dec, double min, double max) {
     return (
         (double)((long int)rand() %
-                 (long int)((max - min + 1) * pow(10,dec)) / pow(10,dec) + min));
+                     (long int)((max - min + 1) * pow(10, dec)) /
+                     pow(10, dec) +
+                 min));
 }
