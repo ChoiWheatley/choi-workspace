@@ -1,15 +1,15 @@
-1	No man is an island,
-2	Entire of itself,
-3	Every man is a piece of the continent,
-4	A part of the main.
-5	If a clod be washed away by the sea,
-6	Europe is the less.
-7	As well as if a promontory were.
-8	As well as if a manor of thy friend’s
-9	Or of thine own were:
-10	Any man’s death diminishes me,
-11	Because I am involved in mankind,
-12	And therefore never send to know for whom the bell tolls;
-13	It tolls for thee.
-14	
-15	No man is an island - John Donne 
+N mn s n slnd,
+Entr f tslf,
+Evry mn s  pc f th cntnnt,
+A prt f th mn.
+If  cld b wshd wy by th s,
+Erp s th lss.
+As wll s f  prmntry wr.
+As wll s f  mnr f thy frnd’s
+Or f thn wn wr:
+Any mn’s dth dmnshs m,
+Bcs I m nvlvd n mnknd,
+And thrfr nvr snd t knw fr whm th bll tlls;
+It tlls fr th.
+
+N mn s n slnd - Jhn Dnn 
