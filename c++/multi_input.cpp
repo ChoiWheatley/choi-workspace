@@ -29,10 +29,15 @@ enum class M_base {
     decimal,
     hexadecimal
 };
-vector<string> m_base {
+const vector<string> m_base {
     "octal",
     "decimal",
     "hexadecimal"
+};
+const vector<char> whitespace {
+    ' ',
+    '\t',
+    '\n'
 };
 
 struct M_input {
@@ -49,6 +54,8 @@ ostream& operator<<(ostream& os, const M_input& m);
 int longest_string(const vector<string>&);
 int longest_int(const vector<int>&);
 M_base base(const string&);
+istream& operator>>(istream& is, string& str);
+bool is_whitespace(char c);
 
 int main(void) 
 {
@@ -90,7 +97,10 @@ vector<string> input(istream& is) {
         is >> newnum;
         // is error handling
         if (is.eof()) break;                        // regard as we met Cmd_exit
-        else if (is.fail()) continue;               // skip to next string
+        else if (is.fail()) {
+            is.clear();
+            continue;               // skip to next string
+        }
         else if (is.bad()) throw ERRCODE::bad;      // we cannot handle this
         ret.push_back(newnum);
     }
@@ -150,4 +160,30 @@ M_base base(const string& s) {
         else return M_base::octal;
     }
     return M_base::decimal;
+}
+istream& operator>>(istream& is, string& str) {
+    // override : only read digit and 'x' character
+    // when other character was found, turn istream to failbit
+    for (char c; true; ) {
+        c = is.get();
+        // is error handling
+        if (is.fail()) return is;
+        if (is.bad()) return is;
+
+        // format error handling
+        if (is_whitespace(c)) break;
+        if (!isdigit(c) && c != 'x') {
+            is.clear(ios_base::failbit);
+            return is;
+        }
+        str.push_back(c);
+    }
+    // base format checking
+    return is;
+}
+bool is_whitespace(char c) {
+    for (auto i : whitespace) {
+        if (c == i) return true;
+    }
+    return false;
 }
