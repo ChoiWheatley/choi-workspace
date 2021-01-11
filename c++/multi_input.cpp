@@ -27,7 +27,8 @@ enum class ERRCODE {
 enum class M_base {
     octal,
     decimal,
-    hexadecimal
+    hexadecimal,
+    error
 };
 const vector<string> m_base {
     "octal",
@@ -39,6 +40,8 @@ const vector<char> whitespace {
     '\t',
     '\n'
 };
+const string octal_format = "01234567";
+const string hexadec_format = "0123456789abcdefABCDEF";
 
 struct M_input {
     vector<string> original;
@@ -56,11 +59,16 @@ int longest_int(const vector<int>&);
 M_base base(const string&);
 istream& operator>>(istream& is, string& str);
 bool is_whitespace(char c);
+bool is_octal(char c);
+bool is_hexadec(char c);
 
 int main(void) 
 {
     try{
-        cout << prompt() << '\n';
+        // cout << prompt() << '\n';
+        vector<string> original = input(* make_unique<ifstream>("sample_input.txt"));
+        vector<int> converted = output(original);
+        cout << M_input{original, converted};
     }
     catch(ERRCODE e) {
         switch(e) {
@@ -150,39 +158,90 @@ int longest_int(const vector<int>& v) {
     }
     return ret;
 }
+// we have to find out octal, decimal, and hexa forms
+// octal : 0 ~ 7
+// decimal : digit 
+// hexa : digit || 'a' ~ 'f' || 'A' ~ 'F'
 M_base base(const string& s) {
     istringstream istr{s};
+    M_base base_flag = M_base::error;
     char c = 0;
     c = istr.get();
+    // first one or two characters to find out suffix
     if (c == '0') {
         c = istr.get();
-        if (c == 'x') return M_base::hexadecimal;
-        else return M_base::octal;
+        if (c == 'x') base_flag = M_base::hexadecimal;
+        else {
+            base_flag = M_base::octal;
+            istr.putback(c);
+        }
+    } else if (isdigit(c)){
+        base_flag = M_base::decimal;
+        istr.putback(c);
+    } else return M_base::error;
+
+    // based on suffix, we have to find out other characters 
+    // satisfying own format
+    for (c = 0; istr && base_flag != M_base::error; ) {
+        c = istr.get();
+        if (istr.eof()) break;
+        switch (base_flag)
+        {
+        case M_base::decimal:
+            if (!isdigit(c))
+                base_flag = M_base::error;
+            break;
+        case M_base::octal:
+            if (!is_octal(c))
+                base_flag = M_base::error;
+            break;
+        case M_base::hexadecimal:
+            if (!is_hexadec(c))
+                base_flag = M_base::error;
+            break;
+        }
     }
-    return M_base::decimal;
+    return base_flag;
 }
+// we use 'base' function to do a format checking
 istream& operator>>(istream& is, string& str) {
     // override : only read digit and 'x' character
     // when other character was found, turn istream to failbit
     for (char c; true; ) {
         c = is.get();
-        // is error handling
         if (is.fail()) return is;
         if (is.bad()) return is;
 
-        // format error handling
+        // loop break point handling
         if (is_whitespace(c)) break;
-        if (!isdigit(c) && c != 'x') {
-            is.clear(ios_base::failbit);
-            return is;
-        }
         str.push_back(c);
     }
     // base format checking
+    switch(base(str)) {
+        case M_base::decimal:
+        case M_base::octal:
+        case M_base::hexadecimal:
+            break;
+        case M_base::error:
+            is.clear(ios_base::failbit);
+            break;
+    }
     return is;
 }
 bool is_whitespace(char c) {
     for (auto i : whitespace) {
+        if (c == i) return true;
+    }
+    return false;
+}
+bool is_octal(char c) {
+    for (char i : octal_format) {
+        if (c == i) return true;
+    }
+    return false;
+}
+bool is_hexadec(char c) {
+    for (char i : hexadec_format) {
         if (c == i) return true;
     }
     return false;
