@@ -9,7 +9,11 @@
  * 0123  octal       converts to     83  decimal
  *   65  decimal     converts to     65  decimal
  * 
+ * << second attempt 2021. 1. 11 >>>
+ * 1. M_input struct revision : int value and M_base base :: input time decision
+ * 2. It would be ease to print out from M_input
  * 
+ * <<< first attempt 2021. 1. 10 >>>
  * 1. string 으로 처묵 및 vector<string> 에 저장
  * 2. istringstream 으로 read 및 vector<int> 에 저장
  * 3. cout format print
@@ -40,35 +44,31 @@ const vector<char> whitespace {
     '\t',
     '\n'
 };
+struct M_input {
+    vector<int> value;
+    vector<M_base> base;
+};
 const string octal_format = "01234567";
 const string hexadec_format = "0123456789abcdefABCDEF";
-
-struct M_input {
-    vector<string> original;
-    vector<int> converted;
-};
-
 constexpr char Cmd_exit = '|';
 
 M_input prompt();
-vector<string> input(istream&);
-vector<int> output(const vector<string>&);
+M_input input(istream&);
 ostream& operator<<(ostream& os, const M_input& m);
-int longest_string(const vector<string>&);
 int longest_int(const vector<int>&);
 M_base base(const string&);
-istream& operator>>(istream& is, string& str);
+//istream& operator>>(istream& is, string& str);
 bool is_whitespace(char c);
 bool is_octal(char c);
 bool is_hexadec(char c);
+void to_ios_base(ostream&, M_base);
+int string_to_int(const string&);
 
 int main(void) 
 {
     try{
         // cout << prompt() << '\n';
-        vector<string> original = input(* make_unique<ifstream>("sample_input.txt"));
-        vector<int> converted = output(original);
-        cout << M_input{original, converted};
+        cout << input(* make_unique<ifstream>("sample_input.txt")) << '\n';
     }
     catch(ERRCODE e) {
         switch(e) {
@@ -86,42 +86,37 @@ int main(void)
 
 M_input prompt() {
     cout << "Please input several numbers including base suffices.\nthe exit command is '|'.\n>>>";
-    vector<string>  original  = input(cin);
-    vector<int>     converted = output(original);
-    return M_input{original, converted};
+    return M_input{input(cin)};
 }
-vector<string> input(istream& is) {
-    vector<string> ret;
-    for (char terminator; true; ) {
-        is >> terminator;
+// try to find out whether a word is correct format for dec, oct, hex
+M_input input(istream& is) {
+    M_input ret;
+    for (char c; true; ) {
+        c = is.get();
         // is error handling
-        if (is.good() && terminator == Cmd_exit) break;
-        else if (is.eof()) break;                   // regard as we met Cmd_exit
-        else if (is.fail()) throw ERRCODE::fail;    // we mustn't fail while we got one character
-        else if (is.bad()) throw ERRCODE::bad;      // we cannot handle this problem
+        if (is.good() && c == Cmd_exit) break;
+        else if (is.eof()) { // assume eof() is also a exit command 
+            break;
+        } 
+        else if (is.fail()) throw ERRCODE::fail;
+        else if (is.bad()) throw ERRCODE::bad;
 
         is.unget();
         string newnum;
         is >> newnum;
         // is error handling
-        if (is.eof()) break;                        // regard as we met Cmd_exit
-        else if (is.fail()) {
+        if (is.eof()) break;
+        else if (is.fail()) { // skip to next number
             is.clear();
-            continue;               // skip to next string
+            continue;
         }
-        else if (is.bad()) throw ERRCODE::bad;      // we cannot handle this
-        ret.push_back(newnum);
-    }
-    return ret;
-}
-vector<int> output(const vector<string>& origin) {
-    vector<int> ret;
-    for (auto i : origin) {
-        istringstream istr{i};
-        istr.unsetf(ios::dec | ios::hex | ios::oct);
-        int newnum = 0;
-        istr >> newnum;
-        ret.push_back(newnum);
+        else if (is.bad()) throw ERRCODE::bad;
+
+        // newnum format checking and newnum error handling
+        if (base(newnum) == M_base::error) continue;    //skip to next number
+        if (ret.base.size() != ret.value.size()) error ("fatal error : base and value index mismatch");
+        ret.base.push_back(base(newnum));
+        ret.value.push_back(string_to_int(newnum));
     }
     return ret;
 }
@@ -132,31 +127,18 @@ ostream& operator<<(ostream& os, const M_input& m) {
  * 0123  octal       converts to     83  decimal
  *   65  decimal     converts to     65  decimal
  */
-    int longest_origin = 0, longest_converted = 0;
-    longest_origin = longest_string(m.original);
-    longest_converted = longest_int(m.converted);
-    for (int i = 0; i < m.original.size(); i++) {
-        os << setw(longest_origin + 3) << right << m.original[i]  << " " <<
-                setw(string("hexadecimal").size() + 3) << left << m_base[static_cast<int>(base(m.original[i]))] <<  " " << 
+    int longest_value = 0;
+    longest_value = longest_int(m.value);
+    for (int i = 0; i < m.value.size(); i++) {
+        to_ios_base(os, m.base[i]);
+        os.setf(ios_base::showbase);
+        os << setw(longest_value + 3) << right <<  m.value[i] << ' ' << 
+                setw(string("hexadecimal").size() + 3) << left << m_base[static_cast<int>(m.base[i])] << ' ' <<
                 "converts to\t" << 
-                setw(longest_converted + 3) << m.converted[i] << " " <<
+                setw(longest_value + 3) << right << noshowbase << dec << m.value[i] << ' ' << 
                 "decimal\n";
     }
     return os;
-}
-int longest_string(const vector<string>& v) {
-    int ret = 0;
-    for (auto i : v) {
-        if (ret < i.size()) ret = i.size();
-    }
-    return ret;
-}
-int longest_int(const vector<int>& v) {
-    int ret = 0;
-    for (auto i : v) {
-        if (ret < to_string(i).size()) ret = to_string(i).size();
-    }
-    return ret;
 }
 // we have to find out octal, decimal, and hexa forms
 // octal : 0 ~ 7
@@ -203,30 +185,12 @@ M_base base(const string& s) {
     }
     return base_flag;
 }
-// we use 'base' function to do a format checking
-istream& operator>>(istream& is, string& str) {
-    // override : only read digit and 'x' character
-    // when other character was found, turn istream to failbit
-    for (char c; true; ) {
-        c = is.get();
-        if (is.fail()) return is;
-        if (is.bad()) return is;
-
-        // loop break point handling
-        if (is_whitespace(c)) break;
-        str.push_back(c);
+int longest_int(const vector<int>& v) {
+    int ret = 0;
+    for (auto i : v) {
+        if (ret < to_string(i).size()) ret = to_string(i).size();
     }
-    // base format checking
-    switch(base(str)) {
-        case M_base::decimal:
-        case M_base::octal:
-        case M_base::hexadecimal:
-            break;
-        case M_base::error:
-            is.clear(ios_base::failbit);
-            break;
-    }
-    return is;
+    return ret;
 }
 bool is_whitespace(char c) {
     for (auto i : whitespace) {
@@ -245,4 +209,26 @@ bool is_hexadec(char c) {
         if (c == i) return true;
     }
     return false;
+}
+void to_ios_base(ostream& os, M_base m) {
+    switch(m) {
+        case M_base::decimal:
+            os.setf(ios_base::dec, ios_base::basefield);
+            break;
+        case M_base::octal:
+            os.setf(ios_base::oct, ios_base::basefield);
+            break;
+        case M_base::hexadecimal:
+            os.setf(ios_base::hex, ios_base::basefield);
+            break;
+        default:
+            error("serious problem occured converting M_base into ios_base");
+    }
+}
+int string_to_int(const string& str) {
+    istringstream istr{str};
+    istr.unsetf(ios_base::dec | ios_base::oct | ios_base::hex);
+    int ret;
+    istr >> ret;
+    return ret; 
 }
