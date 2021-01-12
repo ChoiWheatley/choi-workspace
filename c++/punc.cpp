@@ -39,12 +39,13 @@ namespace PUNC {
 int main() 
 {
     ifstream ifs{"sample.txt"};
+    ofstream ofs{"output.txt"};
     if(!ifs) error("error while opening this file");
     PUNC::Puncstream ps{ifs, ".;?,-'"};
     for (string str; ps >> str; ) {
         static int cnt = 1;
-        if ((cnt++ %10) == 0) cout << '\n';
-        cout << str << '\t';
+        if ((cnt++ %10) == 0) ofs << '\n';
+        ofs << str << '\t';
     }
     return 0;
 }
