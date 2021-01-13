@@ -1,4 +1,14 @@
 /*
+ * <PPPUC++> Chapter11 Exercise7
+ * Replace don't ==> do not
+ * Replace can't ==> cannot
+ * 
+ * << First Attempt 2021. 01. 13. >>
+ * - I'll use static string during punctuation checking     NOPE
+ *      I just used std::string::find() and std::string::replace() function. EZ
+ * - Finally solved how to recover from src_.eof() problem. I used a simple flag which
+ *      turns off when src_ met eof
+ * 
  * <PPPUC++> Chapter11 Exercise6 
  * Write a program that replaces punctuation with whitespace. 
  * Consider . (dot), ; (semicolon), , (comma), ? (question mark), - (dash), ' (single quote) punctuation characters. 
@@ -58,8 +68,8 @@ int main()
     for (string str; ps >> str; )
     {
         static int cnt = 0;
-        ofs << str << '\t';
-        if ((++cnt %20) == 0) ofs << '\n';
+        ofs << setw(15) << str;
+        if ((++cnt %10) == 0) ofs << '\n';
     }
     return 0;
 }
@@ -75,11 +85,20 @@ namespace Punc
     // from src_, we convert defined whitespace into buffer each line,
     // and we do buffer >> str until buffer is nothing left.
     Puncstream &Puncstream::operator>>(string& str) {
+        static bool eof_flag = true;
         while (!(buffer_ >> str)) {
             if (buffer_.bad() || !src_.good()) return *this;
             buffer_.clear();
             string line;
             getline(src_, line);
+            if (src_.eof() && eof_flag) {
+                src_.clear();
+                eof_flag = false;
+            }
+            if (line.find("don't") != string::npos) line.replace(line.find("don't"), 5, "do not");
+            if (line.find("Don't") != string::npos) line.replace(line.find("Don't"), 5, "do not");
+            if (line.find("can't") != string::npos) line.replace(line.find("can't"), 5, "cannot");
+            if (line.find("Can't") != string::npos) line.replace(line.find("Can't"), 5, "Cannot");
             // punctuation into whitespace 
             for (char& c : line) {
                 if (is_punctuation(c)) c = ' ';
