@@ -35,7 +35,7 @@ namespace Punc
     public:
         Puncstream(istream &is, bool case_sensitive = false, string punctuation = ".,;!?|~'-") : src_{is}, punctuation_{punctuation}, case_sensitive_{case_sensitive} {}
         bool is_case_sensitive() const { return case_sensitive_; }
-        operator bool() {return !(src_.eof() || src_.bad() || buffer_.bad());}
+        operator bool() {return !(src_.bad() || buffer_.bad() || (src_.eof() && buffer_.eof()));}
         bool is_punctuation(char) const;
         istringstream& get_buffer() {return buffer_;}
         // from src_, we convert defined whitespace into buffer each line,
