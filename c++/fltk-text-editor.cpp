@@ -25,7 +25,7 @@
 
 int main(int argc, char **argv) {
     textbuf = new Fl_Text_Buffer;
-    EditorWindow* window = newview();
+    Fl_Window* window = newview();
     window->show(1, argv);
     if (argc > 1) load_file(argv[1], -1);
     return Fl::run();
@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
 EditorWindow* newview() {
     static EditorWindow ret(640, 400);
     static Fl_Menu_Bar m(0, 0, 640, 30);
-    m.copy(menuitems);
+    m.copy(menuitems, (void*)&ret);
     // So that we can keep track of changes to the file, 
     // we also want to add a "modify" callback
     textbuf->add_modify_callback(changed_cb, &ret);
@@ -51,6 +51,8 @@ EditorWindow* newview() {
     ret.resizable();
 
     strcpy(ret.search, "sample");
+
+    editorwindow = &ret;
 
     return &ret;
 }
@@ -146,6 +148,7 @@ void quit_cb(Fl_Widget *, void *) {
 void cut_cb(Fl_Widget *, void * v) {
     // DEBUG
     std::cout << "DBG : cut_cb() function called\n";
+    std::cout << "DBG : v = " << std::hex << v << '\n';
     EditorWindow *e = (EditorWindow *)v;
     Fl_Text_Editor::kf_cut(0, e->editor);
 }
@@ -159,7 +162,7 @@ void cut_cb(Fl_Widget *, void * v) {
 void copy_cb(Fl_Widget *, void * v) {
     // DEBUG
     std::cout << "DBG : copy_cb() function called\n";
-    EditorWindow * e = (EditorWindow *)v;
+    EditorWindow* e = (EditorWindow*)v;
     Fl_Text_Editor::kf_copy(0, e->editor);
 }
 // This callback function will call

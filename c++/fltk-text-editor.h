@@ -35,9 +35,11 @@ int             changed = 0;
 int             loading = 0;
 char            filename[256] = "";
 Fl_Text_Buffer  *textbuf;
+EditorWindow    *editorwindow;
 
 // Global functions
 EditorWindow* newview();
+Fl_Callback *master_cb(Fl_Widget *, void *);
 void new_cb(Fl_Widget *, void *);
 void open_cb(Fl_Widget *, void *);
 //void insert_cb(Fl_Widget *, void *);
@@ -70,7 +72,7 @@ void save_file(char *newfile);
 // to perform. we will define the callback functions(new_cb, ...) later 
 // Once we have the menus defined we can create the Fl_Menu_Bar widget and assign the menus to it with:
 //      Fl_Menu_Bar *m = new Fl_Menu_bar(0, 0, 640, 30);
-//      m->copy(menuitems);
+//      m->copy(menuitems, (void*)userdata);
 Fl_Menu_Item menuitems[] = {
     { "&File",              0, 0, 0, FL_SUBMENU },
         { "&New File",          0, (Fl_Callback *)new_cb },
