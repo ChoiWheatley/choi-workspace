@@ -21,46 +21,49 @@
  * 
  */
 #include "fltk-text-editor.h"
+#include <iostream>
 
 int main(int argc, char **argv) {
     textbuf = new Fl_Text_Buffer;
-    Fl_Window* window = newview();
-    Fl_Menu_Bar *m = new Fl_Menu_Bar(0, 0, 640, 30);
-    m->copy(menuitems);
+    EditorWindow* window = newview();
     window->show(1, argv);
     if (argc > 1) load_file(argv[1], -1);
     return Fl::run();
 }
 
 EditorWindow* newview() {
-    return new EditorWindow(640, 400, "Untitled");
+    static EditorWindow ret(640, 400);
+    static Fl_Menu_Bar m(0, 0, 640, 30);
+    m.copy(menuitems);
+    // So that we can keep track of changes to the file, 
+    // we also want to add a "modify" callback
+    textbuf->add_modify_callback(changed_cb, &ret);
+    textbuf->call_modify_callbacks();
+    // To keep things simple our text editor will use the
+    //          Fl_Text_Editor
+    // widget to edit the text
+    ret.editor = new Fl_Text_Editor(0, 30, 640, 370);
+    ret.editor->buffer(textbuf);
+    ret.editor->textfont(FL_COURIER);
+
+    ret.add(m);
+    ret.add(ret.editor);
+    ret.resizable();
+
+    strcpy(ret.search, "sample");
+
+    return &ret;
 }
 EditorWindow::EditorWindow(int w_, int h_, const char * title_) : 
     Fl_Double_Window(w_, h_, title_)
 {
     replace_dlg = new Fl_Window(300, 105, "Replace");
-    replace_dlg->callback(replace_cb);
     replace_find = new Fl_Input(70, 10, 200, 25, "Find:");
     replace_with = new Fl_Input(70, 40, 200, 25, "Replace:");
     replace_all = new Fl_Button(10, 70, 90, 25, "Replace All");
-    replace_all->callback(replall_cb);
     replace_next = new Fl_Return_Button(105, 70, 120, 25, "Replace Next");
-    replace_next->callback(replace2_cb);
     replace_cancel = new Fl_Button(230, 70, 60, 25, "Cancel");
-    replace_cancel->callback(replcan_cb);
-    // To keep things simple our text editor will use the 
-    //          Fl_Text_Editor 
-    // widget to edit the text
-    editor = new Fl_Text_Editor(0, 30, 640, 370);
-    editor->buffer(textbuf);
-    // So that we can keep track of changes to the file, 
-    // we also want to add a "modify" callback
-    textbuf->add_modify_callback(changed_cb, this);
-    textbuf->call_modify_callbacks();
-    // Finally, we want to use a mono-spaced font like 
-    //          FL_COURIER
-    editor->textfont(FL_COURIER);
-
+    strcpy(filename, title_);
 }
 EditorWindow::~EditorWindow() {
     delete replace_dlg;
@@ -141,6 +144,8 @@ void quit_cb(Fl_Widget *, void *) {
 //          Fl_Text_Editor::kf_cut() 
 // to cut the currently selected text to the clipboard
 void cut_cb(Fl_Widget *, void * v) {
+    // DEBUG
+    std::cout << "DBG : cut_cb() function called\n";
     EditorWindow *e = (EditorWindow *)v;
     Fl_Text_Editor::kf_cut(0, e->editor);
 }
@@ -152,6 +157,8 @@ void cut_cb(Fl_Widget *, void * v) {
 //      text or the current character in the current buffer of 
 //      editor 'e'
 void copy_cb(Fl_Widget *, void * v) {
+    // DEBUG
+    std::cout << "DBG : copy_cb() function called\n";
     EditorWindow * e = (EditorWindow *)v;
     Fl_Text_Editor::kf_copy(0, e->editor);
 }
@@ -176,12 +183,13 @@ void delete_cb(Fl_Widget *, void *) {
 // function to find the string 
 void find_cb(Fl_Widget * w, void * v) {
     EditorWindow *e = (EditorWindow *) v;
-    const char * val;
-
-    val = fl_input("Search String:", e->search);
+    const char * val = fl_input("Search String:");
     if (val != NULL) {
         // User entered a string -- go and find it!
         strcpy(e->search, val);
+        // DEBUG
+        std::cout << "DBG : function \'find_cb()\' entered\n";
+        std::cout << "\tsearch= " << e->search << '\n';
         find2_cb(w, v);
     }
 }
@@ -297,17 +305,19 @@ int check_save(void) {
     }
     return (r == 2) ? 1 : 0;
 }
-// This function checks the changed variable and updates the window label accordingly
+// This function checks the $(changed) variable and updates the window label accordingly
 void set_title(EditorWindow* w) {
+    static char title[256] = "Hello World";
     if (filename[0] == '\0') strcpy(title, "Untitled");
     else {
         char *slash;
         slash = strrchr(filename, '/');
-#ifdef WIN32
+    #ifdef WIN32
         if (slash == NULL) slash = strrchr(filename, '\\');
-#endif
-        if (slash != NULL) strcpy(title, slash + 1);
+    #endif
+        if (slash != NULL) strcpy(title, slash+1);
         else strcpy(title, filename);
+
     }
     if (changed) strcat(title, " (modified)");
 

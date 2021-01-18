@@ -11,12 +11,12 @@
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/fl_ask.H>
 #include <FL/Fl_File_Chooser.H>
-#include <cstring>
+#include <string.h>
 #include <errno.h>
 
 class EditorWindow : public Fl_Double_Window {
     public:
-        EditorWindow(int w, int h, const char* t);
+        EditorWindow(int w, int h, const char* t = "Untitled");
         ~EditorWindow();
 
         Fl_Window           *replace_dlg;
@@ -34,7 +34,6 @@ class EditorWindow : public Fl_Double_Window {
 int             changed = 0;
 int             loading = 0;
 char            filename[256] = "";
-char*           title;
 Fl_Text_Buffer  *textbuf;
 
 // Global functions
@@ -94,9 +93,9 @@ Fl_Menu_Item menuitems[] = {
 
     { "&Search", 0, 0, 0, FL_SUBMENU },
         { "&Find...",           FL_COMMAND + 'f', (Fl_Callback *)find_cb },
-        { "F&ind Again",        FL_COMMAND + 'g', find2_cb },
-        { "&Replace...",        FL_COMMAND + 'r', replace_cb },
-        { "Re&place Again",     FL_COMMAND + 't', replace2_cb },
+        { "F&ind Again",        FL_COMMAND + 'g', (Fl_Callback *)find2_cb },
+        { "&Replace...",        FL_COMMAND + 'r', (Fl_Callback *)replace_cb },
+        { "Re&place Again",     FL_COMMAND + 't', (Fl_Callback *)replace2_cb },
         { 0 },
     
     { 0 },
