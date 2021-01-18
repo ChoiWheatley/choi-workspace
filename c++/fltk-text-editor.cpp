@@ -63,8 +63,11 @@ EditorWindow::EditorWindow(int w_, int h_, const char * title_) :
     replace_find = new Fl_Input(70, 10, 200, 25, "Find:");
     replace_with = new Fl_Input(70, 40, 200, 25, "Replace:");
     replace_all = new Fl_Button(10, 70, 90, 25, "Replace All");
+    replace_all->callback(replall_cb,(void*)this);
     replace_next = new Fl_Return_Button(105, 70, 120, 25, "Replace Next");
+    replace_next->callback(replace2_cb,(void*)this);
     replace_cancel = new Fl_Button(230, 70, 60, 25, "Cancel");
+    replace_cancel->callback(replcan_cb,(void*)this);
     strcpy(filename, title_);
 }
 EditorWindow::~EditorWindow() {
@@ -291,6 +294,8 @@ void replall_cb(Fl_Widget *, void* v) {
 }
 // This callback just hides the replace dialog
 void replcan_cb(Fl_Widget *, void* v) {
+    // DBG
+    std::cout << "DBG : replcan_cb() function called\n";
     EditorWindow * e = (EditorWindow *)v;
     e->replace_dlg->hide();
 }
