@@ -41,21 +41,21 @@ void NewDraw::draw() {
     // pop clip back
     // so you can draw outside
     //fl_pop_clip();
-    fl_draw_box(FL_UP_BOX, 1, 201, 99, 99, fl_rgb_color(0xab));
+    fl_draw_box(FL_UP_BOX, 1, 201, 99, 99, FL_BLUE);
 
     //colorpaletes 
     constexpr int startx = 101;
     constexpr int starty = 1;
     constexpr int side = 10;
-    for (int i = 0; i < 64; i++) {
+    Fl_Color c = 0;
+    for (int i = 0; i < 32; i++) {
         for (int j = 0; j < 8; j++) {
-            static Fl_Color c =  fl_color_cube(0, 0, 0);
             fl_draw_box(Fl_Boxtype::FL_THIN_UP_BOX,
                         startx + (j * side),
                         starty + (i * side), 
                         side,
                         side,
-                        fl_rgb_color(c++)
+                        c++ 
             );
         }
     }
