@@ -8,6 +8,14 @@
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Box.H>
 #include <FL/Enumerations.H>
+#include <FL/Fl_Color_Chooser.H>
+#include <FL/fl_show_colormap.H>
+#include <iostream>
+
+uchar rr = 0xff;
+uchar gg = 0xff;
+uchar bb = 0xff;
+void colorCB(Fl_Widget *w, void *v);
 
 class NewDraw : public Fl_Widget {
     public:
@@ -18,6 +26,8 @@ class NewDraw : public Fl_Widget {
 
 int main(int argc, const char ** argv) {
     Fl_Window win(1000, 800, "Draw everything");
+    Fl_Button col_btn(301, 1, 100, 100, "Choose Color!");
+    col_btn.callback(colorCB, &win);
     NewDraw d{0, 0, 1000, 800};
     d.draw();
     win.show();
@@ -59,4 +69,17 @@ void NewDraw::draw() {
             );
         }
     }
+}
+
+void colorCB(Fl_Widget *w, void *v) {
+    // DEBUG
+    std::cout << "DBG : colorCB entered!\n";
+    std::cout << "DBG : rr = " << std::hex << (int)rr << '\n';
+    std::cout << "DBG : gg = " << std::hex << (int)gg << '\n';
+    std::cout << "DBG : bb = " << std::hex << (int)bb << '\n';
+    Fl_Window * e = (Fl_Window *) v;
+    fl_color_chooser("Select a color!", rr, gg, bb, 2);
+    w->color(fl_rgb_color(rr, gg, bb));
+    e->color(fl_rgb_color(rr, gg, bb));
+    e->redraw();
 }
