@@ -62,6 +62,7 @@
 mono_crash.*
 
 # Build results
+c++/windows-fltk/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
@@ -139,6 +140,7 @@ _Chutzpah*
 
 # Visual C++ cache files
 ipch/
+c++/windows-fltk/.vs/windows-fltk/v16
 *.aps
 *.ncb
 *.opendb
