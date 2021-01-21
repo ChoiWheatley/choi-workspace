@@ -140,7 +140,7 @@ _Chutzpah*
 
 # Visual C++ cache files
 ipch/
-c++/windows-fltk/.vs/windows-fltk/v16
+c++/windows-fltk/.vs/windows-fltk/v16/
 *.aps
 *.ncb
 *.opendb
