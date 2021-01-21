@@ -1,0 +1,12 @@
+﻿  fl-drawing.cpp
+fl-drawing.obj : error LNK2019: "public: static int __cdecl Fl::wait(void)" (?wait@Fl@@SAHXZ)_main 함수에서 참조되는 확인할 수 없는 외부 기호
+fl-drawing.obj : error LNK2001: 확인할 수 없는 외부 기호 "protected: virtual void __thiscall Fl_Window::flush(void)" (?flush@Fl_Window@@MAEXXZ)
+fl-drawing.obj : error LNK2019: "public: __thiscall Fl_Window::Fl_Window(int,int,char const *)" (??0Fl_Window@@QAE@HHPBD@Z)"public: __thiscall MyWindow::MyWindow(int,int,char const *)" (??0MyWindow@@QAE@HHPBD@Z) 함수에서 참조되는 확인할 수 없는 외부 기호
+fl-drawing.obj : error LNK2019: "public: virtual __thiscall Fl_Window::~Fl_Window(void)" (??1Fl_Window@@UAE@XZ)"public: virtual __thiscall MyWindow::~MyWindow(void)" (??1MyWindow@@UAE@XZ) 함수에서 참조되는 확인할 수 없는 외부 기호
+fl-drawing.obj : error LNK2001: 확인할 수 없는 외부 기호 "public: virtual int __thiscall Fl_Window::handle(int)" (?handle@Fl_Window@@UAEHH@Z)
+fl-drawing.obj : error LNK2001: 확인할 수 없는 외부 기호 "public: virtual void __thiscall Fl_Window::resize(int,int,int,int)" (?resize@Fl_Window@@UAEXHHHH@Z)
+fl-drawing.obj : error LNK2001: 확인할 수 없는 외부 기호 "public: virtual void __thiscall Fl_Window::show(void)" (?show@Fl_Window@@UAEXXZ)
+fl-drawing.obj : error LNK2001: 확인할 수 없는 외부 기호 "public: virtual void __thiscall Fl_Window::hide(void)" (?hide@Fl_Window@@UAEXXZ)
+fl-drawing.obj : error LNK2001: 확인할 수 없는 외부 기호 "class Fl_Graphics_Driver * fl_graphics_driver" (?fl_graphics_driver@@3PAVFl_Graphics_Driver@@A)
+MSVCRTD.lib(exe_winmain.obj) : error LNK2019: _WinMain@16"int __cdecl invoke_main(void)" (?invoke_main@@YAHXZ) 함수에서 참조되는 확인할 수 없는 외부 기호
+C:\Users\chltm\source\repos\ChoiWheatley\choi-workspace\c++\windows-fltk\Debug\windows-fltk.exe : fatal error LNK1120: 10개의 확인할 수 없는 외부 참조입니다.
