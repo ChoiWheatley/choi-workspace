@@ -33,6 +33,26 @@ public:
 private:
 };
 
+struct Point {
+	double x;
+	double y;
+};
+
+Point points[] = {
+	{100, 200},
+	{250, 200},
+	{300, 300},
+	{250, 400},
+	{100, 400},
+	{50 , 300},
+};
+
+Point gaps[] = {
+	{175, 250},
+	{195, 320},
+	{165, 320},
+};
+
 int main(int argc, char** argv)
 {
 	MyWindow* win = new MyWindow(640, 480, "My Window");
@@ -44,25 +64,33 @@ int main(int argc, char** argv)
 void MyWindow::draw()
 {
 	Fl_Window::draw();
-	fl_draw_box(Fl_Boxtype::FL_UP_BOX, 1, 1, 99, 99, FL_BLUE);
-	fl_frame("AAXX", 1, 101, 99, 99);
-	fl_rectf(1, 201, 99, 99, FL_RED);
-	fl_rect(1, 301, 99, 99, FL_DARK_MAGENTA);
-	fl_line(1, 405, 100, 405);
-	fl_line(1, 410, 100, 410, 50, 360);
+	// Draw Complex Shapes
+	fl_begin_line();
+	// The reason why I couldn't draw any lines was not calling 
+	// both fl_begin_line() and fl_end_line() functions.
+	fl_color(FL_RED);
+	fl_line_style(FL_DOT, 10);
+	fl_line(1, 1, 100, 100);
+	fl_line(5, 1, 105, 100);
+	fl_line(10, 1, 110, 100);
+	fl_line(30, 1, 130, 100);
+	fl_line_style(0);
+	fl_end_line();
 
-	fl_color(FL_BLACK);
-	fl_line_style(FL_CAP_FLAT | FL_DOT, 10);
-	fl_loop(105, 1, 195, 1, 150, 50);
-	fl_color(FL_MAGENTA);
-	fl_line_style(FL_CAP_FLAT | FL_DOT, 10);
-	fl_polygon(105, 60, 195, 60, 150, 150);
-	fl_color(0xa1dffb);
-	fl_xyline(105, 160, 195);
-	fl_xyline(105, 170, 195, 180);
-	fl_xyline(105, 190, 195, 280, 150);
-	fl_color(0xc33124);
-	fl_pie(105, 300, 100, 100, 0, 100);
+	fl_color(FL_BLUE);
+	// start and end drawing a complex filled polygon.
+	// This polygon may be concave, may have holes in it, 
+	// or may be several disconnected pieces.
+	fl_begin_complex_polygon();
+	for (const Point& i : points) {
+		fl_vertex(i.x, i.y);
+	}
+	// Call fl_gap() to separate loops of the path.
+	fl_gap();
+	for (const Point& i : gaps) {
+		fl_vertex(i.x, i.y);
+	}
+	fl_end_complex_polygon();
 }
 
 

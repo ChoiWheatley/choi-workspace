@@ -1,7 +1,14 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\.git",
+    "\\.vscode",
+    "\\c++",
+    "\\c++\\windows-fltk",
+    "\\c++\\windows-fltk\\.vs\\windows-fltk",
+    "\\로컬 설정(.vs)",
+    "\\로컬 설정(.vs)\\choi-workspace"
   ],
-  "SelectedNode": "\\windows-fltk.sln",
+  "SelectedNode": "\\c++\\windows-fltk\\.vs",
   "PreviewInSolutionExplorer": false
 }
