@@ -46,10 +46,23 @@ void MyWindow::draw()
 	Fl_Window::draw();
 	fl_draw_box(Fl_Boxtype::FL_UP_BOX, 1, 1, 99, 99, FL_BLUE);
 	fl_frame("AAXX", 1, 101, 99, 99);
-	fl_line_style(FL_CAP_FLAT | FL_DASHDOTDOT, 10);
-
 	fl_rectf(1, 201, 99, 99, FL_RED);
-	fl_line_style(0);
+	fl_rect(1, 301, 99, 99, FL_DARK_MAGENTA);
+	fl_line(1, 405, 100, 405);
+	fl_line(1, 410, 100, 410, 50, 360);
+
+	fl_color(FL_BLACK);
+	fl_line_style(FL_CAP_FLAT | FL_DOT, 10);
+	fl_loop(105, 1, 195, 1, 150, 50);
+	fl_color(FL_MAGENTA);
+	fl_line_style(FL_CAP_FLAT | FL_DOT, 10);
+	fl_polygon(105, 60, 195, 60, 150, 150);
+	fl_color(0xa1dffb);
+	fl_xyline(105, 160, 195);
+	fl_xyline(105, 170, 195, 180);
+	fl_xyline(105, 190, 195, 280, 150);
+	fl_color(0xc33124);
+	fl_pie(105, 300, 100, 100, 0, 100);
 }
 
 

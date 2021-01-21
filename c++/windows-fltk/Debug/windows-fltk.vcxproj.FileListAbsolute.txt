@@ -1,0 +1,2 @@
+C:\Users\chltm\Source\Repos\ChoiWheatley\choi-workspace\c++\windows-fltk\Debug\windows-fltk.exe
+C:\Users\chltm\Source\Repos\ChoiWheatley\choi-workspace\c++\windows-fltk\Debug\windows-fltk.pdb

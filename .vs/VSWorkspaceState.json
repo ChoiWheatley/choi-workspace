@@ -1,9 +1,7 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\c++",
-    "\\c++\\windows-fltk"
+    ""
   ],
-  "SelectedNode": "\\c++\\windows-fltk\\fl-drawing.cpp",
+  "SelectedNode": "\\windows-fltk.sln",
   "PreviewInSolutionExplorer": false
 }
