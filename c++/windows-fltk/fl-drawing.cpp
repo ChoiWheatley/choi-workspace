@@ -65,32 +65,8 @@ void MyWindow::draw()
 {
 	Fl_Window::draw();
 	// Draw Complex Shapes
-	fl_begin_line();
-	// The reason why I couldn't draw any lines was not calling 
-	// both fl_begin_line() and fl_end_line() functions.
-	fl_color(FL_RED);
-	fl_line_style(FL_DOT, 10);
-	fl_line(1, 1, 100, 100);
-	fl_line(5, 1, 105, 100);
-	fl_line(10, 1, 110, 100);
-	fl_line(30, 1, 130, 100);
-	fl_line_style(0);
-	fl_end_line();
 
-	fl_color(FL_BLUE);
-	// start and end drawing a complex filled polygon.
-	// This polygon may be concave, may have holes in it, 
-	// or may be several disconnected pieces.
-	fl_begin_complex_polygon();
-	for (const Point& i : points) {
-		fl_vertex(i.x, i.y);
-	}
-	// Call fl_gap() to separate loops of the path.
-	fl_gap();
-	for (const Point& i : gaps) {
-		fl_vertex(i.x, i.y);
-	}
-	fl_end_complex_polygon();
+	
 }
 
 
