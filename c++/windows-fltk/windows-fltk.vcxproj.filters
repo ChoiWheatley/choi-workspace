@@ -18,6 +18,9 @@
     <ClInclude Include="std_lib_facilities.h">
       <Filter>소스 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Axis.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="sampletext.txt">
@@ -27,6 +30,9 @@
   <ItemGroup>
     <ClCompile Include="fl-drawing.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Axis.cpp">
+      <Filter>헤더 파일</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
