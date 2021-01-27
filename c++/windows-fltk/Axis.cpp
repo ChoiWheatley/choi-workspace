@@ -21,9 +21,9 @@ void Axis::draw() {
 		fl_line(x, y, x, y + width_);
 		fl_line(x, y + width_, x + length_, y + width_);
 		fl_line(x + length_, y + width_, x + length_, y);
+		int sum = 0;
+		int len = length_;
 		for (int i = 0; i < notches_; i++) {
-			static int sum = 0; 
-			static int len = length_;
 			sum += static_cast<int>(len / (notches_ - i));
 			len = length_ - sum;
 			fl_line(x + sum, y + width_, x + sum, y);
@@ -36,9 +36,9 @@ void Axis::draw() {
 		fl_line(x, y, x + width_, y);
 		fl_line(x, y, x, y + length_);
 		fl_line(x, y + length_, x + width_, y + length_);
+		int sum = 0;
+		int len = length_;
 		for (int i = 0; i < notches_; i++) {
-			static int sum = 0;
-			static int len = length_;
 			sum += static_cast<int>(len / (notches_ - i));
 			len = length_ - sum;
 			fl_line(x, y + sum, x + width_, y + sum);
@@ -47,4 +47,5 @@ void Axis::draw() {
 		break;
 	}
 	}
+	fl_color(0);
 }

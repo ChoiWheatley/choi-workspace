@@ -22,8 +22,8 @@ void Function::draw() {
 	// 3. scale sine wave
 	fl_color(color_);
 	fl_line_style(line_style_, line_width_);
+	double x = 0, y = ((*funcptr_)(0)), dx = 0, dy = ((*funcptr_)(0));
 	for (int i = 0; i < accuracy_; i++) {
-		static double x = 0, y = ((*funcptr_)(0)), dx = 0, dy = ((*funcptr_)(0));
 		dx = (x + ((double)range_max_ - (double)range_min_ + i) / (double)accuracy_);
 		dy = ((*funcptr_)(dx));
 		fl_line(offset(x, pnt_x_, scale_x_),
@@ -42,4 +42,6 @@ void Function::draw() {
 		x = dx;
 		y = dy;
 	}
+	fl_color(0);
+	fl_line_style(0);
 }
