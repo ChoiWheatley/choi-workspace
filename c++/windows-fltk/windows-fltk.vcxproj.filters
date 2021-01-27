@@ -21,6 +21,9 @@
     <ClInclude Include="Axis.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Function.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="sampletext.txt">
@@ -32,6 +35,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Axis.cpp">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Function.cpp">
       <Filter>헤더 파일</Filter>
     </ClCompile>
   </ItemGroup>

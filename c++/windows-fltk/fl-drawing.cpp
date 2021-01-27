@@ -9,6 +9,8 @@
  *
  *
  * < History >
+ * 2021. 01. 27
+ *  -- Axis, Graphing function
  * 2021. 01. 26.
  *  -- PPPUC++ 본격 진도빼기 without custom header
  * 2021. 01. 21.
@@ -22,17 +24,22 @@
 
 #ifndef AXIS_H
 #define AXIS_H
+#ifndef FUNCTION_H
+#define FUNCTION_H
 #include <FL/Fl.H>
 #include <FL/Fl_Widget.H>
 #include <FL/fl_draw.H>
 #include <iostream>
 #include <vector>
+#include <cmath>
+#endif
 #endif
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Window.H>
 #include "Axis.h"
+#include "Function.h"
 
 class MyWindow : public Fl_Window {
 public:
@@ -77,16 +84,22 @@ Point gaps[] = {
 ██  ██  ██ ██   ██ ██ ██  ██ ██ 
 ██      ██ ██   ██ ██ ██   ████ 
 */
-MyWidget* wid = new MyWidget(0, 0, 640, 480);
 int main(int argc, char** argv)
 {
-	MyWindow*	win = new MyWindow(1080, 720, "냠냠 옴뇸뇸?");
-	MyWidget*	wid = new MyWidget(10, 10, win->w(), win->h());
+	MyWindow*	win = new MyWindow(1080, 720, "나의 창문");
+	MyWidget*	wid = new MyWidget(10, 10, 100, 100);
 	Axis* xa = new Axis(100, 600, 500, 25, Axis::orientation::x, "x axis");
+	Axis* xb = new Axis(100, 650, 500, 60, Axis::orientation::x, "X axis2");
 	Axis* ya = new Axis(100, 100, 500, 32, Axis::orientation::y, "y axis");
+	Function* cosine = new Function(cos, 0, 10, 20, 300, 500, 50, 100);
+	Function* sine = new Function(sin, 0, 10, 20, 150, 50, 50, 100);
+	Function* logarithm = new Function(log10, 1, 10, 20, 450, 50, 50, 100);
+	cosine->setcolor(FL_DARK_MAGENTA);
+	cosine->setlinestyle(FL_SOLID, 4);
+	sine->setcolor(FL_DARK_GREEN);
 	xa->setcolor(FL_DARK_RED);
 	ya->setcolor(FL_DARK_CYAN);
-	win->show(argc, argv);
+	win->show();
 	return Fl::run();
 }
 
@@ -94,10 +107,9 @@ void MyWindow::draw()
 {
 	Fl_Window::draw();
 	// Draw Text
+	fl_color(0);
 	fl_font(FL_HELVETICA, 50);
 	fl_draw("MyWindow!", 300, 100);
-	fl_translate(100, 300);
-	std::cout << "fl_height() = " << fl_height() << '\n';
 }
 
 void MyWidget::draw()
@@ -111,11 +123,11 @@ void MyWidget::draw()
 		{400, 200}
 	};
 	fl_color(FL_RED);
-	fl_translate(500, 0);
 	fl_begin_loop();
-	for (const Point& i : points) {
+	for (const Point& i : vertices) {
 		fl_vertex(i.x, i.y);
 	}
 	fl_end_loop();
 	fl_color(0);
 }
+
