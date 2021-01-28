@@ -30,6 +30,8 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Window.H>
+#include <FL/Fl_JPEG_Image.H>
+#include <FL/Fl_BMP_Image.H>
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
@@ -37,6 +39,8 @@
 #include "Axis.h"
 #include "Function.h"
 #include "Rectangle.h"
+// import images
+#include "choe.xpm"
 
 class MyWindow : public Fl_Window {
 public:
@@ -94,6 +98,10 @@ int main(int argc, char** argv)
 	Rectangle* rec1 		= new Rectangle(10, 10, 100, 100);
     Rectangle* rec2         = new Rectangle(10, 120, 100, 100);
 
+// draw bitmap
+	//Fl_BMP_Image *bmpImg = new Fl_BMP_Image{"/Users/choeseunghyeon/Desktop/choi-workspace/c++/windows-fltk/IMG_2342.bmp"};
+	//if(bmpImg->fail()) std::cerr << "something went wrong opening bmp file!!\n";
+
 	cosine->setcolor(FL_DARK_MAGENTA);
 	cosine->setlinestyle(FL_SOLID, 4);
 	sine->setcolor(FL_DARK_GREEN);
@@ -115,6 +123,7 @@ void MyWindow::draw()
 	fl_color(0);
 	fl_font(FL_HELVETICA, 50);
 	fl_draw("MyWindow!", 300, 100);
+
 }
 
 void MyWidget::draw()
@@ -132,6 +141,16 @@ void MyWidget::draw()
 		fl_vertex(i.x, i.y);
 	}
 	fl_end_loop();
+// draw xpm 
+	if(!fl_draw_pixmap(choe, 500, 300, FL_WHITE)) std::cerr << "something is wrong drawing an image!!\n";
+// draw jpg
+	//Fl_JPEG_Image img1{"./IMG_2342.jpg"};
+	//if (img1.fail()) std::cerr << "somthing is wrong opening jpeg file!!\n";
+	//img1->draw(700, 0);
+
+	
+	Fl::visual(FL_RGB);
+	
 	fl_color(0);
     fl_line_style(0);
 }
