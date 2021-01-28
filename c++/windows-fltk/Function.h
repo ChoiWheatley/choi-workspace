@@ -32,7 +32,7 @@ public:
 		int accuracy,
 		int scale_x,
 		int scale_y);
-	~Function() { free(funcptr_); }
+	~Function() { free(&funcptr_); }
 	// setter
 	void setcolor(Fl_Color bg) { color_ = bg; redraw(); }
 	void setlinestyle(int style, int line_width = 0) { line_style_ = style; line_width_ = line_width; }

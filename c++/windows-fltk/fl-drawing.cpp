@@ -38,6 +38,7 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Window.H>
+#include <stdlib.h>
 #include "Axis.h"
 #include "Function.h"
 
@@ -91,14 +92,14 @@ int main(int argc, char** argv)
 	Axis* xa = new Axis(100, 600, 500, 25, Axis::orientation::x, "x axis");
 	Axis* xb = new Axis(100, 650, 500, 60, Axis::orientation::x, "X axis2");
 	Axis* ya = new Axis(100, 100, 500, 32, Axis::orientation::y, "y axis");
-	Function* sine			= new Function(sin,		0, 100, 20, 300, 500, 50, 100);
-	Function* cosine		= new Function(cos,		0, 100, 20, 300, 500, 50, 100);
-	Function* logarithm		= new Function(log10,	0, 100, 20, 450, 500, 50, 100);
+	Function* sine			= new Function(sin,		0, 100, 20, 300, 1000, 50, 100);
+	Function* cosine		= new Function(cos,		0, 100, 20, 300, 1000, 50, 100);
+	Function* logarithm		= new Function(log10,	0, 100, 20, 450, 1000, 50, 100);
 	cosine->setcolor(FL_DARK_MAGENTA);
 	cosine->setlinestyle(FL_SOLID, 4);
 	sine->setcolor(FL_DARK_GREEN);
 	sine->setlinestyle(FL_DASHDOT, 3);
-	logarithm->setlinestyle(FL_DASHDOTDOT, 5);
+	//logarithm->setlinestyle(FL_DASHDOTDOT, 5);
 	xa->setcolor(FL_DARK_RED);
 	ya->setcolor(FL_DARK_CYAN);
 	win->show();
