@@ -16,7 +16,6 @@
 #include <FL/fl_draw.H>
 #include <iostream>
 #include <vector>
-#endif
 
 class Axis : public Fl_Widget {
 public:
@@ -31,3 +30,5 @@ private:
 	orientation o_ = orientation::x;
 	virtual void draw() override;
 };
+
+#endif

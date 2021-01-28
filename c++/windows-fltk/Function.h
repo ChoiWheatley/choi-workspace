@@ -20,7 +20,6 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Widget.H>
 #include <FL/fl_draw.H>
-#endif
 #include <iomanip>
 #include <string>
 
@@ -62,3 +61,4 @@ private:
 inline int offset(double origin, int move, int scale) {
 	return (int)((origin * scale) + move);
 }
+#endif

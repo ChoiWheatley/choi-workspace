@@ -9,7 +9,8 @@
  *
  *
  * < History >
- * 2021. 01. 27
+ * 2021. 01. 28.
+ * 2021. 01. 27.
  *  -- Axis, Graphing function
  * 2021. 01. 26.
  *  -- PPPUC++ 본격 진도빼기 without custom header
@@ -22,25 +23,20 @@
  * 
  */
 
-#ifndef AXIS_H
-#define AXIS_H
-#ifndef FUNCTION_H
-#define FUNCTION_H
 #include <FL/Fl.H>
 #include <FL/Fl_Widget.H>
 #include <FL/fl_draw.H>
-#include <iostream>
-#include <vector>
-#include <cmath>
-#endif
-#endif
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Window.H>
 #include <stdlib.h>
+#include <iostream>
+#include <vector>
+#include <cmath>
 #include "Axis.h"
 #include "Function.h"
+#include "Rectangle.h"
 
 class MyWindow : public Fl_Window {
 public:
@@ -87,21 +83,27 @@ Point gaps[] = {
 */
 int main(int argc, char** argv)
 {
-	MyWindow*	win = new MyWindow(1080, 720, "나의 창문");
-	MyWidget*	wid = new MyWidget(10, 10, 100, 100);
-	Axis* xa = new Axis(100, 600, 500, 25, Axis::orientation::x, "x axis");
-	Axis* xb = new Axis(100, 650, 500, 60, Axis::orientation::x, "X axis2");
-	Axis* ya = new Axis(100, 100, 500, 32, Axis::orientation::y, "y axis");
+	MyWindow*	win 		= new MyWindow(1080, 720, "나의 창문");
+	MyWidget*	wid 		= new MyWidget(10, 10, 100, 100);
+	Axis* xa 				= new Axis(100, 600, 500, 25, Axis::orientation::x, "x axis");
+	Axis* xb 				= new Axis(100, 650, 500, 60, Axis::orientation::x, "X axis2");
+	Axis* ya 				= new Axis(100, 100, 500, 32, Axis::orientation::y, "y axis");
 	Function* sine			= new Function(sin,		0, 100, 20, 300, 1000, 50, 100);
 	Function* cosine		= new Function(cos,		0, 100, 20, 300, 1000, 50, 100);
 	Function* logarithm		= new Function(log10,	0, 100, 20, 450, 1000, 50, 100);
+	Rectangle* rec1 		= new Rectangle(10, 10, 100, 100);
+    Rectangle* rec2         = new Rectangle(10, 120, 100, 100);
+
 	cosine->setcolor(FL_DARK_MAGENTA);
 	cosine->setlinestyle(FL_SOLID, 4);
 	sine->setcolor(FL_DARK_GREEN);
 	sine->setlinestyle(FL_DASHDOT, 3);
-	//logarithm->setlinestyle(FL_DASHDOTDOT, 5);
 	xa->setcolor(FL_DARK_RED);
 	ya->setcolor(FL_DARK_CYAN);
+    rec1->line_style(FL_RED, FL_DOT, 3);
+    rec1->fill_color(FL_BLUE);
+    rec2->fill_color(FL_DARK_MAGENTA);
+
 	win->show();
 	return Fl::run();
 }
@@ -117,8 +119,6 @@ void MyWindow::draw()
 
 void MyWidget::draw()
 {
-	// Draw something
-	fl_draw_box(FL_UP_BOX, 10, 10, 100, 100, FL_BLUE);
 	// draw red triangle by three points
 	const static std::vector<Point> vertices{
 		{300, 200},
@@ -126,11 +126,13 @@ void MyWidget::draw()
 		{400, 200}
 	};
 	fl_color(FL_RED);
+    fl_line_style(FL_DOT , 5);
 	fl_begin_loop();
 	for (const Point& i : vertices) {
 		fl_vertex(i.x, i.y);
 	}
 	fl_end_loop();
 	fl_color(0);
+    fl_line_style(0);
 }
 
