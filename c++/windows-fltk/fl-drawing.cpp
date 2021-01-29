@@ -9,7 +9,10 @@
  *
  *
  * < History >
+ * 2021. 01. 29.
+ *  -- Drawing Images & Circle & Ellipse & Resizable & Mask  
  * 2021. 01. 28.
+ *  -- Rectangle & Text 
  * 2021. 01. 27.
  *  -- Axis, Graphing function
  * 2021. 01. 26.
@@ -98,9 +101,18 @@ int main(int argc, char** argv)
 	Rectangle* rec1 		= new Rectangle(10, 10, 100, 100);
     Rectangle* rec2         = new Rectangle(10, 120, 100, 100);
 
+
+// DRAW IMAGE!!!!!!!
+    auto myimage = new Fl_JPEG_Image("../images/IMG_2342.jpg");
+    auto mypicbox = new Fl_Box(12, 12, 100, 100);
+    myimage->scale(95, 95, 0, 0);
+    mypicbox->image(myimage);
+    mypicbox->redraw();
 // draw bitmap
-	//Fl_BMP_Image *bmpImg = new Fl_BMP_Image{"/Users/choeseunghyeon/Desktop/choi-workspace/c++/windows-fltk/IMG_2342.bmp"};
-	//if(bmpImg->fail()) std::cerr << "something went wrong opening bmp file!!\n";
+    auto mybmp = new Fl_BMP_Image("../images/IMG_2342.bmp");
+	if(mybmp->fail()) std::cerr << "something went wrong opening bmp file!!\n";
+    mybmp->scale(100, 100);
+    Fl::visual(FL_RGB);
 
 	cosine->setcolor(FL_DARK_MAGENTA);
 	cosine->setlinestyle(FL_SOLID, 4);
@@ -144,9 +156,29 @@ void MyWidget::draw()
 // draw xpm 
 	if(!fl_draw_pixmap(choe, 500, 300, FL_WHITE)) std::cerr << "something is wrong drawing an image!!\n";
 // draw jpg
-	//Fl_JPEG_Image img1{"./IMG_2342.jpg"};
-	//if (img1.fail()) std::cerr << "somthing is wrong opening jpeg file!!\n";
-	//img1->draw(700, 0);
+	Fl_JPEG_Image img1{"../images/IMG_2269.JPG"};
+	if (img1.fail()) std::cerr << "somthing is wrong opening jpeg file!!\n";
+    img1.scale(300, 300, 0);
+	img1.draw(700, 0);
+// draw one more
+    Fl_JPEG_Image img2{"../images/IMG_2344.jpg"};
+    if (img2.fail()) std::cerr << "img2 failed!\n";
+    img2.scale(300, 300);
+    img2.draw(700, 310);
+// draw multiple images
+    int startX = 10, startY = 300;
+    std::vector<Fl_JPEG_Image*> images{
+        new Fl_JPEG_Image("../images/IMG_2357.jpg"),
+        new Fl_JPEG_Image("../images/IMG_2359.jpg"),
+        new Fl_JPEG_Image("../images/IMG_2361.jpg"),
+        new Fl_JPEG_Image("../images/IMG_2376.jpg")
+    };
+    for (Fl_JPEG_Image* i : images) if (i->fail()) std::cerr << "opening file error! \n"; 
+    for (Fl_JPEG_Image* i : images) i->scale(300, 300, 0);
+    for (int i = 0; i < images.size(); i++) {
+        images[i]->draw(startX + 300 * i + 10, startY);
+    }
+    
 
 	
 	Fl::visual(FL_RGB);

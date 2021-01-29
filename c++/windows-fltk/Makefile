@@ -1,8 +1,8 @@
 CXX = g++
 DEBUG = -g
-CXXFLAGS = $(shell fltk-config --cxxflags) -I. -std=c++17 -Wall
-LDFLAGS = $(shell fltk-config --ldflags)
-LDSTATIC = $(shell fltk-config --ldstaticflags)
+CXXFLAGS = $(shell fltk-config --use-gl --use-images --cxxflags) -I. -std=c++17 -Wall
+LDFLAGS = $(shell fltk-config --use-gl --use-images --ldflags)
+LDSTATIC = $(shell fltk-config --use-gl --use-images --ldstaticflags)
 LINK = $(CXX)
 
 TARGET = a.out
