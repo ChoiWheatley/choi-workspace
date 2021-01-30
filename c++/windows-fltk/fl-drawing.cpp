@@ -9,7 +9,7 @@
  *
  *
  * < History >
- * 2021. 01. 29.
+ * 2021. 01. 30.
  *  -- Drawing Images & Circle & Ellipse & Resizable & Mask  
  * 2021. 01. 28.
  *  -- Rectangle & Text 
@@ -124,6 +124,8 @@ int main(int argc, char** argv)
     rec1->fill_color(FL_BLUE);
     rec2->fill_color(FL_DARK_MAGENTA);
 
+// void Fl_Window::size_range(int minw, int minh, int maxw=0, int maxh=0, int dw=0, int dh=0, int aspect=0)
+	win->size_range(250, 100, 1920, 1080);
 	win->show();
 	return Fl::run();
 }
