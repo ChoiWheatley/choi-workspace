@@ -6,8 +6,8 @@ LDSTATIC = $(shell fltk-config --use-gl --use-images --ldstaticflags)
 LINK = $(CXX)
 
 TARGET = a.out
-OBJS = fl-drawing.o   Axis.o   Function.o   Rectangle.o
-SRCS = fl-drawing.cpp Axis.cpp Function.cpp Rectangle.cpp 
+OBJS = fl-drawing.o   Axis.o   Function.o   Rectangle.o   Circle.o
+SRCS = fl-drawing.cpp Axis.cpp Function.cpp Rectangle.cpp Circle.cpp
 
 .SUFFIXES:.o .cxx
 %.o: %.cxx
@@ -21,6 +21,7 @@ fl-drawing.o: fl-drawing.cpp
 Axis.o: Axis.cpp Axis.h
 Function.o: Function.cpp Function.h
 Rectangle.o: Rectangle.cpp Rectangle.h
+Circle.o: Circle.cpp Circle.h
 
 clean: 
 	rm -f *.o 

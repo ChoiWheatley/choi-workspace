@@ -3,49 +3,36 @@
  */
  #ifndef CIRCLE_H
  #define CIRCLE_H
- #include <FL_fl_draw.H>
+ #include <FL/fl_draw.H>
+ #include <FL/Fl_Widget.H>
 
- typedef Func_Type void (*)();
-
- class Circle : public Fl_Widget {
-    int x_, y_, rad_, start_, end_;
-    enum class Filltype = Filltype::line;
- public:
-    Circle(int x, int y, int w, int h, int start = 0, int end = 360, const char* label = 0);
-    Circle(int x, int y, int rad, int start = 0, int end = 360, const char* label = 0);
- private:
+ class Circle : public Fl_Widget{
+    int x_, y_, rad_;
+    int ln_style_ = 0, ln_width_ = 0;
+    int font_face_ = FL_HELVETICA, font_size_ = 0;
+    const char * label_;
+    Fl_Color * fill_color_ = nullptr;
+    Fl_Color * line_color_ = new Fl_Color{FL_BLACK};
+public:
+    Circle(int x, int y, int rad, const char * label = 0) :
+        Fl_Widget{x-rad, y-rad, rad+rad, rad+rad, label},
+        x_{x}, y_{y}, rad_{rad}, label_{label} {}
+    ~Circle() { delete fill_color_; delete label_; delete line_color_; }
+    void fill_color(Fl_Color);
+    void line_color(Fl_Color);
+    void line_style(int style, int width); 
+    void font_style(int font_face, int font_size);
+public:
+    Fl_Color fill_color() const {return *fill_color_;}
+    Fl_Color line_color() const {return *line_color_;}
+    int ln_style() const {return ln_style_;}
+    int ln_width() const {return ln_width_;}
+    int x() const {return x_;}
+    int y() const {return y_;}
+    int rad() const {return rad_;}
+    const char* label() const {return label_;}
+private:
     virtual void draw() override;
-    // begin might be three types
-    // 1. fl_begin_points()
-    // 2. fl_begin_line()
-    // 3. fl_begin_arc()
-    Func_Type begin;
-    // end might be three types
-    // 1. fl_end_points()
-    // 2. fl_end_line()
-    // 3. fl_begin_arc()
-    Func_Type end;
  }; // class Circle
 
- enum class Circle::Filltype{
-    point = 0 ,
-    line = 1 ,
-    arc = 2 
- };
-
- /* Circle Reference
- // Draw an arc of points
-     fl_begin_points();
-     fl_arc(100.0, 100.0, 50.0, 0.0, 180.0);
-     fl_end_points();
- // Draw arc with a line
-     fl_begin_line();
-     fl_arc(200.0, 100.0, 50.0, 0.0, 180.0);
-     fl_end_line();
- // Draw filled arc
-     fl_begin_polygon();
-     fl_arc(300.0, 100.0, 50.0, 0.0, 180.0);
-     fl_end_polygon();
-
- */
  #endif

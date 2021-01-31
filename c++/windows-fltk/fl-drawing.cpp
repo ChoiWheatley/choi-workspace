@@ -42,6 +42,7 @@
 #include "Axis.h"
 #include "Function.h"
 #include "Rectangle.h"
+#include "Circle.h"
 // import images
 #include "choe.xpm"
 
@@ -91,6 +92,7 @@ Point gaps[] = {
 int main(int argc, char** argv)
 {
 	MyWindow*	win 		= new MyWindow(1080, 720, "나의 창문");
+    /*
 	MyWidget*	wid 		= new MyWidget(10, 10, 100, 100);
 	Axis* xa 				= new Axis(100, 600, 500, 25, Axis::orientation::x, "x axis");
 	Axis* xb 				= new Axis(100, 650, 500, 60, Axis::orientation::x, "X axis2");
@@ -100,6 +102,12 @@ int main(int argc, char** argv)
 	Function* logarithm		= new Function(log10,	0, 100, 20, 450, 1000, 50, 100);
 	Rectangle* rec1 		= new Rectangle(10, 10, 100, 100);
     Rectangle* rec2         = new Rectangle(10, 120, 100, 100);
+    */
+    Circle*    cir1         = new Circle(300, 300, 100, "x");
+    cir1->fill_color(FL_RED);
+    cir1->line_color(FL_GREEN);
+    cir1->line_style(FL_DASH, 4);
+
 
 
 // DRAW IMAGE!!!!!!!
@@ -114,6 +122,7 @@ int main(int argc, char** argv)
     mybmp->scale(100, 100);
     Fl::visual(FL_RGB);
 
+/*
 	cosine->setcolor(FL_DARK_MAGENTA);
 	cosine->setlinestyle(FL_SOLID, 4);
 	sine->setcolor(FL_DARK_GREEN);
@@ -123,6 +132,7 @@ int main(int argc, char** argv)
     rec1->line_style(FL_RED, FL_DOT, 3);
     rec1->fill_color(FL_BLUE);
     rec2->fill_color(FL_DARK_MAGENTA);
+*/
 
 // void Fl_Window::size_range(int minw, int minh, int maxw=0, int maxh=0, int dw=0, int dh=0, int aspect=0)
 	win->size_range(250, 100, 1920, 1080);
@@ -137,7 +147,7 @@ void MyWindow::draw()
 	fl_color(0);
 	fl_font(FL_HELVETICA, 50);
 	fl_draw("MyWindow!", 300, 100);
-
+    fl_font(FL_HELVETICA, 0);
 }
 
 void MyWidget::draw()

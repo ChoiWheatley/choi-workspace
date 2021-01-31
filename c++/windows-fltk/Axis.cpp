@@ -15,6 +15,7 @@ void Axis::draw() {
 	int x = this->x();
 	int y = this->y();
 	fl_color(color_);
+	fl_font(FL_HELVETICA, 0);
 	switch (o_) {
 	case orientation::x:
 	{

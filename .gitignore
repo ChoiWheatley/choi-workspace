@@ -394,3 +394,7 @@ MigrationBackup/
 .ionide/
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio,c++
+
+# Choi Wheatley Settings
+# ignore .swp swap files generated from Vim text editor
+**/*.swp
