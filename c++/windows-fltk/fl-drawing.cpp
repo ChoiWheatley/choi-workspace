@@ -92,11 +92,11 @@ Point gaps[] = {
 ██  ██  ██ ██   ██ ██ ██  ██ ██ 
 ██      ██ ██   ██ ██ ██   ████ 
 */
+MyWindow*	win 		= new MyWindow(1080, 720, "나의 창문");
 int main(int argc, char** argv)
 {
-	MyWindow*	win 		= new MyWindow(1080, 720, "나의 창문");
+	MyWidget*	wid 		= new MyWidget(10, 10, win->w(), win->h());
     /*
-	MyWidget*	wid 		= new MyWidget(10, 10, 100, 100);
 	Axis* xa 				= new Axis(100, 600, 500, 25, Axis::orientation::x, "x axis");
 	Axis* xb 				= new Axis(100, 650, 500, 60, Axis::orientation::x, "X axis2");
 	Axis* ya 				= new Axis(100, 100, 500, 32, Axis::orientation::y, "y axis");
@@ -167,6 +167,14 @@ void MyWindow::draw()
 
 void MyWidget::draw()
 {
+
+// make clipping region
+	int clip_x = 100;
+	int clip_y = 100;;
+	int clip_w = win->w() - clip_x - clip_x;
+	int clip_h = win->h() - clip_y - clip_y;
+	fl_push_clip(clip_x, clip_y, clip_w, clip_h);
+
 	// draw red triangle by three points
 	const static std::vector<Point> vertices{
 		{300, 200},
@@ -212,5 +220,8 @@ void MyWidget::draw()
 	
 	fl_color(0);
     fl_line_style(0);
+
+// release clip region 
+	fl_pop_clip();
 }
 
