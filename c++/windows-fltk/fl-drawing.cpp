@@ -39,6 +39,8 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <string>
+#include <sstream>
 #include "Axis.h"
 #include "Function.h"
 #include "Rectangle.h"
@@ -142,7 +144,7 @@ int main(int argc, char** argv)
 */
 
 // void Fl_Window::size_range(int minw, int minh, int maxw=0, int maxh=0, int dw=0, int dh=0, int aspect=0)
-	win->size_range(250, 100, 1920, 1080);
+	win->size_range(250, 100, 0, 0);
 	win->show();
 	return Fl::run();
 }
@@ -150,10 +152,16 @@ int main(int argc, char** argv)
 void MyWindow::draw()
 {
 	Fl_Window::draw();
-	// Draw Text
+
+	std::stringstream scrinfo;
 	fl_color(0);
 	fl_font(FL_HELVETICA, 50);
-	fl_draw("MyWindow!", 300, 100);
+	scrinfo << "w = " << std::to_string(this->w()) << ", h = " << std::to_string(this->h());
+	int align_x = static_cast<int>(this->w() / 2) - 
+				  static_cast<int>(fl_width(scrinfo.str().c_str(), scrinfo.str().size()) / 2);
+	int align_y = fl_descent() + fl_height() / 2;
+	// Draw Text
+	fl_draw(scrinfo.str().c_str(), align_x, align_y);
     fl_font(FL_HELVETICA, 0);
 }
 
