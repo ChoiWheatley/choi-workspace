@@ -43,6 +43,7 @@
 #include "Function.h"
 #include "Rectangle.h"
 #include "Circle.h"
+#include "Ellipse.h"
 // import images
 #include "choe.xpm"
 
@@ -104,9 +105,15 @@ int main(int argc, char** argv)
     Rectangle* rec2         = new Rectangle(10, 120, 100, 100);
     */
     Circle*    cir1         = new Circle(300, 300, 100, "x");
+	Ellipse*   ell1			= new Ellipse(500, 300, 75, 150, "hello");
+
     cir1->fill_color(FL_RED);
     cir1->line_color(FL_GREEN);
     cir1->line_style(FL_DASH, 4);
+	
+	ell1->fill_color(FL_CYAN);
+	ell1->line_color(FL_RED);
+	ell1->line_style(FL_SOLID, 5);
 
 
 
