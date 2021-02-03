@@ -92,7 +92,7 @@ int main(int argc, char** argv)
 {
 // void Fl_Window::size_range(int minw, int minh, int maxw=0, int maxh=0, int dw=0, int dh=0, int aspect=0)
 	MyWindow  *	win 		= new MyWindow(1080, 720, "나의 창문");
-	Rectangle * rec 		= new Rectangle{10, 10, 100, 100};
+	Rectangle * rec 		= new Rectangle{10, 10, 100, 30, "Howdy!"};
 	rec->line_style(FL_BLUE);
 
 	win->size_range(250, 100, 0, 0);
@@ -103,12 +103,6 @@ int main(int argc, char** argv)
 void MyWindow::draw()
 {
 	Fl_Window::draw();
-	fl_color(FL_RED);
-	fl_begin_line();
-	for (auto i : vertices)
-		fl_vertex(i.x, i.y);
-	fl_end_line();
-	fl_color(0);
 }
 
 void MyWidget::draw()
