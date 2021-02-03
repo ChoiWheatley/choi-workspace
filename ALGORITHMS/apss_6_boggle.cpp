@@ -39,6 +39,8 @@ PANDORA NO
 GIAZAPX YES
 
 <History>
+21. 02. 03
+	-- debugging, submit
 21. 02. 02
 	-- 어젠 Input만 끙끙대다 끝났네.
 21. 02. 01
@@ -93,10 +95,9 @@ int main(void)
 }
 bool f(const vector<string>& case_, string& word)
 {
-	for (int i = 0; i < 5; i++){
-		for (int j = 0; j < 5; j++){
-			if (case_[i][j] == word[0] && 
-				next(case_, j, i, word.erase(0, 1)))
+	for (int y = 0; y < 5; y++){
+		for (int x = 0; x < 5; x++){
+			if (case_[y][x] == word[0] && next(case_, y, x, word.erase(0, 1)))
 				return true;
 		}
 	}
@@ -112,15 +113,16 @@ bool next(const vector<string>& case_, int y, int x, string& word_)
 	if (word_.size() < 1) return true;
 
 //debug
-	cerr << "word_ = " << word_ << '\n';
-	cerr << "(x, y) = (" << x << ", " << y << ")\n";
+	std::cerr << "word_ = " << word_ << '\\';
+	std::cerr << "(y, x) = (" << y << ", " << x << ")\n";
 //end debug
 
 	for (int i = 0; i < 8; i++){
 		int x_ = x + dx[i];
 		int y_ = y + dy[i];
-		if (case_[x_][y_] == word_[0] &&
-			next(case_, y_, x_, word_.erase(0, 1))
+		string erased(word_);
+		if (case_[y_][x_] == word_[0] &&
+			next(case_, y_, x_, erased.erase(0, 1))
 		)  return true;
 	}
 	return false;
