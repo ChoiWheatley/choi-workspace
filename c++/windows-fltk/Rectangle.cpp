@@ -24,6 +24,12 @@ void Rectangle::draw() {
     fl_color(line_color_);
     fl_line_style(line_style_, line_width_);
     fl_rect(x, y, w, h);
+    if (this->label()) {
+        const char * label = this->label();
+        int align_x = x + (w/2) - (fl_width(label, strlen(label))/2);
+        int align_y = y + (h/2) - fl_descent() + (fl_height() / 2);
+        fl_draw(label, align_x, align_y);
+    }
     fl_color(0);
     fl_line_style(0);
 }
