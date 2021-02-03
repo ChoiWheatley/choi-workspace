@@ -39,6 +39,8 @@ PANDORA NO
 GIAZAPX YES
 
 <History>
+21. 02. 03
+	-- debugging, submit
 21. 02. 02
 	-- 어젠 Input만 끙끙대다 끝났네.
 21. 02. 01
@@ -54,9 +56,6 @@ GIAZAPX YES
 #include <string>
 using namespace std;
 
-// dx, dy are starting at 3o'clock to clockwise
-const int dx[] = {1, 1, 0, -1, -1, -1, 0, 1};
-const int dy[] = {0, -1, -1, -1, 0, 1, 1, 1};
 
 // f("PRETTY") --> true
 // f("UUUUU") --> false
@@ -65,13 +64,13 @@ bool f(const vector<string>& case_, string& word);
 // word_ = word - word[0]
 // BASE_CASE1 check x, y range 
 // BASE_CASE2 check word_ 's size (if 0, return true)
-bool next(const vector<string>& case_, int x, int y, string& word_);
+bool next(const vector<string>& case_, int y, int x, string& word_);
 // input control (is >> case_ , is >> words)
 void input(istream& is, vector<string>& case_, vector<string>& words);
 
 // helper functions
-//inline bool isRange(int x, int y) {return (0 <= x && x <= 5) &&
-//										  (0 <= y && y <= 5);}
+inline bool isRange(int x, int y) {return (0 <= x && x < 5) &&
+										  (0 <= y && y < 5);}
 
 int main(void) 
 {
@@ -89,32 +88,41 @@ int main(void)
 			cout << i << '\n';
 // end debug
 		for (auto i : words){
-			cout << i << " " << (f(case_, i) ? "YES" : "NO") << '\n';
+			cout << i << " \n" << (f(case_, i) ? "YES" : "NO") << '\n';
 		}
 	}
     return 0;
 }
 bool f(const vector<string>& case_, string& word)
 {
-	for (int i = 0; i < 5; i++){
-		for (int j = 0; j < 5; j++){
-			if (case_[i][j] == word[0] && 
-				next(case_, i, j, word.erase(0, 1)))
+	for (int y = 0; y < 5; y++){
+		for (int x = 0; x < 5; x++){
+			if (case_[y][x] == word[0] && next(case_, y, x, word.erase(0, 1)))
 				return true;
 		}
 	}
 	return false;
 }
-bool next(const vector<string>& case_, int x, int y, string& word_)
+bool next(const vector<string>& case_, int y, int x, string& word_)
 {
+// dx, dy are starting at 3o'clock to clockwise
+	static const int dx[] = {1, 1, 0, -1, -1, -1, 0, 1};
+	static const int dy[] = {0, 1, 1, 1, 0, -1, -1, -1};
+// BASE CONDITIONS
 	if (!isRange(x, y)) return false;
 	if (word_.size() < 1) return true;
+
+//debug
+	std::cerr << "word_ = " << word_ << '\\';
+	std::cerr << "(y, x) = (" << y << ", " << x << ")\n";
+//end debug
+
 	for (int i = 0; i < 8; i++){
 		int x_ = x + dx[i];
 		int y_ = y + dy[i];
-		if ( (0 <= x_) && (0 <= y_) &&
-			case_[x_][y_] == word_[0] &&
-			next(case_, x_, y_, word_.erase(0, 1))
+		string erased(word_);
+		if (case_[y_][x_] == word_[0] &&
+			next(case_, y_, x_, erased.erase(0, 1))
 		)  return true;
 	}
 	return false;
