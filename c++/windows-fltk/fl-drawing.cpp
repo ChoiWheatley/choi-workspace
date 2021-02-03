@@ -10,8 +10,7 @@
  *
  * < History >
  * 2021. 02. 03
- *  -- <PPPUC++> Chapter 6 Exercise1. 
- *		"Draw a rectangle as a Rectangle and as a Polygon."
+ *  -- <PPPUC++> Chapter 6 Exercises{1, 2, 4}
  * 2021. 01. 30.
  *  -- Drawing Images & Circle & Ellipse & Resizable & Mask  
  * 2021. 01. 28.
@@ -73,13 +72,6 @@ struct Point {
 	double y;
 };
 
-Point vertices[] = {
-	{200, 10},
-	{300, 10},
-	{300, 110},
-	{200, 110},
-	{200, 10}
-};
 
 /*
 ███    ███  █████  ██ ███    ██ 
@@ -92,8 +84,20 @@ int main(int argc, char** argv)
 {
 // void Fl_Window::size_range(int minw, int minh, int maxw=0, int maxh=0, int dw=0, int dh=0, int aspect=0)
 	MyWindow  *	win 		= new MyWindow(1080, 720, "나의 창문");
-	Rectangle * rec 		= new Rectangle{10, 10, 100, 30, "Howdy!"};
-	rec->line_style(FL_BLUE);
+	Rectangle tic_tac_toe[9]{
+		{10, 10, 10, 10, 0, 0, FL_WHITE},
+		{21, 10, 10, 10, 0, 0, FL_RED},
+		{32, 10, 10, 10, 0, 0, FL_WHITE},
+		{10, 21, 10, 10, 0, 0, FL_RED},
+		{21, 21, 10, 10, 0, 0, FL_WHITE},
+		{32, 21, 10, 10, 0, 0, FL_RED},
+		{10, 32, 10, 10, 0, 0, FL_WHITE},
+		{21, 32, 10, 10, 0, 0, FL_RED},
+		{32, 32, 10, 10, 0, 0, FL_WHITE}
+	};
+	for (int i = 0; i < 9; i++)
+		win->add(tic_tac_toe[i]);
+
 
 	win->size_range(250, 100, 0, 0);
 	win->show();
