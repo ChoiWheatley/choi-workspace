@@ -10,9 +10,9 @@ Study C++ Programming Language using the book 'Programming: Principles and Pract
 
 - [ ]  in Ch12 Ellipse Implementation, Text alignment method needed! using bitmask
     - [ ]  I found out there already be `Fl_Widget::align()` method.
-	- [ ]  in Ch12, I need to develop my own base class `Shape` which includes `{Circle, Rectangle, Axis, Polyline, ...}`
-	- [ ]  in Ch12 Offscreen Drawing and Event handling
-	- [ ]  in Ch11 streambuffer → making custom stream class
+- [ ]  in Ch12, I need to develop my own base class `Shape` which includes `{Circle, Rectangle, Axis, Polyline, ...}`
+- [ ]  in Ch12 Offscreen Drawing and Event handling
+- [ ]  in Ch11 streambuffer → making custom stream class
 
 	## TIPS
 
