@@ -12,9 +12,6 @@
 class Rectangle : public Fl_Widget {
 public:
     Rectangle(int x, int y, int w, int h, const char* label = 0) : Fl_Widget(x, y, w, h, label){}
-    Rectangle(int x, int y, int w, int h, int line_style = 0, int line_width = 0, Fl_Color line_col = 0, Fl_Color *fill_col = nullptr, const char* label = 0) : 
-        Fl_Widget(x, y, w, h, label), 
-        line_style_{line_style}, line_width_{line_width}, line_color_{line_col}, fill_color_{fill_col} {}
     ~Rectangle() { free(fill_color_); }
 // getters
     Fl_Color line_color() const {return line_color_;}
