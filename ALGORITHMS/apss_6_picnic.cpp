@@ -42,38 +42,46 @@
 #include <fstream>
 #include <iomanip>	// to use std::setw() function
 #include <string>
+#include <cstring>  // to use memcpy() function
 #include <vector>
 #include <algorithm>
+#include <utility>	// to use swap() function
+#define MAX_N 10
 using namespace std;
-
-void input(istream& is, vector<int>& unpaired, vector<int>& friends);
-// iteration halt when two of friends are left
-void count_pair(const vector<int>& unpaired, const vector<int>& friends, int& cnt);
+typedef unsigned char uchar;
+//
+//
+//
+void input(istream& is, uchar * unpaired, uchar ** friends, int& n);
+void count_pair(uchar * unpaired, uchar ** friends, const int& n);
 //for debugging, print vector
-ostream& operator<<(ostream& os, const vector<int>& list);
-template<typename T>
-bool find(const vector<T>& ls, const T& n);
-template<typename T>
-bool find(const vector<T>& ls, const T& n, const T& n1);
-
+ostream& operator<<(ostream& os, const uchar * list);
+ostream& operator<<(ostream& os, uchar *const* matrix);
+ostream& print_matrix(ostream& os, uchar** matrix);
+uchar ** matrix_init();
+void clear_list(uchar * ls);
+void clear_matrix(uchar ** matrix);
+void delete_matrix(uchar ** matrix);
+void rotate_matrix(uchar ** matrix);
 //
 //
 //
+int cnt = 0;
 int main(void)
 {
 	ifstream fs{"sample.txt"};
 	if (!fs) throw std::runtime_error("error opening an file");
-	vector<int> unpaired;
-	vector<int> friends;
-	int c;
+	uchar * unpaired = new uchar[MAX_N];
+	uchar ** friends = matrix_init();
+	int c, n;
 	fs >> c;
 	for (; c > 0; c--){
-		input(fs, unpaired, friends);
-		//debug
-		cerr << unpaired << friends << '\n';
-		//end debug
-		int cnt = 0;
-		count_pair(unpaired, friends, cnt);
+		input(fs, unpaired, friends, n);
+//debug
+cout << "DEBUG: unpaired: \n" << unpaired << "\nfriends:\n" << friends << '\n';
+//end debug
+		cnt = 0;
+		count_pair(unpaired, friends, n);
 		cout << cnt << '\n';
 	}
 	return 0;
@@ -83,68 +91,135 @@ int main(void)
 //
 
 
-
-// iteration halt when two of friends are left
-void count_pair(const vector<int>& unpaired, const vector<int>& friends, int& cnt)
+void input(istream& is, uchar * unpaired, uchar ** friends, int& n) 
 {
-//HALT_CONDITION: friends.size() == 2
-	if (friends.size() == 2){
-		if (find(unpaired, friends[0], friends[1])) cnt++;
-		return;
+	// initialize unpaired and friends into 0
+	clear_list(unpaired);
+	clear_matrix(friends);
+
+	int m;			// m : number of pairs	  (0<=m<=(n(n-1)/2))
+	is >> n >> m;
+	for (int i = 0; i < n; i++){
+		unpaired[i] = 1;
 	}
-	for (int i = 0; i < friends.size(); i += 2){
-		if (find(unpaired, friends[i], friends[i+1])) {
+	for (int i = 0; i < m; i++){
+		int tmp1, tmp2;
+		is >> tmp1 >> tmp2;
+		if (tmp1 > tmp2) swap(tmp1, tmp2);		// I'll only use one side of friends matrix
+		friends[tmp1][tmp2] = 1;
+	}
 //debug
+//cerr << "unpaired = " << unpaired << '\n';
 //enddebug
-			count_pair(unpaired_, friends_, cnt);
+//debug
+//cerr << "friends = ";
+//print_matrix(cerr, friends);
+//enddebug
+} // void input()
+void count_pair(uchar * unpaired, uchar ** friends, const int& n)
+{
+// Base_Condition : no 1 in unpaired (all students paired already)
+	if (find(unpaired, unpaired + MAX_N, 1) == unpaired + MAX_N) { cnt++; return; }
+//debug
+static int depth = 0;
+cerr << "depth = " << depth << ", unpaired : " << unpaired << '\n';
+cerr << "in count_pair(), friends : \n" << friends << '\n';
+depth++;
+//enddebug
+
+	for (int i = 0; i < n; i++){
+		for (int j = i+1; j < n; j++){
+			if (friends[i][j] == 0) continue;
+			uchar ** new_friends = matrix_init();
+			uchar * new_unpaired = new uchar[MAX_N];
+			memcpy(new_friends, friends, sizeof(uchar) * MAX_N * MAX_N);
+			memcpy(new_unpaired, unpaired, sizeof(uchar) * MAX_N);
+			new_unpaired[i] = new_unpaired[j] = 0;
+			fill_n(new_friends[i], MAX_N, 0);		// new_friends[i][all] = 0
+			fill_n(new_friends[j], MAX_N, 0);		// new_friends[j][all] = 0
+			rotate_matrix(new_friends);
+			fill_n(new_friends[i], MAX_N, 0);		// new_friends[all][i] = 0
+			fill_n(new_friends[j], MAX_N, 0);		// new_friends[all][j] = 0
+			rotate_matrix(new_friends);
+			rotate_matrix(new_friends);
+			rotate_matrix(new_friends);
+			count_pair(new_unpaired, new_friends, n);
+//debug
+depth--;
+cerr << "out of reculsive, friends = " << friends;
+cerr << "out of reculsive, unpaired = " << unpaired << '\n';
+//enddebug
+			// TODO after recursive function, useless new_friends MUST be deleted
+			delete_matrix(new_friends);
+			delete[] new_unpaired;
 		}
 	}
 }
-void input(istream& is, vector<int>& unpaired, vector<int>& friends) 
+ostream& operator<<(ostream& os, const uchar * ls)
 {
-	unpaired = vector<int>();
-	friends  = vector<int>();
-	int n, m;		// n : number of students (2<=n<=100)
-					// m : number of pairs	  (0<=m<=(n(n-1)/2))
-	is >> n >> m;
-	for (int i = 0; i < n; i++){
-		unpaired.push_back(i);
+	os << "[";
+	if (ls == nullptr) { os << "no elements]\n"; return os;}
+	for (int i = 0; i < MAX_N; i++){
+		os << (int)ls[i] << ", ";
 	}
-	for (int i = 0; i < m*2; i++){
-		int tmp;
-		is >> tmp;
-		friends.push_back(tmp);
-	}
-}
-//for debugging, print vector
-ostream& operator<<(ostream& os, const vector<int>& list)
-{
-	os << "list.size() : " << list.size() << " [\n";
-	int cnt = 1;
-	for (auto i : list) {
-		os << setw(3) << i;
-		if (cnt++ % 10 == 0) os << "\n";
-	}
-	os << "\n]\n";
+	os << "\b\b]\n";
 	return os;
 }
-
-template<typename T>
-bool find(const vector<T>& ls, T& n)
+ostream& operator<<(ostream& os, uchar *const* matrix)
 {
-	for (int i = 0 ; i < ls.size() ; i++){
-		if (n == ls[i]) return true;
+	os << '\n';
+	for (int i = 0 ; i < MAX_N; i++){
+		os << matrix[i];
 	}
-	return false;
+	return os;
 }
-template<typename T>
-bool find(const vector<T>& ls, const T& n, const T& n1)
+ostream& print_matrix(ostream& os, uchar** matrix)
 {
-	bool retn = false;
-	bool retn1 = false;
-	for (auto i : ls){
-		if (n == i) retn = true;
-		if (n1 == i) retn1 = true;
+	if (matrix == nullptr) {os << "[no elements]\n"; return os;}
+	for (int i = 0; i < MAX_N; i++){
+		os << matrix[i];
 	}
-	return (retn && retn1);
+	os << "\n";
+	return os;
+}
+uchar ** matrix_init()
+{
+	uchar ** ret = new uchar*[MAX_N];
+	for (int i = 0; i < MAX_N; i++){
+		ret[i] = new uchar[MAX_N]{0};
+	}
+	return ret;
+}
+void clear_list(uchar * ls)
+{
+	for (int i = 0; i < MAX_N; i++)
+		ls[i] = 0;
+}
+void clear_matrix(uchar ** matrix)
+{
+	for (int i = 0; i < MAX_N; i++)
+		for (int j = 0; j < MAX_N; j++)
+			matrix[i][j] = 0;
+}
+void rotate_matrix(uchar ** matrix)
+{
+//debug
+//cerr << "original matrix : \n" << matrix << "\n";
+//enddebug
+//1. i,j converse
+//2. j inverse
+	for (int i = 0; i < MAX_N; i++){
+		for (int j = i; j < MAX_N; j++){
+			swap(matrix[i][j], matrix[j][i]);
+		}
+	}
+	for (int j = 0; j < MAX_N/2; j++){
+		swap(matrix[j], matrix[MAX_N-j-1]);
+	}
+//debug
+//cerr << "rotated matrix : \n" << matrix << "\n";
+//enddebug
+}
+void delete_matrix(uchar ** matrix)
+{
 }
