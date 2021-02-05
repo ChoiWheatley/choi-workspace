@@ -49,6 +49,8 @@ void some_callback_function(functionname, [...]);
 
 ## TODO
 
+## TIP
+- passing const reference array into parameter : "const type (&name)[][]"
 ---
 
 # ./HTML
