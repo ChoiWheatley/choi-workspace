@@ -3,8 +3,15 @@
 	Author : ChoiWheatley
 	History :
 	{
+	-- 2021. 02. 04.
+		?????
 	-- 2021. 02. 03.
 		start
+	}
+	TIPS:
+	{
+		https://stackoverflow.com/questions/11543625/passing-an-array-as-a-const-argument-of-a-method-in-c
+			which describes about passing a "const reference" of array
 	}
 안드로메다 유치원 익스프레스반에서는 다음 주에 율동공원으로 소풍을 갑니다. 원석 선생님은 소풍 때 학생들을 두 명씩 짝을 지어 행동하게 하려고 합니다. 그런데 서로 친구가 아닌 학생들끼리 짝을 지어 주면 서로 싸우거나 같이 돌아다니지 않기 때문에, 항상 서로 친구인 학생들끼리만 짝을 지어 줘야 합니다.
 
@@ -39,10 +46,10 @@
 */
 
 #include <iostream>
+#include <cstdio>
 #include <fstream>
 #include <iomanip>	// to use std::setw() function
 #include <string>
-#include <cstring>  // to use memcpy() function
 #include <vector>
 #include <algorithm>
 #include <utility>	// to use swap() function
@@ -52,37 +59,38 @@ typedef unsigned char uchar;
 //
 //
 //
-void input(istream& is, uchar * unpaired, uchar ** friends, int& n);
-void count_pair(uchar * unpaired, uchar ** friends, const int& n);
+void input(istream& is, uchar unpaired[MAX_N], uchar friends[MAX_N][MAX_N], int& n);
+int count_pair(uchar unpaired[MAX_N], const uchar (&friends)[MAX_N][MAX_N] , const int& n);
 //for debugging, print vector
 ostream& operator<<(ostream& os, const uchar * list);
-ostream& operator<<(ostream& os, uchar *const* matrix);
+ostream& operator<<(ostream& os, const uchar matrix[MAX_N][MAX_N]);
 ostream& print_matrix(ostream& os, uchar** matrix);
 uchar ** matrix_init();
-void clear_list(uchar * ls);
-void clear_matrix(uchar ** matrix);
+void clear_list(uchar ls[MAX_N]);
+void clear_matrix(uchar matrix[MAX_N][MAX_N]);
 void delete_matrix(uchar ** matrix);
 void rotate_matrix(uchar ** matrix);
+bool base_condition(uchar unpaired[MAX_N]);
+int find_idx(uchar ls[MAX_N], uchar f);
 //
 //
 //
-int cnt = 0;
 int main(void)
 {
 	ifstream fs{"sample.txt"};
 	if (!fs) throw std::runtime_error("error opening an file");
-	uchar * unpaired = new uchar[MAX_N];
-	uchar ** friends = matrix_init();
+	uchar unpaired[MAX_N];
+	uchar friends[MAX_N][MAX_N];
+	clear_list(unpaired);
+	clear_matrix(friends);
 	int c, n;
 	fs >> c;
 	for (; c > 0; c--){
 		input(fs, unpaired, friends, n);
 //debug
-cout << "DEBUG: unpaired: \n" << unpaired << "\nfriends:\n" << friends << '\n';
+//cout << "DEBUG: unpaired: \n" << unpaired << "\nfriends:" << friends << '\n';
 //end debug
-		cnt = 0;
-		count_pair(unpaired, friends, n);
-		cout << cnt << '\n';
+		cout << count_pair(unpaired, friends, n) << '\n';
 	}
 	return 0;
 }
@@ -91,7 +99,7 @@ cout << "DEBUG: unpaired: \n" << unpaired << "\nfriends:\n" << friends << '\n';
 //
 
 
-void input(istream& is, uchar * unpaired, uchar ** friends, int& n) 
+void input(istream& is, uchar unpaired[MAX_N], uchar friends[MAX_N][MAX_N], int& n)
 {
 	// initialize unpaired and friends into 0
 	clear_list(unpaired);
@@ -108,52 +116,23 @@ void input(istream& is, uchar * unpaired, uchar ** friends, int& n)
 		if (tmp1 > tmp2) swap(tmp1, tmp2);		// I'll only use one side of friends matrix
 		friends[tmp1][tmp2] = 1;
 	}
-//debug
-//cerr << "unpaired = " << unpaired << '\n';
-//enddebug
-//debug
-//cerr << "friends = ";
-//print_matrix(cerr, friends);
-//enddebug
 } // void input()
-void count_pair(uchar * unpaired, uchar ** friends, const int& n)
+int count_pair(uchar unpaired[MAX_N], const uchar (&friends)[MAX_N][MAX_N] , const int& n)
 {
-// Base_Condition : no 1 in unpaired (all students paired already)
-	if (find(unpaired, unpaired + MAX_N, 1) == unpaired + MAX_N) { cnt++; return; }
-//debug
-static int depth = 0;
-cerr << "depth = " << depth << ", unpaired : " << unpaired << '\n';
-cerr << "in count_pair(), friends : \n" << friends << '\n';
-depth++;
-//enddebug
-
-	for (int i = 0; i < n; i++){
-		for (int j = i+1; j < n; j++){
-			if (friends[i][j] == 0) continue;
-			uchar ** new_friends = matrix_init();
-			uchar * new_unpaired = new uchar[MAX_N];
-			memcpy(new_friends, friends, sizeof(uchar) * MAX_N * MAX_N);
-			memcpy(new_unpaired, unpaired, sizeof(uchar) * MAX_N);
-			new_unpaired[i] = new_unpaired[j] = 0;
-			fill_n(new_friends[i], MAX_N, 0);		// new_friends[i][all] = 0
-			fill_n(new_friends[j], MAX_N, 0);		// new_friends[j][all] = 0
-			rotate_matrix(new_friends);
-			fill_n(new_friends[i], MAX_N, 0);		// new_friends[all][i] = 0
-			fill_n(new_friends[j], MAX_N, 0);		// new_friends[all][j] = 0
-			rotate_matrix(new_friends);
-			rotate_matrix(new_friends);
-			rotate_matrix(new_friends);
-			count_pair(new_unpaired, new_friends, n);
-//debug
-depth--;
-cerr << "out of reculsive, friends = " << friends;
-cerr << "out of reculsive, unpaired = " << unpaired << '\n';
-//enddebug
-			// TODO after recursive function, useless new_friends MUST be deleted
-			delete_matrix(new_friends);
-			delete[] new_unpaired;
-		}
-	}
+/// Base_Condition: Every student is paired (= no unpaired one)
+	if (base_condition(unpaired)) return 1;
+///
+//find very first unpaired one
+	int very_first = find_idx(unpaired, 1);
+	int ret = 0;
+	for (int i = very_first+1; i < n; i++){
+		//GOTCHA: unpaired ones and both are friends
+		if (unpaired[i] && friends[very_first][i]){
+			unpaired[i] = unpaired[very_first] = 0;
+			ret += count_pair(unpaired, friends, n);
+			unpaired[i] = unpaired[very_first] = 1;
+	}	}	
+	return ret;
 }
 ostream& operator<<(ostream& os, const uchar * ls)
 {
@@ -165,7 +144,7 @@ ostream& operator<<(ostream& os, const uchar * ls)
 	os << "\b\b]\n";
 	return os;
 }
-ostream& operator<<(ostream& os, uchar *const* matrix)
+ostream& operator<<(ostream& os, const uchar matrix[MAX_N][MAX_N])
 {
 	os << '\n';
 	for (int i = 0 ; i < MAX_N; i++){
@@ -190,12 +169,12 @@ uchar ** matrix_init()
 	}
 	return ret;
 }
-void clear_list(uchar * ls)
+void clear_list(uchar ls[MAX_N])
 {
 	for (int i = 0; i < MAX_N; i++)
 		ls[i] = 0;
 }
-void clear_matrix(uchar ** matrix)
+void clear_matrix(uchar matrix[MAX_N][MAX_N])
 {
 	for (int i = 0; i < MAX_N; i++)
 		for (int j = 0; j < MAX_N; j++)
@@ -222,4 +201,20 @@ void rotate_matrix(uchar ** matrix)
 }
 void delete_matrix(uchar ** matrix)
 {
+	for (int i = 0; i < MAX_N; i++)
+		delete [] matrix[i];
+	delete [] matrix;
+}
+bool base_condition(uchar unpaired[MAX_N])
+{
+	bool flag = true;
+	for (int i = 0; i < MAX_N; i++)
+		if (unpaired[i] == 1) flag = false;
+	return flag;
+}
+int find_idx(uchar ls[MAX_N], uchar f)
+{
+	for (int i = 0; i < MAX_N; i++)
+		if (ls[i] == f) return i;
+	return -1;
 }
