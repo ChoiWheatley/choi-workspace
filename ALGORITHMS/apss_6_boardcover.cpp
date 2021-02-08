@@ -61,35 +61,27 @@ using namespace std;
 #define WHITE '.'
 typedef unsigned char uchar;
 constexpr int MAX_W = 20;
-const uchar L_block[4][2][2] = {
-	{
-		{'#','#'},
-		{'#','.'}
-	},{
-		{'#','#'},
-		{'.','#'}
-	},{
-		{'.','#'},
-		{'#','#'}
-	},{
-		{'#','.'},
-		{'#','#'}
-	}
+// Four ways of filling index (relative)
+const int L_block[4][3][2] = {
+	{{0, 0}, {0, 1}, {1, 0}},
+	{{0, 0}, {0, 0}, {1, 1}},
+	{{0, 0}, {0, 1}, {1, 1}},
+	{{0, 0}, {1, 0}, {1, -1}}
 };
 
 
 /* function declarations below */
 void input(istream& is, uchar (*board)[MAX_W], int h, int w);
 int f(uchar board[MAX_W][MAX_W], const int& h, const int& w);
-bool is_fit(const uchar (*board)[MAX_W], int i, int j, int& block_form);
-uchar ** fill_block(const uchar (*board)[MAX_W], int i, int j, int block_form);
+bool is_fit(const uchar (*board)[MAX_W], const int& i, const int& j, const int& h, const int& w, int& form);
+uchar ** fill_block(uchar (*board)[MAX_W], const int& i, const int& j, const int& form);
+void empty_block(uchar (*board)[MAX_W], const int& i, const int& j, const int& form);
 /* helper functions below */
 template<typename T> void clear_matrix(T (*board)[MAX_W], T t);
 ostream& operator<<(ostream& os, const uchar (*board)[MAX_W]);
 void istream_recover(istream& is);
 int count_white(const uchar (*board)[MAX_W]);
 void delete_board(uchar *** board);
-bool block_or(uchar, uchar);
 
 
 ///////////////////////////////////////////////////////////////
@@ -111,7 +103,8 @@ cerr << "제출하기 전에는 ifs->cin 으로 변경할 것!\n";
 cout << board;
 //enddebug
 		// if every color in the board is already BLACK, print 0
-		if (count_white(board) == 0) {
+		// OR the number of WHITE is not the times of 3, print 0
+		if (count_white(board) == 0 || count_white(board)%3 != 0) {
 			cout << "0\n";
 			continue;
 		}
@@ -133,57 +126,77 @@ void input(istream& is, uchar (*board)[MAX_W], int h, int w)
 		if (!is) istream_recover(is);
 	}
 }
+// 1. find i,j which is WHITE
+// 2. try four ways of filling index (L_block)
+// 3. fill with the ingaged variable, form
+// 4. recurse iteration
+// 5. fill out that index and go another loop
 int f(uchar board[MAX_W][MAX_W], const int& h, const int& w)
 {
 //BASE_CONDITION: if every color in the board is BLACK, return 1
 	if (count_white(board) == 0) return 1;
-	
+
 	int ret = 0;
-	int block_form = -1;
-	for (int i = 0; i < h-1; i++){
-		for (int j = 0; j < w-1; j++){
-			if (is_fit(board, i, j, block_form)){
-				uchar **new_block = fill_block(board, i, j, block_form);
-				ret += f((uchar (*)[MAX_W])new_block, h, w);
-//debug
-//cerr << "(i,j) = ("<<i<<","<<j<<"), new_block = \n" << (uchar (*)[MAX_W])new_block;
-//sleep(1);
-//enddebug
-			}
+	int form = -1;
+	int i = -1, j = -1;
+	// find very first WHITE
+	for (i = 0; i < h; i++){
+		bool ijflag = false;
+		for (j = 0; j < w; j++){
+			if (board[i][j] == WHITE) {ijflag = true; break;}
 		}
+		if (ijflag) break;
+	}
+	if (is_fit(board, i, j, h, w, form)){
+//DBG
+cerr << "(i,j,form) = ("<<i<<","<<j<<","<<form<< ") board = \n" << (uchar (*)[MAX_W])board;
+sleep(1);
+//endDBG
+		ret += f((uchar (*)[MAX_W])fill_block(board, i, j, form), h, w);
+		empty_block(board, i, j, form);
 	}
 	return ret;
 }
-bool is_fit(const uchar (*board)[MAX_W], int i, int j, int& block_form)
+// false condition : out of boundary, already filled
+bool is_fit(const uchar (*board)[MAX_W], const int& i, const int& j, const int& h, const int& w, int& form)
 {
-	for (block_form = 0; block_form < 4; block_form++){
-		uchar piece[2][2] = {
-			{L_block[block_form][0][0], L_block[block_form][0][1]},
-			{L_block[block_form][1][0], L_block[block_form][1][1]}
-		};
-		if (!(piece[0][0] == BLACK && board[i][j] 		== BLACK) &&
-			!(piece[0][1] == BLACK && board[i][j+1] 	== BLACK) &&
-			!(piece[1][0] == BLACK && board[i+1][j] 	== BLACK) &&
-			!(piece[1][1] == BLACK && board[i+1][j+1] 	== BLACK)) return true; 
+	if (board[i][j] == BLACK) return false;
+	for (form = 0; form < 4; form++){
+		bool isfit = true;
+		for (int k = 0; k < 3; k++){
+			int ny = i + L_block[form][k][0];
+			int nx = j + L_block[form][k][1];
+			// FALSE CONDITION - out of boundary
+			if (nx < 0 || w <= nx ||
+				ny < 0 || h <= ny) { isfit = false; continue; }
+			// FALSE_CONDITION - already filled
+			if (board[ny][nx] == BLACK) isfit = false;
+		}
+		if (isfit) return true;
 	}
+	form = -1;
 	return false;
 }
-uchar ** fill_block(const uchar (*board)[MAX_W], int i, int j, int block_form)
+// Assume that we already checked it is possible to fill
+uchar ** fill_block(uchar (*board)[MAX_W], const int& i, const int& j, const int& form)
 {
-	if (block_form == -1) cerr << "block_form not initialized!\n";
-	uchar (*ret)[MAX_W] = new uchar[MAX_W][MAX_W];
-	memcpy(ret, board, sizeof(uchar)*MAX_W*MAX_W);
-//debug
-//cerr << "ret = \n" << (uchar (*)[MAX_W])(*board);
-//sleep(1);
-//enddebug
-	for (int y = 0; y <= 1; y++){
-		for (int x = 0; x <= 1; x++){
-			if (L_block[block_form][y][x] == WHITE) continue;
-			ret[i+y][j+x] = L_block[block_form][y][x];
-		}
+	if (form == -1) throw std::runtime_error("block_form not initialized!\n");
+	for (int k = 0; k < 3; k++){
+		int ny = i + L_block[form][k][0];
+		int nx = j + L_block[form][k][1];
+		board[ny][nx] = BLACK;
 	}
-	return (uchar **)ret;
+	return (uchar **)board;
+}
+// Do opposite as fill_block() does
+void empty_block(uchar (*board)[MAX_W], const int& i, const int& j, const int& form)
+{
+	if (form == -1) throw std::runtime_error("block_form not initialized!\n");
+	for (int k = 0; k < 3; k++){
+		int ny = i + L_block[form][k][0];
+		int nx = j + L_block[form][k][1];
+		board[ny][nx] = WHITE;
+	}
 }
 template<typename T> void clear_matrix(T (*board)[MAX_W], T t)
 {
@@ -226,9 +239,4 @@ void delete_board(uchar *** board)
 	for (int i = 0; i < MAX_W; i++)
 		delete[] *board[i];
 	delete[] *board;
-}
-bool block_or(uchar a, uchar b)
-{
-	if (a == BLACK && b == BLACK) return false;
-	return true;
 }
