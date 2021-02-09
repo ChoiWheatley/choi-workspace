@@ -1,5 +1,5 @@
 #include "PPP/Simple_window.h"
-#include "Graph.h"
+#include "PPP/Graph.h"
 
 int main()
 {
