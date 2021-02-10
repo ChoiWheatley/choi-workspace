@@ -1,13 +1,13 @@
 .SUFFIXES: .o .cpp
-CXX = g++-10
+CXX = g++-10 -std=c++17
 DEBUG = -g
-INC = -I/usr/local/include -I./PPP -I.
-LINK = $(CXX) -L./PPP $(LIBS) $(LDFLAGS) $(LDSTATIC)
-LIBS = -lPPPfltk
+INC = -I/usr/local/include -I./CHOE -I.
+LINK = $(CXX) -L$(DIRS) $(LIBS) $(LDFLAGS) $(LDSTATIC) 
+LIBS = -lCHOEfltk
 CXXFLAGS = $(shell fltk-config --use-gl --use-images --cxxflags) $(INC)
 LDFLAGS = $(shell fltk-config --use-gl --use-images --ldflags) 
 LDSTATIC = $(shell fltk-config --use-gl --use-images --ldstaticflags)
-DIRS = PPP
+DIRS = CHOE 
 
 SRCS = sample.cpp
 OBJS = $(SRCS:.cpp=.o)
