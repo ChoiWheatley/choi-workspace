@@ -1,10 +1,9 @@
 .SUFFIXES: .o .cpp
-CXX = g++-10
+CXX = g++-10 -std=c++17
 DEBUG = -g
 LIB = libPPPfltk.a
 INC = -I/usr/local/include -I.
-DEP = Makefile.d
-CXXFLAGS = $(shell fltk-config --use-gl --use-images --cxxflags) $(INC) -std=c++17 -Wall
+CXXFLAGS = $(shell fltk-config --use-gl --use-images --cxxflags) $(INC)
 
 SRCS = Simple_window.cpp GUI.cpp Graph.cpp Window.cpp
 OBJS = $(SRCS:.cpp=.o)
@@ -12,12 +11,7 @@ OBJS = $(SRCS:.cpp=.o)
 # default target
 # AR: Archieve utility (ar rs libc.a test.o)
 $(LIB): $(OBJS) 
-	$(MAKE) dep
 	$(AR) rsv $@ $(OBJS)
-
-# Generating dependency files
-dep: 
-	$(CXX) -MM $(SRCS) > $(DEP)
 
 # $@: 현재 타겟의 이름, 
 # $<: 현재 타겟보다 일찍 변경된 종속항목 리스트
@@ -27,14 +21,13 @@ dep:
 %.o:  %.cpp
 	$(CXX) $(CXXFLAGS) $(DEBUG) -c $< -o $@
 
+# Generating dependency files
 %.d: %.cpp
-	$(CXX) -MM $< > $(DEP)
+	$(CXX) -MM $< > $@
 
 # $(wildcard [PATTERN]): 현재 디렉토리에서 패턴과 일치하는 파일리스트
 # include dependency files to have g++ recompile necessary sources
-ifeq ($(DEP), $(wildcard $(DEP)))
-	-include %.d
-endif
+-include $(patsubst %.cpp,%.d,$(wildcard *.cpp))
 
 clean:
 	rm -f *.o *.d $(LIB)
