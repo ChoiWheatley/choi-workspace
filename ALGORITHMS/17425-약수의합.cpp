@@ -30,9 +30,12 @@
 - g_tbl[i] = g_tbl[i-1] + f(i) 는 O(N^2) 또는 O(N√N)의 시간복잡도를 가지기에 너무 느리다.
     when you use the multiplication method, g_tbl can be drawn in O(N) time-complexity
 <TODO>
-- precompiled table?
+<+> Compile-time table?
+<TIP>
+- You can use Compile-time table using constexpr array function (I dunno well...)  http://cplusplus.com/forum/beginner/249023/ 
 */
 #include<iostream>
+#include<array>
 #include<cmath>
 //#define DBG
 #define N_MAX 1000000  // 10^6
@@ -41,7 +44,19 @@ using namespace std;
 
 typedef unsigned long long int ull;
 
-ull f_tbl[N_MAX+1];
+// Compile-time array generation
+constexpr std::array<ull, N_MAX+1> f_table() {
+    std::array<ull, N_MAX+1> result{};
+    for (int i = 0; i <= N_MAX; i++)
+        result[i] = 1;
+    for (int i = 2; i <= N_MAX; i++){
+        for (int j = 1; i*j <= N_MAX; j++){
+            result[i*j] += i;
+    }   }
+    return result;
+}
+
+auto f_tbl = f_table();
 ull g_tbl[N_MAX+1];
 void init_f_tbl();
 void init_g_tbl();
@@ -51,7 +66,7 @@ int main(void)
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    init_f_tbl();
+    //init_f_tbl();
     init_g_tbl();
 #ifdef DBG
 cerr << "initialization g_tbl done!" << '\n';
@@ -67,11 +82,13 @@ cerr << "initialization g_tbl done!" << '\n';
 }
 void init_f_tbl()
 {
+/*
     fill_n(f_tbl, N_MAX+1, 1);
     for (int i = 2; i <= N_MAX; i++){
         for (int j = 1; i*j <= N_MAX; j++){
             f_tbl[i*j] += i;
     }   }
+*/
 }
 void init_g_tbl()
 {
