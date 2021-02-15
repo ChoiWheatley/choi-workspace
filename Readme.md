@@ -51,6 +51,7 @@ void some_callback_function(functionname, [...]);
 
 ## TIP
 - passing const reference array into parameter : "const type (&name)[][]"
+- You can use Compile-time table using constexpr array function (I dunno well...)  http://cplusplus.com/forum/beginner/249023/ 
 ---
 
 # ./HTML
