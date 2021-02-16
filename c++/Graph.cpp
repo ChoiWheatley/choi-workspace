@@ -38,6 +38,7 @@ Function::Function(Fct f, double r1, double r2, Point orig, int count, double xs
     double fr = f(r);
     for (int i = 0; i < count; ++i) {
         add(Point(orig.x + int(r*xscale), orig.y - int(fr*yscale)));
+		r+=dist;
     }
 }
 

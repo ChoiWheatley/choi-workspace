@@ -14,12 +14,12 @@ typedef double Fct(double);
 struct Color {
     enum Transparency { invisible = 0, visible = 255 };
 
-    Color(Fl_Color cc) : c{cc}, v{visible} {}
-    Color(Fl_Color cc, Transparency vv) : c{cc}, v{vv} {}
-    Color(Transparency vv) : c{Fl_Color()}, v{vv} {}
+    Color(Fl_Color cc) : v{visible}, c{cc} {}
+    Color(Fl_Color cc, Transparency vv) : v{vv}, c{cc} {}
+    Color(Transparency vv) : v{vv}, c{Fl_Color()} {}
 
     int as_int() const { return c; }
-    char visibility() const { return v; }
+    Transparency visibility() const { return v; }
     void visibility(Transparency vv) { v=vv; }
 private:
     Transparency v;        // visibility 0 or 1
