@@ -1,4 +1,4 @@
-CXX = g++
+CXX = g++ -std=c++17
 DEBUG = -g
 CXXFLAGS = $(shell fltk-config --use-gl --use-images --cxxflags) -I. -std=c++17 -Wall
 LDFLAGS = $(shell fltk-config --use-gl --use-images --ldflags)
@@ -6,8 +6,8 @@ LDSTATIC = $(shell fltk-config --use-gl --use-images --ldstaticflags)
 LINK = $(CXX)
 
 TARGET = a.out
-OBJS = fl-drawing.o   Axis.o   Function.o   Rectangle.o   Circle.o   Ellipse.o
-SRCS = fl-drawing.cpp Axis.cpp Function.cpp Rectangle.cpp Circle.cpp Ellipse.cpp
+SRCS = $(wildcard *.cpp)
+OBJS = $(SRCS:.cpp=.o)
 
 .SUFFIXES:.o .cxx
 %.o: %.cxx
@@ -24,6 +24,13 @@ Rectangle.o: Rectangle.cpp Rectangle.h
 Circle.o: Circle.cpp Circle.h
 Ellipse.o: Ellipse.cpp Ellipse.h
 
+# generating dependency files
+%.d: %.cpp
+	$(CXX) -MM $< > $@
+
+# include dependency files
+-include $(patsubst %.cpp,%.d,$(wildcard *.cpp))
+
 clean: 
-	rm -f *.o 
+	rm -f *.o *.d
 	rm -f $(TARGET)
