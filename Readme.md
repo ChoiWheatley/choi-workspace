@@ -51,6 +51,17 @@ void some_callback_function(functionname, [...]);
 
 ## TIP
 - passing const reference array into parameter : "const type (&name)[][]"
+- You can use Compile-time table using constexpr array function (I dunno well...)  http://cplusplus.com/forum/beginner/249023/ 
+<TIP> Compile time initialization   // https://en.cppreference.com/w/cpp/language/constexpr
+	the function body must not contain
+	- a goto statement
+	- goto label 
+	- case - default
+	- a try block
+	- an asm declaration (assembly)
+	- a definition of a variable for which initialization is performed 
+	- a definition of a none literal type
+
 ---
 
 # ./HTML
