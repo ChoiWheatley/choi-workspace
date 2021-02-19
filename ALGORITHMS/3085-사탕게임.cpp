@@ -1,4 +1,9 @@
 /*
+
+<<< Optimized Version >>>
+두 칸만 서로 바꾸는 거라면... 영향받는 행과 열은 오직 3줄 뿐이다.
+
+
 문제
 상근이는 어렸을 적에 "봄보니 (Bomboni)" 게임을 즐겨했다.
 
@@ -36,29 +41,29 @@ CPPZZ
 #define RIGHT 0
 #define DOWN 1
 using namespace std;
-//#define DBG 1
+
+//#define DBG
 
 int n = 0;
 // right, down
 const int dx[] = { 1, 0 };
 const int dy[] = { 0, 1 };
 
-int longest_length(vector<string> board);
-int adjacent(vector<string>& board, int y, int x, int dir);
+int longest_length(const vector<string>& board, int y, int x, int y_, int x_);
 /* helper functions */
 void input(istream& is, vector<string>& board);
 ostream& operator<<(ostream& os, vector<string>& board);
 bool is_bound(const vector<string>& board, int y, int x);
 
-int main(void)
+int main(int argc, char ** argv)
 {
 	vector<string> board;	// (N+2) * (N+2) board with boundary
-	//ifstream ifs{"sample.txt"};
-	//if(!ifs) runtime_error("file wrong");
-	input(cin, board);
 #ifdef DBG
-cerr << " IFS -> CIN \n";
-cerr << board << '\n';
+	ifstream ifs{"sample.txt"};
+	if(!ifs) runtime_error("file wrong");
+	input(ifs, board);
+#else
+	input(cin, board);
 #endif
 	
 	// TODO
@@ -70,7 +75,7 @@ cerr << board << '\n';
 				int y_ = y + dy[i];
 				if (!is_bound(board, y_, x_)) {
 					swap(board[y][x], board[y_][x_]);
-					max_length = max(max_length, longest_length(board));
+					max_length = max(max_length, longest_length(board, y, x, y_, x_));
 					swap(board[y][x], board[y_][x_]);		// 원상복귀
 				}
 			}
@@ -80,40 +85,32 @@ cerr << board << '\n';
 
 	return 0;
 }
-int longest_length(vector<string> board)
+int longest_length(const vector<string>& board, int y, int x, int y_, int x_)
 {
 	int max_length = 0;
-	int cnt = 0;
-	for (int i = 1; i < n+1; i++){
+	int cnt = 1;
+	int fixed_x[2] = {x, x_};
+	int fixed_y[2] = {y, y_};
+
+// horizontal
+	for (int i = 0; i < 2; i++) {
 		cnt = 1;
 		for (int j = 1; j < n; j++){
-		// RIGHT
-			if (board[i][j] == board[i][j+1]) cnt++;
+			if (board[fixed_y[i]][j] == board[fixed_y[i]][j+1]) cnt++;
 			else cnt = 1;
 			max_length = max(max_length, cnt);
 		}
+	}
+// vertical
+	for (int i = 0; i < 2; i++) {
 		cnt = 1;
 		for (int j = 1; j < n; j++){
-		// DOWN
-			if (board[j][i] == board[j+1][i]) cnt++;
+			if (board[j][fixed_x[i]] == board[j+1][fixed_x[i]]) cnt++;
 			else cnt = 1;
 			max_length = max(max_length, cnt);
 		}
 	}
 	return max_length;
-}
-int adjacent(vector<string>& board, int y, int x, int dir)
-{
-// BASE CONDITION : board[i][j] is boundary
-	if (is_bound(board, y, x)) return 0;
-
-	int cnt = 1;
-
-	int y_ = y + dy[dir];
-	int x_ = x + dx[dir];
-	if (board[y][x] == board[y_][x_])
-		cnt += adjacent(board, y_, x_, dir);
-	return cnt;
 }
 void input(istream& is, vector<string>& board)
 {
