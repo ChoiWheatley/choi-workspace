@@ -33,13 +33,18 @@ CPPZZ
 #include<stdexcept>
 #include<unistd.h>	// to use sleep() function
 #define BOUND '0'
+#define RIGHT 0
+#define DOWN 1
 using namespace std;
-#define DBG 1
+//#define DBG 1
 
 int n = 0;
+// right, down
+const int dx[] = { 1, 0 };
+const int dy[] = { 0, 1 };
 
 int longest_length(vector<string> board);
-int adjacent(vector<string>& board, int y, int x);
+int adjacent(vector<string>& board, int y, int x, int dir);
 /* helper functions */
 void input(istream& is, vector<string>& board);
 ostream& operator<<(ostream& os, vector<string>& board);
@@ -48,13 +53,11 @@ bool is_bound(const vector<string>& board, int y, int x);
 int main(void)
 {
 	vector<string> board;	// (N+2) * (N+2) board with boundary
-	// 오른쪽, 아래하고만 교환하면 모든 칸에 대해 검사하게 된다.
-	const static int dx[2] = { 1, 0 };
-	const static int dy[2] = { 0, 1 };
-	ifstream ifs{"sample.txt"};
-	if(!ifs) runtime_error("file wrong");
-	input(ifs, board);
+	//ifstream ifs{"sample.txt"};
+	//if(!ifs) runtime_error("file wrong");
+	input(cin, board);
 #ifdef DBG
+cerr << " IFS -> CIN \n";
 cerr << board << '\n';
 #endif
 	
@@ -68,7 +71,7 @@ cerr << board << '\n';
 				if (!is_bound(board, y_, x_)) {
 					swap(board[y][x], board[y_][x_]);
 					max_length = max(max_length, longest_length(board));
-					swap(board[y][x], board[y_][x_]);
+					swap(board[y][x], board[y_][x_]);		// 원상복귀
 				}
 			}
 		}
@@ -78,40 +81,38 @@ cerr << board << '\n';
 	return 0;
 }
 int longest_length(vector<string> board)
-// BASE CONDITION : 4 방향 모두 막혔을 때
 {
 	int max_length = 0;
-
-	for (int y = 1; y < n+1; y++){
-		for (int x = 1; x < n+1; x++){
-#ifdef DBG
-cerr << board << '\n';
-sleep(1);
-#endif
-			max_length = max(max_length, adjacent(board, y, x));
+	int cnt = 0;
+	for (int i = 1; i < n+1; i++){
+		cnt = 1;
+		for (int j = 1; j < n; j++){
+		// RIGHT
+			if (board[i][j] == board[i][j+1]) cnt++;
+			else cnt = 1;
+			max_length = max(max_length, cnt);
+		}
+		cnt = 1;
+		for (int j = 1; j < n; j++){
+		// DOWN
+			if (board[j][i] == board[j+1][i]) cnt++;
+			else cnt = 1;
+			max_length = max(max_length, cnt);
 		}
 	}
 	return max_length;
 }
-// adjacent function ERASES when visit
-int adjacent(vector<string>& board, int y, int x)
+int adjacent(vector<string>& board, int y, int x, int dir)
 {
-	// 상, 우, 하, 좌
-	const static int dx[4] = { 0, 1, 0, -1 };
-	const static int dy[4] = { -1, 0, 1, 0 };
 // BASE CONDITION : board[i][j] is boundary
 	if (is_bound(board, y, x)) return 0;
 
 	int cnt = 1;
-	char sample = board[y][x];
-	board[y][x] = BOUND;	// prevent from re-visiting
-	for (int d = 0; d < 4; d++){
-		int y_ = y + dy[d];
-		int x_ = x + dx[d];
-		if (sample == board[y_][x_]){
-			cnt += adjacent(board, y_, x_);
-		}
-	}
+
+	int y_ = y + dy[dir];
+	int x_ = x + dx[dir];
+	if (board[y][x] == board[y_][x_])
+		cnt += adjacent(board, y_, x_, dir);
 	return cnt;
 }
 void input(istream& is, vector<string>& board)
