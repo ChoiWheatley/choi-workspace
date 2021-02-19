@@ -40,87 +40,57 @@
 - a definition of a none literal type
 */
 #include<iostream>
-#include<vector>
-#include<string>
-#include<array>
-#include<cmath>
+
 //#define DBG
-#define MAX 1000000
+#define MAX 1000001
 using namespace std;
 
-typedef unsigned long long int ull;
-class BadGoldbach{ 
-public:
-	string what() { return "Goldbach's conjecture is wrong."; }
-};
-class Exit{};
-// compile-time array generation
-constexpr array<ull, MAX+1> init_prime(array<bool, MAX+1>& check, int& result_idx) {
-	array<ull, MAX+1> result{0};
-	//array<bool, MAX+1> check{false};	// erased = true
-	result_idx = 0;
-	for (int i = 2; i*i <= MAX; i++){
-		if (check[i] == false) {
-			for (int j = i+i; j <= MAX; j += i) check[j] = true;
-	}	}
-	// result push
-	for (int i = 2; i <= MAX; i++) 
-		if (check[i] == false) result[result_idx++] = i;
-	return result;
-}
+bool check[MAX];
 
-int prime_end;
-array<bool, MAX+1> check{false};
-auto prime = init_prime(check, prime_end);
-bool inputf(istream& is, ull& input);
-void print(ull n, ull a, ull b); // n = a + b
-bool verify(ull& n, ull& a);
+void init_prime() {
+	
+	check[1] = true; 
+	
+	for (int i = 2; i <= 1000; i++)
+	{
+		if (check[i] == false) 
+		{
+			for (int j = i * i; j < MAX; j += i) check[j] = true;
+		}
+	}
+}
 
 int main(void)
 {
+	init_prime();
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-	try {
-		ull input = 0, a = 0;
-		for (; ;) {
-			if (inputf(cin, input) ==  false) continue;
-			if (verify(input, a)) print(input, prime[a], input-prime[a]);
-			else throw BadGoldbach{};
+	cout.tie(nullptr);
+	
+	while (1)
+	{
+		int n;
+		cin >> n;
+		if(!n) break;
+
+		int f_part = 3;
+		int s_part = n - 3;
+
+		bool flag = false;
+		int comp = n >> 1;
+		while(f_part <= comp){
+			if(!check[f_part] && !check[s_part]){
+				cout << n << " = " << f_part << " + " << s_part << "\n";
+				flag = true;
+				break;
+			}
+			f_part++;
+			s_part--;
+		}
+		if(!flag){
+			cout << "Goldbach's conjecture is wrong.";
 		}
 	}
-	catch (BadGoldbach e){
-		cout << e.what() << '\n';
-		return 1;
-	}
-	catch (Exit e){
-		return 0;
-	}
+	
 	return 0;
-}
-
-
-bool inputf(istream& is, ull& input)
-{
-	is >> input;
-	if (input == 0) throw Exit{};
-	if (input % 2 != 0) return false;
-	if (input < 5) return false;
-	return is.good();
-}
-void print(ull n, ull a, ull b) // n = a + b
-{
-	cout << n << " = " << a << " + " << b << '\n';
-}
-bool verify(ull& n, ull& a)
-// 풀이 : 두 소수 a, b 에 대해 
-// a + b = n 이면
-// b = n - a
-// a 를 구했을 때 n-a 도 소수이면 true
-{
-	// 1부터 세는 이유는 [0] = 2이고, n-2 는 언제나 짝수라서
-	// 세는 의미가 없다.
-	for (a = 1; a < prime_end; a++)	{
-		if (check[n - prime[a]] == false) return true;
-	}
-	return false;
 }
