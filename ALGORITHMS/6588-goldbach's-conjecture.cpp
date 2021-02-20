@@ -39,58 +39,71 @@
 - a definition of a variable for which initialization is performed 
 - a definition of a none literal type
 */
-#include<iostream>
+#include <array>
+#include <iostream>
+#include <sstream>
 
 //#define DBG
 #define MAX 1000001
 using namespace std;
 
-bool check[MAX];
+stringstream ss;
+void print(int n, int a, int b);
 
-void init_prime() {
-	
-	check[1] = true; 
-	
-	for (int i = 2; i <= 1000; i++)
-	{
-		if (check[i] == false) 
-		{
-			for (int j = i * i; j < MAX; j += i) check[j] = true;
-		}
-	}
+
+template<int N>
+constexpr array<bool, N> init_prime() {
+
+    array<bool, N> ret{0};
+    ret[1] = true;
+
+    for (int i = 2; i < 1001; i++) {
+        if (!ret[i]) {
+            for (int j = i * i; j < MAX; j += i) {
+                ret[j] = true;
+            }
+        }
+    }
+	return ret;
 }
 
-int main(void)
+auto check = init_prime<MAX>();
+
+int main(void) {
+    
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    while (1) {
+        int n;
+        cin >> n;
+        if (!n)
+            break;
+
+        int f_part = 3;
+        int s_part = n - 3;
+
+        bool flag = false;
+        int comp = n >> 1;
+        while (f_part <= comp) {
+            if (!check[f_part] && !check[s_part]) {
+                print(n, f_part, s_part);
+                flag = true;
+                break;
+            }
+            f_part++;
+            s_part--;
+        }
+        if (!flag) {
+            ss << "Goldbach's conjecture is wrong.\n";
+        }
+    }
+    cout << ss.str();
+    return 0;
+}
+
+void print(int n, int a, int b) // n = a + b
 {
-	init_prime();
-	ios_base::sync_with_stdio(false);
-	cin.tie(nullptr);
-	cout.tie(nullptr);
-	
-	while (1)
-	{
-		int n;
-		cin >> n;
-		if(!n) break;
-
-		int f_part = 3;
-		int s_part = n - 3;
-
-		bool flag = false;
-		int comp = n >> 1;
-		while(f_part <= comp){
-			if(!check[f_part] && !check[s_part]){
-				cout << n << " = " << f_part << " + " << s_part << "\n";
-				flag = true;
-				break;
-			}
-			f_part++;
-			s_part--;
-		}
-		if(!flag){
-			cout << "Goldbach's conjecture is wrong.";
-		}
-	}
-	
-	return 0;
+    ss << n << " = " << a << " + " << b << '\n';
 }
