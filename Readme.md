@@ -61,7 +61,10 @@ void some_callback_function(functionname, [...]);
 	- an asm declaration (assembly)
 	- a definition of a variable for which initialization is performed 
 	- a definition of a none literal type
-
+- 어떤 수 i 에 대하여 1~M 까지 반복한다면 
+```
+((i-1) % M)+1
+```
 ---
 
 # ./HTML
