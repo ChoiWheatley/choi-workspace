@@ -52,19 +52,18 @@ void some_callback_function(functionname, [...]);
 ## TIP
 - passing const reference array into parameter : "const type (&name)[][]"
 - You can use Compile-time table using constexpr array function (I dunno well...)  http://cplusplus.com/forum/beginner/249023/ 
-<TIP> Compile time initialization   // https://en.cppreference.com/w/cpp/language/constexpr
-	the function body must not contain
-	- a goto statement
-	- goto label 
-	- case - default
-	- a try block
-	- an asm declaration (assembly)
-	- a definition of a variable for which initialization is performed 
-	- a definition of a none literal type
-- 어떤 수 i 에 대하여 1~M 까지 반복한다면 
+	Compile time initialization   // https://en.cppreference.com/w/cpp/language/constexpr
+- 어떤 수 i 에 대하여 1~M 까지 반복한다면 `((i-1) % M)+1` 이런 식으로 인덱스를 짜면 좋다. (아니 이렇게 해야 한다)
+- 2차원 벡터 초기화 : `vector<vector<int>> board(n, vector<int>(m, 0)); `
+- `ios_base::setw()` 는 `<iomanip>` header 파일에 들어있다.
+- To make cin, cout faster,
+```cpp
+ios_base::sync_with_studio(false);
+cin.tie(nullptr);
+cout.tie(nullptr);
 ```
-((i-1) % M)+1
-```
+
+
 ---
 
 # ./HTML
