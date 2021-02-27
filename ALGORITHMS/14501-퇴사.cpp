@@ -95,7 +95,7 @@ using namespace std;
 #define DBG
 
 void input(istream& is, int& n, vector<int>& ti, vector<int>& pi);
-int income(const vector<int>& ti, const vector<int>& pi, const int& n, int day = 0, int sum = 0, int last_sum = 0);
+int income(const vector<int>& ti, const vector<int>& pi, const int& n, int day = 0, int sum = 0);
 
 int main(void)
 {
@@ -104,9 +104,9 @@ int main(void)
 #ifdef DBG
 	ifstream ifs{"sample.txt"};
 	if(!ifs) throw runtime_error("ifs opening error");
-	for (;ifs.good();){
-		input(ifs, n, ti, pi);
+	for (input(ifs, n, ti, pi); ifs.good(); ){
 		cout << income(ti, pi, n) << '\n';
+		input(ifs, n, ti, pi);
 	}
 #else
 	input(cin, n, ti, pi);
@@ -123,17 +123,17 @@ void input(istream& is, int& n, vector<int>& ti, vector<int>& pi)
 	for (int i = 0; i < n; i++)
 		is >> ti[i] >> pi[i];
 }
-int income(const vector<int>& ti, const vector<int>& pi, const int& n, int day, int sum, int last_sum)
+int income(const vector<int>& ti, const vector<int>& pi, const int& n, int day, int sum)
 {
 	// BASE CONDITION
 	if (n == day) return sum;
-	if (n < day) return sum - last_sum;
+	if (n < day) return -1;
 
 	int summax = 0;
-	for (int i = day; i < n; i++){
-		sum += pi[i];
-		summax = max(summax, income(ti, pi, n, i+ti[i], sum, pi[i]));
-		sum -= pi[i];
-	}
+	// Using Binary Selection Method
+	// 1. no select
+	summax = max(summax, income(ti, pi, n, day+1, sum));
+	// 2. select and pass days
+	summax = max(summax, income(ti, pi, n, day+ti[day], sum+pi[day]));
 	return summax;
 }

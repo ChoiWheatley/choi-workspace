@@ -63,13 +63,14 @@ void possible(const vector<char>& alphabets, vector<char> selected, const int& l
     if (selected.size() == l &&
         1 <= cnt_vowel(selected) &&
         2 <= cnt_consonant(selected)) { cout << selected << '\n'; return; }
-    if (selected.size() > l) return;
+    if (start >= alphabets.size()) return;
 
-    for (int i = start; i < alphabets.size(); i++){
-        selected.push_back(alphabets[i]);
-        possible(alphabets, selected, l, i+1);
-        selected.pop_back();
-    }
+    // select
+    selected.push_back(alphabets[start]);
+    possible(alphabets, selected, l, start+1);
+    // deselect
+    selected.pop_back();
+    possible(alphabets, selected, l, start+1);
 }
 int cnt_vowel(const vector<char>& selected)
 {
