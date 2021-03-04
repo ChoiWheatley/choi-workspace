@@ -62,6 +62,8 @@ ios_base::sync_with_studio(false);
 cin.tie(nullptr);
 cout.tie(nullptr);
 ```
+- Backtracking = Bruteforce + Condition
+	We can improve Bruteforce program using backtracking method. Halting the iteration in which the result can be impossible or tedious. 
 
 
 ---
