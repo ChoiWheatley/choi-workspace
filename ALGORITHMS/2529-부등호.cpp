@@ -40,16 +40,16 @@ int K = 0;
 string minimum = "";
 string maximum = "";
 
-void input(istream& is, vector<char>& angles);
-void digit(const vector<char>& angles, bool used[10], int angle_idx=0, string num="");
-bool is_possible(const vector<char>& angle, const bool used[10], const string& num);
-string strmin(string a, string b);
-string strmax(string a, string b){ if(strmin(a,b) == a) return b; else return a; }
+void input(istream& is, string& angles);
+void digit_recur(const string& angles, bool (&used)[10], int angle_idx=0, string num="");
+bool is_possible(const string& angle, const string& num);
+string& strmin(string& a, string& b);
+string& strmax(string& a, string& b){ if(strmin(a,b) == a) return b; else return a; }
 char itoc(int i);
 
 int main(void)
 {
-	vector<char> angles;
+	string angles;
 #if DBG > 0
 	fstream ifs{"sample.txt"};
 	if (!ifs) { cerr<<"file opening error\n"; return 1; }
@@ -58,67 +58,64 @@ int main(void)
 		if (!ifs) break;
 		//TODO
 		bool used[10] = {false};
-		digit(angles, used);
+		digit_recur(angles, used);
 		cout << "maximum = " << maximum << '\n' << "minimum = " << minimum << '\n';
 	}
 #else
 	input(cin, angles);
 	bool used[10] = {false};
-	digit(angles, used);
+	digit_recur(angles, used);
 	cout << maximum << '\n' << minimum << '\n';
 #endif
 	return 0;
 }
-void input(istream& is, vector<char>& angles)
+void input(istream& is, string& angles)
 {
 	is >> K;
-	angles = vector<char>(K);
+	angles = string(K,' ');
 	for (int i = 0; i < K; i++){
 		is >> angles[i];
 		if (angles[i] != '<' && angles[i] != '>') throw runtime_error("angle error!");
 	}
 }
-void digit(const vector<char>& angles, bool used[10], int angle_idx, string num)
+void digit_recur(const string& angles, bool (&used)[10], int angle_idx, string num)
 {
 	// init minimum and maximum
 	if (angle_idx == 0) { 
 #if DBG > 1
 cerr << "num = " << num << '\n';
 #endif
-		maximum = string(K,'9');
-		minimum = string(K,'0');
+		maximum = string(K,'0');
+		minimum = string(K,'9');
 	}
-	// BASE CONDITION - success
-	if (angle_idx == angles.size()) {
-		minimum = strmin(minimum, num);
+	// BASECONDITION
+	if (angle_idx == K+1){
+		if (!is_possible(angles, num)) return;
 		maximum = strmax(maximum, num);
-		return;
+		minimum = strmin(minimum, num);
 	}
-	// BASE CONDITION - failure
-	if (!is_possible(angles, used, num)) return;
-
 	// 몰라 일단 넣고보자
 	for (int i = 0; i < 10; i++){
 		if (used[i]) continue;
 		used[i] = true;
 		num.push_back(itoc(i));
-		digit(angles, used, angle_idx+1, num);
+		digit_recur(angles, used, angle_idx+1, num);
 
 		used[i] = false;
 		num.pop_back();
 	}
 }
-string strmin(string a, string b)
+string& strmin(string& a, string& b)
 {
 	for (int i = 0; i < K; i++){
-		if (a[i] > b[i]) return a;
-		if (a[i] < b[i]) return b;
+		if (a[i] > b[i]) return b;
+		if (a[i] < b[i]) return a;
 	}
 	// identical case can happen
 	return a;
 }
 // check the whole angle-digit conditions
-bool is_possible(const vector<char>& angle, const bool used[10], const string& num)
+bool is_possible(const string& angle, const string& num)
 {
 	if (num.size() == 0) return true;
 	for (int i = 0; i < num.size()-1; i++){
