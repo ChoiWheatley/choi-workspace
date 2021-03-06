@@ -88,9 +88,10 @@ cerr << "num = " << num << '\n';
 		maximum = string(K,'0');
 		minimum = string(K,'9');
 	}
-	// BASECONDITION
+	// BASECONDITION : failure
+	if (!is_possible(angles, num)) return;
+	// BASECONDITION : success
 	if (angle_idx == K+1){
-		if (!is_possible(angles, num)) return;
 		maximum = strmax(maximum, num);
 		minimum = strmin(minimum, num);
 	}
