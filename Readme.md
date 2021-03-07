@@ -64,6 +64,7 @@ cout.tie(nullptr);
 ```
 - Backtracking = Bruteforce + Condition
 	We can improve Bruteforce program using backtracking method. Halting the iteration in which the result can be impossible or tedious. 
+- Halt conditions on Recursive functions. just return boolean value whether or not is on a halt condition. You can check when calling inside this recursive iteration, return true when its return value is also true
 
 
 ---
