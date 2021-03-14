@@ -56,7 +56,8 @@ int main(void)
 		if (!ifs) break;
 		for (int i = 0; i < n; i++){
 			for (int j = 0; j < n; j++){
-				std::cout << std::setw(10)  << w[i][j] << ' ';
+				if (w[i][j] == DISCONNECTED) std::cout << std::setw(10) << "XXX";
+				else std::cout << std::setw(10)  << w[i][j] << ' ';
 			}
 			std::cout << '\n';
 		}
@@ -64,6 +65,7 @@ int main(void)
 		for (int i = 0; i < n; i++)
 			seq[i] = i;
 		do {
+			if (seq[0] != 0) break;
 			ans = std::min(ans, fee(seq));
 			for (auto i : seq) std::cout << i << ' ';
 			std::cout << "= " << fee(seq) << '\n';
@@ -75,9 +77,10 @@ int main(void)
 	std::vector<int> seq(n);
 	for (int i = 0; i < n; i++)
 		seq[i] = i;
-	ans = std::min(ans, fee(seq));
-	for (;next_permu(seq);)
+	do {
+		if (seq[0] != 0) break;
 		ans = std::min(ans, fee(seq));
+	} while (next_permu(seq));
 	std::cout << ans << '\n';
 
 #endif
@@ -85,16 +88,16 @@ int main(void)
 }
 bool next_permu(std::vector<int>& seq)
 {
-	int i = 0, j = 0;
-	for (i = (int)seq.size()-1; i >= 0; i--){
+	size_t i = 0, j = 0;
+	for (i = seq.size()-1; i >= 0; i--){
 		if (i == 0) return false;	// very last permutation
 		if (seq[i-1] < seq[i]) break;
 	}
-	for (j = i; j < (int)seq.size(); j++){
+	for (j = i; j < seq.size(); j++){
 		if (seq[i-1] >= seq[j]) break;
 	}
 	swap(seq[i-1], seq[j-1]);
-	for (int k = seq.size()-1; k > i; k--){
+	for (size_t k = seq.size()-1; k > i; k--){
 		swap(seq[k], seq[i++]);
 	}
 	return true;
@@ -119,10 +122,10 @@ void input(std::istream& is)
 }
 int fee(const std::vector<int>& seq)
 {
-	int ret = 0;
-	for (int i = 0; i < seq.size(); i++){
-		if (ret > INT_MAX - w[seq[i]][seq[(i+1) % seq.size()]]) ret = DISCONNECTED;
+	size_t ret = 0;
+	for (size_t i = 0; i < seq.size(); i++){
+		if (ret > (size_t)INT_MAX - w[seq[i]][seq[(i+1) % seq.size()]]) ret = DISCONNECTED;
 		ret += w[seq[i]][seq[(i+1) % seq.size()]];
 	}
-	return ret;
+	return (int)ret;
 }
