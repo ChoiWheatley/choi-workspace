@@ -97,16 +97,24 @@ int main(void)
 	{
 		input(IST);
 		if (!IST) break;
+
 #if DBG > 1
-for (int i = 0; i < n; i++) {
-	for (int j = 0; j < n; j++)
-		std::cerr << synergy[i][j] << ' ';
-	std::cerr << '\n';
-}
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++)
+				std::cerr << synergy[i][j] << ' ';
+			std::cerr << "\n";
+		}
+		std::cerr << '\n';
 #endif
 
-		for (bitwised_people = 1; bitwised_people < (unsigned int)(1<<n); bitwised_people++){
+		for (bitwised_people = 1; bitwised_people <= (unsigned int)(1<<n); bitwised_people++){
+			// Unnecessary condition
 			if (number_of_one(bitwised_people, n) * 2 != n) continue;
+
+#if DBG > 1
+			for (int i = 0; i < n; i++) std::cerr << (( bitwised_people & (1<<i) ) != 0 ? i : '\0') << ' ';
+			std::cerr << '\n';
+#endif
 
 			// 1 : start team
 			// 0 : link  team
@@ -120,9 +128,13 @@ for (int i = 0; i < n; i++) {
 }
 void input(istream& is)
 {
+//initialize all global variables
 	ans = INT_MAX;
 	bitwised_people = 0;
-	for (int i = 0; i < MAXN * MAXN; i++) *(*synergy+i) = INT_MAX;
+	for (int i = 0; i < MAXN; i++)
+		for (int j = 0; j < MAXN; j++)
+			synergy[i][j] = INT_MAX;
+
 	is >> n;
 	for (int i = 0; i < n; i++){
 		for (int j = 0; j < n; j++){
@@ -143,8 +155,8 @@ int get_synergy(unsigned int synergy[MAXN][MAXN], unsigned int bitwise, unsigned
 	for (int i = 0; i < n; i++){
 		for (int j = 0; j < n; j++){
 			if (i == j) continue;
-			if ((bitwise & (1<<i)) == team_name &&
-				(bitwise & (1<<j)) == team_name)
+			if (((bitwise & (1<<i))>>i) == team_name &&
+				((bitwise & (1<<j))>>j) == team_name)
 				ret += synergy[i][j];
 	}	}
 
