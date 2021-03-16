@@ -112,7 +112,9 @@ int main(void)
 			if (number_of_one(bitwised_people, n) * 2 != n) continue;
 
 #if DBG > 1
-			for (int i = 0; i < n; i++) std::cerr << (( bitwised_people & (1<<i) ) != 0 ? i : '\0') << ' ';
+			for (int i = 0; i < n; i++) 
+				if (( bitwised_people & (1<<i) ) != 0)
+					std::cerr << i << ' ';
 			std::cerr << '\n';
 #endif
 
