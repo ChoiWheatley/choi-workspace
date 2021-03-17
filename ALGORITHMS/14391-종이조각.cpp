@@ -68,40 +68,45 @@ ifstream IST{"sample.txt"};
 #define HORI 0
 #define VERT 1
 
+
+
 /* FUNCTION DECLATATIONS */
 void input(istream& is, int board[MAXN][MAXN], int& n, int& m);
-int calc(const int board[MAXN][MAXN], int n, int m);
-int shad(const int board[MAXN][MAXN], const unsigned int bitwise, const int n, const int m, unsigned int& bit_selected, int i, int j, unsigned int delta);
+int all_segments(const int board[MAXN][MAXN], const unsigned int bitwise, int n, int m, int delta);
 int bit_map(unsigned int bitwise, int m, int i, int j);
 void print_bit(unsigned int bitwise, int n, int m);
 
 
 int main(void)
 {
+
+#if DBG > 0
     for (;;)
     {
-        int board[MAXN][MAXN] = {-1};
-        int n = 0, m = 0;
-        input(IST, board, n, m);
-#if DBG > 1
-for (int i = 0; i < n; i++){
-	for (int j = 0; j < m; j++)
-		std::cerr << board[i][j] << ' ';
-	std::cerr << '\n';
-}
 #endif
-        if (!IST) break;
+		int board[MAXN][MAXN] = {-1};
+		int n = 0, m = 0;
+		input(IST, board, n, m);
+		
+		// TODO
+		int sum = 0;
+		for (int bitwise = 0; bitwise < (1 << (n*m)); bitwise++){
+			sum = max(sum, all_segments(board, bitwise, n, m, HORI));
+			sum = max(sum, all_segments(board, bitwise, n, m, VERT));
+		}
+		std::cout << sum << '\n';
+#if DBG > 0
+	}
+#endif
 
-        cout << calc(board, n, m) << '\n';
-    }
-    return 0;
+	return 0;
 }
 void input(istream& is, int board[MAXN][MAXN], int& n, int& m)
 {
-    for (int i = 0; i < MAXN * MAXN; i++) *(*board+i) = -1;
-    is >> n >> m;
-    
-    for (int i = 0; i < n; i++){
+	for (int i = 0; i < MAXN * MAXN; i++) *(*board+i) = -1;
+	is >> n >> m;
+
+	for (int i = 0; i < n; i++){
 		is.ignore(10, '\n');
         for (int j = 0; j < m; j++){
 			char tmp = 0;
@@ -111,68 +116,43 @@ void input(istream& is, int board[MAXN][MAXN], int& n, int& m)
        }
 	}
 }
-int calc(const int board[MAXN][MAXN], int n, int m)
+int all_segments(const int board[MAXN][MAXN], const unsigned int bitwise, int n, int m, int delta)
 {
-    int ret = -1;
-	unsigned int bitwise = 0;	// bitwise size is maximum MAXN * MAXN, which can be 16
-    for (bitwise = 0; bitwise < (unsigned int)(1<<(n*m)); bitwise++){
-#if DBG > 1
-std::cerr << "\nbitwise:";
-print_bit(bitwise, n, m);
-#endif
-		int sum = 0;
-		unsigned int bit_selected = 0;
+	int sum = 0;
+
+
+
+	if (delta == HORI){
 		for (int i = 0; i < n; i++){
 			for (int j = 0; j < m; j++){
-				sum += shad(board, bitwise, n, m, bit_selected, i, j, bit_map(bitwise, m, i, j));
+				if ( bit_map( bitwise, m, i, j ) == delta ){
+					int seg = 0;
+
+					// 다른 게 나오거나 끝 까지 갈 때 까지 숫자를 반복하여 더해준다.
+					for (;    j < m && bit_map( bitwise, m, i, j ) == delta    ; j++)
+						seg = seg*10 + board[i][j];
+
+					sum += seg;
+				}
 			}
 		}
-		ret = max(ret, sum);
+	}
+	else if (delta == VERT){	
+		for (int j = 0; j < m; j++){
+			for (int i = 0; i < n; i++){
+				if ( bit_map( bitwise, m, i, j ) == delta ){
+					int seg = 0;
+					
+					for (;    i < n && bit_map( bitwise, m, i, j ) == delta    ; i++)
+						seg = seg*10 + board[i][j];
+
+					sum += seg;
+				}
+			}
+		}
 	}
 
-    return ret;
-}
-// bitwise 값을 토대로 board의 값을 더해서 출력한다.
-int shad(const int board[MAXN][MAXN], const unsigned int bitwise, const int n, const int m, unsigned int& bit_selected, int i, int j, unsigned int delta)
-{
-	// BASE CONDITION
-	if ( i >= n || j >= m ) return 0;
-	if ( (unsigned int)bit_map(bitwise, m, i, j) != delta ) return 0;
-	if ( bit_map(bit_selected, m, i, j) == 1) return 0;		// is [i][j] already visited
-
-	int ret = board[i][j], shad_ = 0, digit = 0;
-	// TODO TODO TODO TODO TODO TODO
-	switch( delta ){
-	case HORI:
-		bit_selected |= (1<<(i*m+j));
-		shad_ = shad(
-			board, bitwise, n, m,
-			bit_selected,
-			i, j+1,
-			bit_map(bitwise, m, i, j)
-		);
-		digit = to_string(shad_).size();
-		ret = ret*pow(10,digit) + shad_;
-		break;
-	case VERT:
-		bit_selected |= (1<<(i*m+j));
-		shad_ = shad(
-			board, bitwise, n, m,
-			bit_selected,
-			i+1, j,
-			bit_map(bitwise, m, i, j)
-		);
-		digit = to_string(shad_).size();
-		ret = ret*pow(10,digit) + shad_;
-		break;
-	}
-	
-
-#if DBG > 1
-std::cerr << ret << '\t';
-#endif
-
-	return ret;
+	return sum;
 }
 int bit_map(unsigned int bitwise, int m, int i, int j)
 {
