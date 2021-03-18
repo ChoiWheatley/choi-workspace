@@ -26,28 +26,25 @@ X가 2로 나누어 떨어지면, 2로 나눈다.
 #include<climits>
 #include<cmath>
 using namespace std;
-int memo[1000001] = {0};
+int memo[1000001] = {INT_MAX};
 
 int f(int n);
 
 int main(void)
 {
+	memo[1] = 0;
+	memo[0] = 0;
 	int n = 0;
 	cin >> n;
 	cout << f(n) << '\n';
 }
 int f(int n)
 {
-	if (n == 1) return 0;
-	int ret = INT_MAX;
-
-	if (memo[n] > 0) return memo[n];
-
-	if (n % 3 == 0)		ret = min(ret, 1 + f(n/3));
-	if (n % 2 == 0) 	ret = min(ret, 1 + f(n/2));
-	ret = min(ret, 1 + f(n-1));
-
-
-	memo[n] = ret;
-	return ret;
+	if ( n == 1 ) return 0;
+	for (int i = 2; i <= n; i++){
+		memo[i] = 1 + memo[i-1];
+		if ( i%3 == 0 ) memo[i] = min(memo[i], 1 + memo[i/3]);
+		if ( i%2 == 0 ) memo[i] = min(memo[i], 1 + memo[i/2]);
+	}
+	return memo[n];
 }
