@@ -25,27 +25,36 @@
 #include<stdlib.h>
 #include<string.h>
 
-#define MAXN 1000
+#define MAXN 1001
+#define MODULO 10007
 
 int tile(int n);
 
 int main(void)
 {
+#ifndef DBG
 	int input = 0;
 	scanf("%d", &input);
 	printf("%d\n", tile(input));
     return 0;
+#endif
+#ifdef DBG
+    for (int i = 1; i < MAXN; i++) {
+        printf("D[%d]=%d\t", i, tile(i));
+        if ( i % 10 == 0 ) 
+            puts("");
+    }
+    return 0;
+#endif
 }
 int tile(int n)
 {
-	if (n == 1) return 1;
-	if (n == 2) return 2;
-	static int memo[MAXN+1] = {0};
-	memo[1] = 1; memo[2] = 2;
+    if (n == 1) return 1;
+    if (n == 2) return 2;
 
-	if (memo[n] > 0) return memo[n];
-
-	memo[n] = (tile(n-1) + tile(n-2)) % 10007;
-
-	return memo[n];
+    int D[MAXN] = {0, 1, 2};
+    for (int i = 3; i <= n; i++) {
+        D[i] = (  (D[i-1])  + (D[i-2])  ) % MODULO;
+    }
+    return D[n];
 }
