@@ -50,15 +50,17 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#include <limits>
+#include <climits>
 #include <stdexcept>
+using namespace std;
 
 #define Y 			'x'
 #define N 			'.'
 #define INF 		INT_MAX
-#define SWITCHES 	10
+#define BTN_SIZE    10
 #define CLOCKS		16
-const char linked[SWITCHES][CLOCKS+1] = {
+int g_push_count = 0;
+const char linked[BTN_SIZE][CLOCKS+1] = {
 //   0123456789012345
 	"xxx.............",
 	"...x...x.x.x....",
@@ -70,36 +72,84 @@ const char linked[SWITCHES][CLOCKS+1] = {
 	"...xxx...x...x.."
 };
 
-// 모든 시계가 12시인지
-bool aligned(const vector<int>& clocks);
-// 현재 clocks 들에 switch번 스위치를 누른다.
-void push(vector<int>& clocks, int switch);
-// 현재 clocks 들에 switch를 제외한 나머지 스위치를 눌러 clocks를 12시로 만들 수 있는지 최소 횟수를 반환.
-// 만약 불가능하면 INF같이 큰 수를 반환한다.
-int solve(vector<int>& clocks, int switch);
+// is all clock indicates 12o'clock?
+bool is_aligned(const vector<int>& clock);
+// move all clocks 30 deg's where linked with that button
+void push_that_button(vector<int>& clock, const int btn_no);
+// use recursive solution for focusing on each button
+int solve(vector<int>& clock, int btn_no = 0);
 
+
+/* HELPER FUNCTIONS */
+void rotate_clock(int& specific_clock);
 
 
 int main(void) 
 {
+    int c;
+    vector<int> test_case(BTN_SIZE);
+    vector<int> clock(CLOCKS);
+
+    cin >> c;
+    while (c-- > 0)
+    {
+        for (int i = 0; i < CLOCKS; i++)
+        {
+            cin >> clock[i];
+        }
+        if (solve(clock) == INF) 
+            cout << -1 << '\n';
+        else
+            cout << g_push_count << '\n';
+        g_push_count = 0;
+    }
 	return 0;
 }
 
-bool aligned(const vector<int>& clocks)
+
+
+// is all clock indicates 12o'clock?
+bool is_aligned(const vector<int>& clock)
 {
-	for (auto i : clocks)
-		if (i != 12) return false;
-	return true;
+    for (auto i : clock)
+        if (i != 12) return false;
+    return true;
 }
-void push(vector<int>& clocks, int switch)
+// move all clocks 30 deg's where linked with that button
+void push_that_button(vector<int>& clock, const int btn_no)
 {
-	for (int i = 0; i < CLOCKS; i++){
-		if (linked[switch][i] == Y) clocks[i] += 3;
-		if (clocks[i] > 12) clocks[i] = 3;
-	}
+    for (int i = 0; i < CLOCKS; i++)
+    {   
+        if (linked[btn_no][i] == 'x')
+        {
+            rotate_clock(clock[i]);
+            g_push_count++;
+        }
+    }
 }
-int solve(vector<int>& clocks, int switch)
+// use recursive solution for focusing on each button
+int solve(vector<int>& clock, int btn_no)
 {
-//BASE CONDITION: no more switches
-	if (switch == SWITCHES) return ( aligned(clocks) ? 0 : INF );
+    if (btn_no >= BTN_SIZE)
+        return (is_aligned(clock) ? 0 : INF);
+
+    // push button 4 times is same as before
+    for (int i = 0; i < 4; i++)
+    {
+        push_that_button(clock, btn_no);
+        if (is_aligned(clock))
+            return g_push_count;
+        solve(clock, btn_no+1);
+    }
+
+    // not aligned until every push...
+    return INF;
+}
+// rotate 30 degrees
+void rotate_clock(int& specific_clock)
+{
+    if (specific_clock == 12)
+        specific_clock = 3;
+    else
+        specific_clock += 3;
 }
