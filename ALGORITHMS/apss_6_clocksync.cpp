@@ -47,29 +47,30 @@
 	9
 */
 #include <iostream>
+#include <fstream>
 #include <vector>
+#include <unistd.h>
 #include <string>
 #include <cmath>
 #include <climits>
 #include <stdexcept>
 using namespace std;
 
-#define Y 			'x'
-#define N 			'.'
 #define INF 		INT_MAX
 #define BTN_SIZE    10
 #define CLOCKS		16
-int g_push_count = 0;
 const char linked[BTN_SIZE][CLOCKS+1] = {
 //   0123456789012345
-	"xxx.............",
-	"...x...x.x.x....",
-	"....x.....x...xx",
-	"......xxx.x.x...",
-	"x.x...........xx",
-	"...x..........xx",
-	".xxxxx..........",
-	"...xxx...x...x.."
+    "xxx.............",
+    "...x...x.x.x....",
+    "....x.....x...xx",
+    "x...xxxx........",
+    "......xxx.x.x...",
+    "x.x...........xx",
+    "...x..........xx",
+    "....xx.x......xx",
+    ".xxxxx..........",
+    "...xxx...x...x.."
 };
 
 // is all clock indicates 12o'clock?
@@ -77,11 +78,12 @@ bool is_aligned(const vector<int>& clock);
 // move all clocks 30 deg's where linked with that button
 void push_that_button(vector<int>& clock, const int btn_no);
 // use recursive solution for focusing on each button
-int solve(vector<int>& clock, int btn_no = 0);
+unsigned int solve(vector<int>& clock, int btn_no = 0);
 
 
 /* HELPER FUNCTIONS */
 void rotate_clock(int& specific_clock);
+void print_clocks(const vector<int>& clocks);
 
 
 int main(void) 
@@ -93,15 +95,15 @@ int main(void)
     cin >> c;
     while (c-- > 0)
     {
+        int solution;
         for (int i = 0; i < CLOCKS; i++)
         {
             cin >> clock[i];
         }
-        if (solve(clock) == INF) 
+        if ((solution = solve(clock)) == INF) 
             cout << -1 << '\n';
         else
-            cout << g_push_count << '\n';
-        g_push_count = 0;
+            cout << solution << '\n';
     }
 	return 0;
 }
@@ -123,27 +125,26 @@ void push_that_button(vector<int>& clock, const int btn_no)
         if (linked[btn_no][i] == 'x')
         {
             rotate_clock(clock[i]);
-            g_push_count++;
         }
     }
 }
 // use recursive solution for focusing on each button
-int solve(vector<int>& clock, int btn_no)
+unsigned int solve(vector<int>& clock, int btn_no)
 {
     if (btn_no >= BTN_SIZE)
         return (is_aligned(clock) ? 0 : INF);
 
     // push button 4 times is same as before
+    unsigned int ret = INF;
     for (int i = 0; i < 4; i++)
     {
+        ret = min(ret, i + solve(clock, btn_no+1));
+        //cout << "in function " << __func__ << "(btn_no=" << btn_no << "), \n";
         push_that_button(clock, btn_no);
-        if (is_aligned(clock))
-            return g_push_count;
-        solve(clock, btn_no+1);
+        //print_clocks(clock);
+        //sleep(1);
     }
-
-    // not aligned until every push...
-    return INF;
+    return ret;
 }
 // rotate 30 degrees
 void rotate_clock(int& specific_clock)
@@ -153,3 +154,14 @@ void rotate_clock(int& specific_clock)
     else
         specific_clock += 3;
 }
+void print_clocks(const vector<int>& clock)
+{
+    cout << "{\n\t";
+    for (auto i : clock)
+    {
+        cout << i << ", ";
+    }
+    cout << "\b\b \n}\n";
+
+}
+
