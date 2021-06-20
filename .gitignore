@@ -398,3 +398,5 @@ MigrationBackup/
 # Choi Wheatley Settings
 # ignore .swp swap files generated from Vim text editor
 **/*.swp
+
+**/*.vim
