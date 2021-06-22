@@ -400,3 +400,5 @@ MigrationBackup/
 **/*.swp
 
 **/*.vim
+
+**/*.DS_Store
