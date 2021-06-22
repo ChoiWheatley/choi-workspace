@@ -1,17 +1,10 @@
 import turtle as t
 
-t.speed(0)
+for i in range(0,3):
+    t.fd(300)
+    t.rt( -120 )
+t.rt( 90 )
 
-t.fd(300)
-t.rt( -120 )
-t.fd(300)
-t.rt( -120 )
-t.fd(300)
-t.rt( -30 )
-t.fd(300)
-t.rt( -90 )
-t.fd(300)
-t.rt( -90 )
-t.fd(300)
-
-
+for i in range(0,3):
+    t.fd(300)
+    t.rt(-90)
