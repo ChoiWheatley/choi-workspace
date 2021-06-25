@@ -38,3 +38,5 @@ t.left(90)
 for i in range(vertex):
     t.fd(side)
     t.right(360/vertex)
+
+t.circle(100)
