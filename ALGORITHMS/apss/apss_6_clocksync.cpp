@@ -162,6 +162,5 @@ void print_clocks(const vector<int>& clock)
         cout << i << ", ";
     }
     cout << "\b\b \n}\n";
-
 }
 
