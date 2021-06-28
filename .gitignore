@@ -402,3 +402,4 @@ MigrationBackup/
 **/*.vim
 
 **/*.DS_Store
+**/tags

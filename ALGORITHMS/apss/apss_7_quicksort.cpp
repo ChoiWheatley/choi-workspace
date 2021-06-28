@@ -21,59 +21,65 @@
 using namespace std;
 typedef int (*comparer_t)(const int, const int);
 
-vector<int> q_sort(vector<int>& sortee, comparer_t cmp);
-void partition(vector<int>& sortee, int& pivot_idx, comparer_t cmp);
+vector<int>& q_sort(vector<int>& sortee, comparer_t cmp, int begin, int end);
+void partition(vector<int>& sortee, int& pivot_idx, comparer_t cmp, int begin, int end);
 int my_comparer(const int a, const int b);
 void swap(int& a, int& b);
 ostream& operator<< (ostream& os, const vector<int>& list);
 
+
+
+
 int main(void)
 {
-    vector<int> sortee {5,4,3,2,1};
-    cout << '\n' << q_sort(sortee, my_comparer) << '\n';
+    vector<int> sortee {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+    cout << '\n' << q_sort(sortee, my_comparer, 0, sortee.size()) << '\n';
     return 0;
 }
-vector<int> q_sort(vector<int>& sortee, comparer_t cmp)
+
+
+
+// - partition
+// - q_sort (left)
+// - q_sort (right)
+// - return whole sortee
+vector<int>& q_sort(vector<int>& sortee, comparer_t cmp, int begin, int end)
 {
-    if (sortee.size() == 1) return sortee;
-#ifdef DBG
-    cerr << "\tsortee=" << sortee << '\n';
-#endif
-    
+    if (begin >= end) return sortee;
+#   ifdef DBG
+    cerr << "\tsortee: " << vector<int>(&sortee[begin], &sortee[end]) << '\n';
+#   endif
+
     int pivot_idx;
-    partition(sortee, pivot_idx, cmp);
+    partition(sortee, pivot_idx, cmp, begin, end);
+#   ifdef DBG
+    cerr << "\tleft: " << vector<int>(&sortee[begin], &sortee[pivot_idx]);
+    cerr << "//pivot: " << sortee[pivot_idx];
+    cerr << "//right: " << vector<int>(&sortee[pivot_idx+1], &sortee[end]) << '\n';
+#   endif
+    
+    q_sort(sortee, cmp, begin, pivot_idx);                  //left
+    q_sort(sortee, cmp, pivot_idx+1, end);    //right
 
-    vector<int> left{ &sortee[0], &sortee[pivot_idx] };
-    vector<int> right{ &sortee[pivot_idx], &sortee[sortee.size()] };
-
-#ifdef DBG
-    cerr << "\tleft=" << left << "\n\tright=" << right << '\n';
-#endif
-    q_sort(left, cmp);
-    q_sort(right, cmp);
-
-    move( left.begin(), left.end(), back_inserter(right) );
-#ifdef DBG
-    cerr << "\tafter sortee=" << sortee << '\n';
-#endif
-   
-    return left;
+#   ifdef DBG
+    cerr << "\tafter sortee: " << sortee << '\n';
+#   endif
+    return sortee;
 }
-void partition(vector<int>& sortee, int& pivot_idx, comparer_t cmp)
+void partition(vector<int>& sortee, int& pivot_idx, comparer_t cmp, int begin, int end)
 {
-    int i, j = 0;
-    int pivot_item = sortee[0];
-
-    for (i = 1; i < sortee.size(); i++)
+    int i, j = begin;
+    int pivot_item = sortee[begin];
+    for (i = begin+1; i < end; i++)
     {
-        if (cmp(sortee[i], pivot_item) < 0)
+        if (sortee[i] < pivot_item)
         {
             j++;
             swap(sortee[i], sortee[j]);
         }
     }
     pivot_idx = j;
-    swap(sortee[j], sortee[0]);
+    swap(sortee[j], sortee[begin]);
 }
 int my_comparer(const int a, const int b)
 {
