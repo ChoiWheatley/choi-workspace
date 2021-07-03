@@ -18,6 +18,8 @@
 #include<cstdlib>
 #include<string>
 #include<sstream>
+#include<unistd.h>
+#include<climits>
 using namespace std;
 
 #define MAX_B 10
@@ -68,7 +70,8 @@ void myinput()
 int tilt(enum dir d, int count)
 {
     if (count > 10)
-        return -1;
+        return INT_MAX;
+    //cerr <<"d,count="<< d << ',' << count << '\n';
     // move marbles
     int red[2], delta_red[2];
     int blue[2], delta_blue[2];
@@ -77,8 +80,13 @@ int tilt(enum dir d, int count)
     whereis_marble(blue, board, 'B');
     do
     {
-        delta_red[0] = red[0] + delta_y[d];
-        delta_red[1] = red[1] + delta_x[d];
+        delta_red[0] = red[0] + delta_x[d];
+        delta_red[1] = red[1] + delta_y[d];
+        if (board[delta_red[0]][delta_red[1]] == '0')
+        {
+            cerr << "success!! : count = " << count << '\n';
+            return count;
+        }
         if (board[delta_red[0]][delta_red[1]] == '.')
         {
             move_marble(board, red, delta_red);
@@ -86,26 +94,32 @@ int tilt(enum dir d, int count)
             red[1] = delta_red[1];
         }
 
-        delta_blue[0] = blue[0] + delta_y[d];
-        delta_blue[1] = blue[1] + delta_x[d];
+        delta_blue[0] = blue[0] + delta_x[d];
+        delta_blue[1] = blue[1] + delta_y[d];
+        if (board[delta_blue[0]][delta_blue[1]] == '0')
+        {
+            return INT_MAX;
+        }
         if (board[delta_blue[0]][delta_blue[1]] == '.')
         {
             move_marble(board, blue, delta_blue);
             blue[0] = delta_blue[0];
             blue[1] = delta_blue[1];
         }
-    } while(!(is_same_coord(red, delta_red) && is_same_coord(blue, delta_blue)));
-           
+        sleep(1);
+    } while(is_same_coord(red, delta_red) || is_same_coord(blue, delta_blue));
 
     // next tilt
-    int next = 10;
+    int next = INT_MAX;
     for (int i = 0; i < 4; i++)
     {
+        if (i == (int)d) continue;
         next = min(next, tilt((enum dir)i, count+1));
-        if (0 < next && next <= 10)
-            return next;
     }
-    return -1;
+    if (0 < next && next <= 10)
+        return next;
+
+    return INT_MAX;
 }
 // helper function
 void init_board(unsigned char board[][MAX_B+1])
@@ -158,5 +172,5 @@ void move_marble(unsigned char board[][MAX_B+1], const int from[2], const int to
     board[from[0]][from[1]] = '.';
     board[to[0]][to[1]] = from_val;
 
-    cerr << print_board(board) << '\n';
+    //cerr << print_board(board) << '\n';
 }
