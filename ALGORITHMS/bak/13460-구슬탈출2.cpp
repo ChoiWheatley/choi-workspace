@@ -14,7 +14,6 @@
 
 #include<iostream>
 #include<vector>
-#include<tuple>
 #include<cstdlib>
 #include<string>
 #include<sstream>
@@ -22,30 +21,43 @@
 #include<climits>
 using namespace std;
 
+typedef struct
+{
+    int red[2];
+    int blue[2];
+    int hole[2];
+} State;
+
 #define MAX_B 10
 int n, m;
 unsigned char board[MAX_B+1][MAX_B+1];
 enum dir { up=0, right, down, left };
-const int delta_x[] = {[dir::up]=-1, [dir::right]=0, [dir::down]=1, [dir::left]=0};
-const int delta_y[] = {[dir::up]=0, [dir::right]=1, [dir::down]=0, [dir::left]=-1};
+const int delta_x[] = {-1, 0, 1, 0};
+const int delta_y[] = {0, 1, 0, -1};
+vector< vector<int> > fail_red;
+vector< vector<int> > fail_blue;
 
 
 void myinput();
 int tilt(enum dir dir, int count);
 // helper function
 void init_board(unsigned char board[][MAX_B+1]);
-string print_board(unsigned char board[MAX_B+1][MAX_B+1]);
+string print_board(unsigned char board[MAX_B+1][MAX_B+1], int n, int m);
 inline int min(int a, int b);
-void whereis_marble(int ret[2], const unsigned char board[][MAX_B+1], char marble_color);
 inline bool is_same_coord(const int a[2], const int b[2]);
 void move_marble(unsigned char board[][MAX_B+1], const int from[2], const int to[2]); 
+State get_board_state(const unsigned char board[][MAX_B+1]);
+void set_board_state(unsigned char board[][MAX_B+1], const State s);
+void copy_state(State& dest, State& src);
+bool operator==(const State& a, const State& b);
+bool operator!=(const State& a, const State& b){ return !(a==b); }
 
 int main(void)
 {
     int count = 10;
     init_board(board);
     myinput();
-    cout << print_board(board);
+    cout << print_board(board, n, m);
     for (int i = 0; i < 4; i++)
     {
         count = min(count, tilt((enum dir)i, 1));
@@ -71,55 +83,22 @@ int tilt(enum dir d, int count)
 {
     if (count > 10)
         return INT_MAX;
-    //cerr <<"d,count="<< d << ',' << count << '\n';
-    // move marbles
-    int red[2], delta_red[2];
-    int blue[2], delta_blue[2];
 
-    whereis_marble(red, board, 'R');
-    whereis_marble(blue, board, 'B');
+    // direction 방향대로 구슬을 움직인다.
+    State before = get_board_state(board);
+    State after;
     do
     {
-        delta_red[0] = red[0] + delta_x[d];
-        delta_red[1] = red[1] + delta_y[d];
-        if (board[delta_red[0]][delta_red[1]] == '0')
+        after.red[0] = before.red[0] + delta_x[d];
+        after.red[1] = before.red[1] + delta_x[d];
+        after.blue[0] = before.blue[0] + delta_y[d];
+        after.blue[1] = before.blue[1] + delta_y[d];
+        if (board[after.red[0]][after.red[1]] == '.')
         {
-            cerr << "success!! : count = " << count << '\n';
-            return count;
         }
-        if (board[delta_red[0]][delta_red[1]] == '.')
-        {
-            move_marble(board, red, delta_red);
-            red[0] = delta_red[0];
-            red[1] = delta_red[1];
-        }
+    }while(before != after);
+    // 기존 방향을 제외한 나머지 세 방향을 시도한다.
 
-        delta_blue[0] = blue[0] + delta_x[d];
-        delta_blue[1] = blue[1] + delta_y[d];
-        if (board[delta_blue[0]][delta_blue[1]] == '0')
-        {
-            return INT_MAX;
-        }
-        if (board[delta_blue[0]][delta_blue[1]] == '.')
-        {
-            move_marble(board, blue, delta_blue);
-            blue[0] = delta_blue[0];
-            blue[1] = delta_blue[1];
-        }
-        sleep(1);
-    } while(is_same_coord(red, delta_red) || is_same_coord(blue, delta_blue));
-
-    // next tilt
-    int next = INT_MAX;
-    for (int i = 0; i < 4; i++)
-    {
-        if (i == (int)d) continue;
-        next = min(next, tilt((enum dir)i, count+1));
-    }
-    if (0 < next && next <= 10)
-        return next;
-
-    return INT_MAX;
 }
 // helper function
 void init_board(unsigned char board[][MAX_B+1])
@@ -132,7 +111,7 @@ void init_board(unsigned char board[][MAX_B+1])
         }
     }
 }
-string print_board(unsigned char board[MAX_B+1][MAX_B+1])
+string print_board(unsigned char board[MAX_B+1][MAX_B+1], int n, int m)
 {
     stringstream ret;
     ret << "{\n";
@@ -147,21 +126,6 @@ inline int min(int a, int b)
 {
     return (a < b ? a : b);
 }
-void whereis_marble(int ret[2], const unsigned char board[][MAX_B+1], char marble_color)
-{
-    for (int i = 0; i < MAX_B; i++)
-    {
-        for (int j = 0; j < MAX_B; j++)
-        {
-            if (board[i][j] == marble_color)
-            {
-                ret[0] = i;
-                ret[1] = j;
-            }
-        }
-    }
-}
-
 inline bool is_same_coord(const int a[2], const int b[2])
 {
     return (a[0] == b[0] && a[1] == b[1]);
@@ -172,5 +136,59 @@ void move_marble(unsigned char board[][MAX_B+1], const int from[2], const int to
     board[from[0]][from[1]] = '.';
     board[to[0]][to[1]] = from_val;
 
-    //cerr << print_board(board) << '\n';
+    cerr << print_board(board, n, m) << '\n';
+}
+State get_board_state(const unsigned char board[][MAX_B+1])
+{
+    State ret;
+    for (int i = 0; i < MAX_B; i++)
+    {
+        for (int j = 0; j < MAX_B; j++)
+        {
+            switch(board[i][j])
+            {
+            case 'R':
+                ret.red[0] = i;
+                ret.red[1] = j;
+                break;
+            case 'B':
+                ret.blue[0] = i;
+                ret.blue[1] = j;
+                break;
+            case '0':
+                ret.hole[0] = i;
+                ret.hole[1] = j;
+            }
+        }
+    }
+    return ret;
+}
+void set_board_state(unsigned char board[][MAX_B+1], const State s)
+{
+    for (int i = 0; i < MAX_B; i++)
+        for (int j = 0; j < MAX_B; j++)
+            if (board[i][j] == 'R' || board[i][j] == 'B')
+                board[i][j] = '.';
+    board[s.red[0]][s.red[1]] = 'R';
+    board[s.blue[0]][s.blue[1]] = 'B';
+    board[s.hole[0]][s.hole[1]] = '0';
+}
+bool operator==(const State& a, const State& b)
+{
+    return (a.red[0] == b.red[0]
+            && a.red[1] == b.red[1]
+            && a.blue[0] == b.blue[0]
+            && a.blue[1] == b.blue[1]
+            && a.hole[0] == b.hole[0]
+            && a.hole[1] == b.hole[1]
+    );
+}
+void copy_state(State& dest, State& src)
+{
+    for (int i = 0; i < 2; i++)
+    {
+        dest.red[i] = src.red[i];
+        dest.blue[i] = src.blue[i];
+        dest.hole[i] = src.hole[i];
+    }
 }

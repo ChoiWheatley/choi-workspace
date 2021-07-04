@@ -1,5 +1,4 @@
 import sys
-from datetime import date
 
 
 child = 7
@@ -7,10 +6,11 @@ elem = 13
 mid = 16
 high = 19
 univ = 26
+thisyear = 2021
 
 prompt = int(input("출생년도를 입력해 주세용 "))
 
-delta_year = date.today().year - prompt
+delta_year = thisyear - prompt + 1
 
 if delta_year < 0:
     print("나이는 음수가 될 수 없습니다!");
