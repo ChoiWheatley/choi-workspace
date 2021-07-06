@@ -9,25 +9,26 @@
 #include<vector>
 #include<string>
 #include<cmath>
+#include<cstdlib>
 #include<sys/types.h>
 
 using namespace std;
 
 vector<char> slow_mult(const vector<char>& a, const vector<char>& b);
 void normalize(vector<char>& num);
-
-int main(void)
-{
-    vector<char> a{4,3,2,1};
-    vector<char> b{8,7,6,5};
-    vector<char> ret = slow_mult(a, b);
-    for (int i = ret.size()-1; i >= 0; --i)
-    {
-        cout << static_cast<int>(ret[i]) << ' ';
-    }
-    printf("\n");
-    return 0;
-}
+//
+//   int main(void)
+//   {
+//       vector<char> a{4,3,2,1};
+//       vector<char> b{8,7,6,5};
+//       vector<char> ret = slow_mult(a, b);
+//       for (int i = ret.size()-1; i >= 0; --i)
+//       {
+//           cout << static_cast<int>(ret[i]) << ' ';
+//       }
+//       printf("\n");
+//       return 0;
+//   }
 // two vectors index is equal to power of 10
 // a[i] means a's i'th digit. (==a[i] * 10^i)
 vector<char> slow_mult(const vector<char>& a, const vector<char>& b)
