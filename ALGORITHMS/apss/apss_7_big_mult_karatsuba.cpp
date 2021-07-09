@@ -50,7 +50,7 @@ vector<char> karatsuba(vector<char>& a, vector<char>& b)
     cerr << "a0=" << a0 << ", a1=" << a1 << '\n';
     cerr << "b0=" << b0 << ", b1=" << b1 << '\n';
 
-    // a * b == z0 + z1*pow(10,half) + z2*pow(10, an) 이때,
+    // a * b == z0 + z1*pow(10,half) + z2*pow(10, half+half) 이때,
     // z0 = a0 * b0
     // z2 = a1 * b1
     // z1 = (a1*b0 + a0*b1) OR ( (a0+a1)*(b0+b1) - z0 - z2 )
