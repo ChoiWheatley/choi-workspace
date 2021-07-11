@@ -18,7 +18,7 @@
 #include <vector>
 #include <string>
 
-std::string flipvertical(const std::string& origin);
+std::string flipvertical(std::string::iterator & it);
 
 int main(void)
 {
@@ -29,41 +29,22 @@ int main(void)
     while (c-->0)
     {
         std::cin >> each;
-        std::cout << flipvertical(each) << "\n\n";
+        auto i = each.begin();
+        std::cout << flipvertical(i) << "\n";
     }
     return 0;
 }
 // x(1234) -> x(3412)
 // x(1x....34) -> x(341x....)
-std::string flipvertical(const std::string& origin)
+std::string flipvertical(std::string::iterator & it)
 {
-    if (origin.size() == 1) 
-        return origin;
-    if (origin[0] != 'x')
-        return std::to_string(origin[0]);
-    std::cerr << origin << '\n';
-
-
-    // 4 개의 덩어리만 본다. 중간에 x 가 끼어있으면 
-    // 남은 덩어리 수의 개수만 제외하고 몽땅 다음 
-    // 이터레이션으로 넘겨버린다.
-    std::string chunk[4] = {""};
-    int count_index = 0;
-    for (int i = 1; i < origin.size(); i++)
+    char c = *it;
+    if (c != 'x')
+        return std::string{c};
+    std::string chunks[4] = {""};
+    for (int i = 0; i < 4; i++)
     {
-        if (origin[i] == 'x')
-        {
-            chunk[count_index] = flipvertical ( 
-                std::string {origin.begin()+i, origin.end()-(3-count_index)} 
-            );
-            i = origin.size()-(3-count_index);
-            count_index++;
-            continue;
-        }
-        chunk[count_index++] = origin[i];
+        chunks[i] = flipvertical(++it);
     }
-    
-    std::string ret;
-    ret += 'x' + chunk[2] + chunk[3] + chunk[0] + chunk[1];
-    return ret;
+    return 'x' + chunks[2] + chunks[3] + chunks[0] + chunks[1];
 }
