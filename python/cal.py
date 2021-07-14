@@ -1,3 +1,4 @@
 import calendar
+from datetime import date
 
-calendar.prmonth(2020,1)
+calendar.prmonth(date.today().year, date.today().month)

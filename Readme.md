@@ -1,12 +1,12 @@
-# choi-workspace/Readme.md
-
 # 리눅스IPC프로그래밍 :: inflearn.com
+
 https://www.inflearn.com/course/%EB%A6%AC%EB%88%85%EC%8A%A4ipc%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D
 총 29개 수업˙총 11시간 27분
 
 **중급자**를 위해 준비한**[웹 개발, 서버 개발] 강의입니다.**
 
 **IPC 도구를 이용한 프로그래밍에서 더 나아가 "소프트웨어 요구사항에 맞는 IPC 도구를 적절히 선택해 설계/구현 할 수 있는 능력을 키우는 것"이 이 강좌의 최종 목표 입니다.**
+
 ### 이 강의를 듣고나면 당신은...
 
 - Linux IPC 도구의 종류와 특징에 대해 알 수 있다.
@@ -16,7 +16,7 @@ https://www.inflearn.com/course/%EB%A6%AC%EB%88%85%EC%8A%A4ipc%ED%94%84%EB%A1%9C
     - 경쟁력 있는 리눅스 시스템 개발자.
         - 리눅스 커널, 디바이스 드라이버 등 도메인 specific 한 개발자로의 진화
 
-# welcome, python!
+# ./python
 
 ## 개요
 
@@ -75,9 +75,33 @@ void some_callback_function(functionname, [...]);
 
 ## 개요
 
+### 종만북 ("apss/")
 도서 '프로그래밍 대회에서 배우는 알고리즘 문제해결전략' (프알문, APSS) 로 공부를 시작했고, 최근에 21년 2월 10일부터 3월 말까지(45일) 백준 인강을 구독했기에 해당 문제들 위주로 정리해서 올릴 예정이다.
 
-## TODO
+### 21년 여름학기 코테 강의 ("CoTe/") 
+
+**강의 사이트** : [programmers.co.kr/learn/challenges](http://programmers.co.kr/learn/challenges) 
+
+**다루는 알고리즘** : 해시, 스택-큐, 힙, 정렬, 완전탐색, 그리디, 다이나믹 프로그래밍, DFS-BFS, 이진탐색, 그래프
+
+**강의 진행 언어** Python
+
+**강의 부교재** 이것이 코딩테스트다 with 파이썬 (한빛미디어, 나동빈)
+
+**코딩 테스트 준비 방법** 기업, 문법암기, 이론을 말로 설명하기, 문제 직접 풀어보기, 자신만의 소스코드 라이브러리화 하기
+
+네이버 10월 6일 온라인 테스트.
+
+## 강의진행순서
+
+1. 알고리즘 개요 전체 설명 → 화요일
+2. 코딩 테스트 문제 설명 → 화요일
+3. 개인이 직접 코딩 후 [programmers.co.kr](http://programmers.co.kr) 사이트에 직접 제출 → 목요일 10시 전까지
+4. 코딩 테스트 문제에 대한 해답을 설명 → 목요일
+
+**당부사항** 강의 시작 전에 개개인마다 강의 예정인 코딩테스트 문제 내용 파악. 
+
+**당부사항** 파이썬 자료형, 자료구조, 알고리즘, 라이브러리 등에 대한 기본적인 사항을 병행해 가며 공부할 것!!
 
 ## TIP
 - passing const reference array into parameter : "const type (&name)[][]"
@@ -95,13 +119,4 @@ cout.tie(nullptr);
 - Backtracking = Bruteforce + Condition
 	We can improve Bruteforce program using backtracking method. Halting the iteration in which the result can be impossible or tedious. 
 - Halt conditions on Recursive functions. just return boolean value whether or not is on a halt condition. You can check when calling inside this recursive iteration, return true when its return value is also true
-
-
----
-
-# ./HTML
-
-## 개요
-
-## TODO
 
