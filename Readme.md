@@ -1,8 +1,22 @@
 # choi-workspace/Readme.md
 
-# welcome, python!
+# 리눅스IPC프로그래밍 :: inflearn.com
+https://www.inflearn.com/course/%EB%A6%AC%EB%88%85%EC%8A%A4ipc%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D
+총 29개 수업˙총 11시간 27분
 
-# ./python
+**중급자**를 위해 준비한**[웹 개발, 서버 개발] 강의입니다.**
+
+**IPC 도구를 이용한 프로그래밍에서 더 나아가 "소프트웨어 요구사항에 맞는 IPC 도구를 적절히 선택해 설계/구현 할 수 있는 능력을 키우는 것"이 이 강좌의 최종 목표 입니다.**
+### 이 강의를 듣고나면 당신은...
+
+- Linux IPC 도구의 종류와 특징에 대해 알 수 있다.
+    - POSIX & SYSV 프로그래밍 인터페이스 간에 비교 및 분석
+        - IPC 도구 별 프로그래밍 및 실습
+    - 소프트웨어 요구사항에 적합한 IPC 도구를 선택, 설계, 구현 할 수 있다.
+    - 경쟁력 있는 리눅스 시스템 개발자.
+        - 리눅스 커널, 디바이스 드라이버 등 도메인 specific 한 개발자로의 진화
+
+# welcome, python!
 
 ## 개요
 
