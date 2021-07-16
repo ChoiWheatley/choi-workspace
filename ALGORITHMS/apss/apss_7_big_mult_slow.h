@@ -1,9 +1,3 @@
-
-/*
-    카라츠바의 빠른 곱셈 알고리즘을 시작하기에 앞서, 
-    일반적으로 곱셈을 수행하는 방식을 그대로 코드에 적용
-    시켜보자.
-*/
 #include<iostream>
 #include<cstdio>
 #include<vector>
@@ -11,6 +5,14 @@
 #include<cmath>
 #include<cstdlib>
 #include<sys/types.h>
+
+#ifndef APSS_7_BIG_MULT_SLOW_H
+#define APSS_7_BIG_MULT_SLOW_H
+/*
+    카라츠바의 빠른 곱셈 알고리즘을 시작하기에 앞서, 
+    일반적으로 곱셈을 수행하는 방식을 그대로 코드에 적용
+    시켜보자.
+*/
 
 using namespace std;
 
@@ -71,3 +73,4 @@ void normalize(vector<char>& num)
     }
     while(num.size() > 1 && num.back() == 0) num.pop_back();
 }
+#endif
