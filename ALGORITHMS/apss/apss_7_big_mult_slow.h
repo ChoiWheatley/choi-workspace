@@ -33,14 +33,14 @@ void normalize(vector<char>& num);
 //   }
 // two vectors index is equal to power of 10
 // a[i] means a's i'th digit. (==a[i] * 10^i)
-vector<char> slow_mult(const vector<char>& a, const vector<char>& b)
+vector<int> slow_mult(const vector<int>& a, const vector<int>& b)
 {
-    vector<char> ret( a.size()+ b.size() + 1, 0 );
-
+    vector<int> ret( a.size() + b.size() );
+    fill(ret.begin(), ret.end(), 0);
     // do multiply each indices
-    for (int i = 0; i < a.size(); i++)
+    for (size_t i = 0; i < a.size(); i++)
     {
-        for (int j = 0; j < b.size(); j++)
+        for (size_t j = 0; j < b.size(); j++)
         {
             ret[i+j] += a[i] * b[j];
         }
@@ -49,19 +49,19 @@ vector<char> slow_mult(const vector<char>& a, const vector<char>& b)
     // when simple multiply is over,
     // you should NORMALIZE this, 
     // because each index might bigger than 10
-    normalize(ret);
+//    normalize(ret);
 
     return ret;
 }
 // 자릿수 올림을 처리
-void normalize(vector<char>& num)
+void normalize(vector<int>& num)
 {
     num.push_back(0);
-    for (int i = 0; i < num.size(); i++)
+    for (size_t i = 0; i < num.size(); i++)
     {
         if (num[i] < 0)
         {
-            char borrow = (abs(static_cast<int>(num[i])) + 9) / 10;
+            char borrow = static_cast<int>((abs((num[i])) + 9) / 10);
             num[i+1] -= borrow;
             num[i] += borrow * 10;
         }

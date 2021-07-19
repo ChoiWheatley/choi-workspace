@@ -2,8 +2,8 @@
 #include"apss_7_big_mult_slow.h"
 using namespace std;
 
-int count_hug(vector<char>& idol, vector<char>& fan);
-extern vector<char> karatsuba(vector<char>& a, vector<char>& b);
+int count_hug(vector<int>& idol, vector<int>& fan);
+extern vector<int> karatsuba(vector<int>& a, vector<int>& b);
 
 int main(void)
 {
@@ -15,8 +15,8 @@ int main(void)
     cin.get();
     while(c-->0)
     {
-        vector<char> idol;
-        vector<char> fan;
+        vector<int> idol;
+        vector<int> fan;
         int idol_num, fan_num;
         char c;
         for (idol_num=0; (c=cin.get())!='\n'; idol_num++)
@@ -33,20 +33,20 @@ int main(void)
             else
 				fan.push_back(0);
         }
-        cerr<<"idol="<< idol <<" fan="<< fan <<'\n';
+//        cerr<<"idol="<< idol <<" fan="<< fan <<'\n';
         cout<< count_hug(idol, fan) << '\n';
     }
 
     return 0;
 }
 
-int count_hug(vector<char>& idol, vector<char>& fan)
+int count_hug(vector<int>& idol, vector<int>& fan)
 {
 	// karatsuba 알고리즘 안에 자리올림 (normalize)가 들어있어서 틀린 값을
 	// 얻어낸다. 이걸 제거한 버전으로 다시 시도해 보아야 한다.
-	vector<char> mult = karatsuba(idol, fan);
+	vector<int> mult = karatsuba(idol, fan);
 	int ret = 0;
-	for (int i=idol.size()-1; i<fan.size(); i++)
+	for (size_t i=idol.size()-1; i<fan.size(); i++)
 	{
 		if (mult[i]==0)
 			ret++;
