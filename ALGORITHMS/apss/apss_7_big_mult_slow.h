@@ -16,8 +16,8 @@
 
 using namespace std;
 
-vector<char> slow_mult(const vector<char>& a, const vector<char>& b);
-void normalize(vector<char>& num);
+//vector<char> slow_mult(const vector<int>& a, const vector<int>& b);
+//void normalize(vector<int>& num);
 //
 //   int main(void)
 //   {
