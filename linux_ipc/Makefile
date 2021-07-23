@@ -3,6 +3,7 @@
 INC=-I.
 DEBUG= -g -DDBG
 CFLAGS=$(INC) $(DEBUG) -Wall -Werror -pthread
+LINK+=-lrt
 CC=gcc-10 
 
 SRCS=$(wildcard *.c)
@@ -15,7 +16,7 @@ all: $(TARGET)
 	$(CC) $(CFLAGS) -c $<
 
 $(TARGET): $(OBJS)
-	$(CC) -o $@ $(patsubst %.out,%.o,$@)
+	$(CC) -o $@ $(patsubst %.out,%.o,$@) $(LINK)
 #	@for i in $(TARGET); \
 #		do \
 #			echo $(CC) -o $$i $(patsubst %.out,%.o, $$i); \

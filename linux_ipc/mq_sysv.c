@@ -17,7 +17,7 @@
 */
 
 
-#define IPC_KEY_FILENAME                "/proc"// 커널이 다루는 프로세스 정보 보관소
+#define IPC_KEY_FILENAME                "/dev/null"// 커널이 다루는 프로세스 정보 보관소
 #define IPC_KEY_PROJ_ID                 'a'
 #define IPC_MSG_TYPE                    'a'
 #define MAXBUF_SIZ                      2048
