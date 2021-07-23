@@ -1,5 +1,5 @@
-#include"apss_7_big_mult_karatsuba.h"
-#include"apss_7_big_mult_slow.h"
+#include"7_big_mult_karatsuba.h"
+#include"7_big_mult_slow.h"
 
 int main(void)
 {
