@@ -1,7 +1,7 @@
 .SUFFIXES:%.c %.cpp %.h
 
 INC=-I.
-DEBUG= -g -DDBG
+DEBUG= -g -DDBG=0
 CFLAGS=$(INC) -std=c++17 -Wall -pthread
 CC=g++-10 
 
@@ -10,7 +10,6 @@ OBJS=$(SRCS:.cpp=.o)
 TARGET=$(OBJS:.o=.out)
 
 all: $(TARGET)
-	$(RM) $(OBJS)
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c $<
