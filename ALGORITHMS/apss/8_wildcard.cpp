@@ -9,8 +9,9 @@
 #include<sstream>
 using namespace std;
 
-vector<string>& solve(const string& src, vector<string>& pat);
-bool isPatMatch(const string& src, const string& pat);
+vector<string> solve(const string& src, const vector<string>& pat);
+bool isPatMatch(const string& src, const string& pat, 
+                size_t src_pos, size_t pat_pos);
 
 int main(int argc, char ** argv)
 {
@@ -22,7 +23,7 @@ int main(int argc, char ** argv)
         string src;
         vector<string> pat;
         
-        cin>> src;
+        cin >> src;
         cin >> n;
         while(n-->0)
         {
@@ -31,7 +32,7 @@ int main(int argc, char ** argv)
             pat.push_back(tmp);
         }
 
-#if DBG == 0
+#ifdef DBG
         cout << "\tsrc: " << src << '\n';
         cout << "\tpat: \n\t[ ";
         for (auto i : pat)
@@ -40,59 +41,54 @@ int main(int argc, char ** argv)
 #endif// DBG
 
         // TODO: solve problem
-        vector<string>& answer = solve(src, pat);
+        vector<string> answer = solve(src, pat);
         for (auto i : answer)
             cout << i << "\n";
     }
     return 0;
 }
 
-vector<string>& solve(const string& src, vector<string>& pat)
+
+vector<string> solve(const string& src, const vector<string>& pat)
 {
-    vector<string>::iterator pat_it=pat.begin();
-    while(pat_it != pat.end())
+    vector<string> ret;
+    for (const string& i : pat)
     {
-        if (!isPatMatch(src, (const string)*pat_it))
-        {
-            #if DBG == 0
-                cerr << "\t'" << *pat_it << "' is deleted\n";
-            #endif
-            pat_it = pat.erase (pat_it);
-        }
-        else
-            pat_it++;
+        if (isPatMatch(src, i, 0, 0))
+            ret.push_back(i);
     }
-    
-    sort(pat.begin(), pat.end());
-    return pat;
+    return ret;
 }
-bool isPatMatch(const string& src, const string& pat)
+bool isPatMatch(const string& src, const string& pat, 
+                size_t src_pos, size_t pat_pos)
 {
-    string::const_iterator src_it, pat_it;
-    src_it = src.begin();
-    pat_it = pat.begin();
-    while( src_it != src.end() ||
-           pat_it != pat.end() )
+#ifdef DBG
+    cerr<<"\t{ "<<src[src_pos] <<", " <<pat[pat_pos] << " }\n";
+#endif//dbg
+
+    while( (src_pos<src.size() && pat_pos<pat.size()) &&
+           (src[src_pos]=='?' || pat[pat_pos]==src[src_pos]) )
     {
-        #if DBG==0
-            cerr << "[src,pat]=[" << *src_it<<","<<*pat_it << "] ";
-        #endif
-        switch(*src_it)
-        {
-        case '?':
-            // do nothing, just bypassing assessment
-            break;
-        case '*':
-            // do iteration
-            break;
-        default:
-            if (*src_it != *pat_it)
-                return false;
-            break;
-        }
-        src_it++;
-        pat_it++;
+        ++src_pos;
+        ++pat_pos;
     }
 
-    return true;
+    //1. src_pos가 '*'을 만난 경우
+    if (src[src_pos] == '*')
+    {
+        // * 안에 몇 개의 글자가 들어갈 지 모르기 때문에 
+        // 0개부터 시작하여 하나씩 추가해 가며 재귀를 돈다.
+        for (size_t skip=pat_pos; skip<=pat.size(); ++skip)
+        {
+            if ( isPatMatch( src, pat, src_pos+1, skip ) )
+                return true;
+        }
+    }
+
+    //2. src_pos 가 끝에 도달한 경우
+    if ( src_pos>=src.size()  &&  pat_pos>=pat.size() )
+        return true;
+
+    //3. 패턴매칭에 실패한 경우
+    return false;
 }
