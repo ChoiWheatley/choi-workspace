@@ -1,8 +1,14 @@
 .SUFFIXES:%.c %.cpp %.h
 
 INC=-I.
-DEBUG= -g -DDBG=0
-CFLAGS=$(INC) -std=c++17 -Wall -pthread
+
+ifeq ($(RELEASE), 1)
+	DEBUG=-O2 -DNDBG
+else
+	DEBUG=-g -O0 -DDBG
+endif
+
+CFLAGS=$(INC) $(DEBUG) -std=c++17 -Wall -pthread
 CC=g++-10 
 
 SRCS=$(wildcard *.cpp)
@@ -16,6 +22,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) -o $@ $(patsubst %.out,%.o,$@)
+
 
 clean:
 	$(RM) $(TARGET) $(OBJS) *.out *.o
