@@ -1,4 +1,4 @@
-3
+4
 he?p
 3
 help
@@ -12,3 +12,6 @@ hello
 t*l?*o*r?ng*s
 1
 theloardoftherings
+********************a
+1
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab
