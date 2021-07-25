@@ -76,18 +76,9 @@ bool isPatMatch(const string& src, const string& pat,
     //1. src_pos가 '*'을 만난 경우
     if (src[src_pos] == '*')
     {
-<<<<<<< HEAD
         // * 안에 몇 개의 글자가 들어갈 지 모르기 때문에 
         // 0개부터 시작하여 하나씩 추가해 가며 재귀를 돈다.
         for (size_t skip=pat_pos; skip<=pat.size(); ++skip)
-=======
-        // src 마지막 문자가 *인 경우
-        if (src_pos+1 == src.size())
-            return true;
-        // * 안에 몇 개의 글자가 들어갈 지 모르기 때문에 
-        // 0개부터 시작하여 하나씩 추가해 가며 재귀를 돈다.
-        for (size_t skip=pat_pos; skip<pat.size(); ++skip)
->>>>>>> 25ecbc4915fb7d3905ae45f2e97da27ad81e4873
         {
             if ( isPatMatch( src, pat, src_pos+1, skip ) )
                 return true;
