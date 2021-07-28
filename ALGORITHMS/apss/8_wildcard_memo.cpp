@@ -8,8 +8,9 @@ enum DP{
     UNDEFINED=-1, FAILURE=0, SUCCESS=1
 };
 
-#define MAXN 101
-static char cache[MAXN][MAXN]={-1};
+#define MAXN 100
+#define MAXC (MAXN+1)
+static int cache[MAXC][MAXC]={-1};
 
 vector<string> solve(const string& src, const vector<string>& pat);
 bool isPatMatch(const string& src, const string& pat, 
@@ -35,11 +36,11 @@ int main(int argc, char **argv)
         }
 
 #ifdef DBG
-        cout << "\tsrc: " << src << '\n';
+        cout << "\n\tsrc: " << src << '\n';
         cout << "\tpat: \n\t[ ";
         for (auto i : pat)
             cout << i << ", ";
-        cout << "\b\b ]\nanswer:\n";
+        cout << "\b\b ]\n";
 #endif// DBG
 
         // TODO: solve problem
@@ -55,48 +56,43 @@ vector<string> solve(const string& src, const vector<string>& pat)
     vector<string> ret;
     for (const string& i : pat)
     {
-        memset( cache, -1, MAXN*MAXN );
-        if ( isPatMatch(src, i, 0, 0) )
+        memset( cache, -1, MAXC*MAXC );
+        if ( isPatMatch(src, i, 0, 0)==SUCCESS )
             ret.push_back(i);
     }
+    sort(ret.begin(), ret.end());
     return ret;
 }
 
 bool isPatMatch(const string& src, const string& pat, 
                 size_t s, size_t p)
 {
-    auto& ret = cache[s][p];
 #ifdef DBG
-    cerr<<"\t[ "<< src << ", " << pat
-        <<" ]:\t[ "<< src[s] << "," << pat[p]
-        << "("<<(int)ret<<")" <<" ]\n";
-#endif
+    printf("\t\t[ %s, %s ]  \tcache=%d\n", &src[s], &pat[p], cache[s][p]);
+#endif 
+
+    int& ret = cache[s][p];
     if (ret != UNDEFINED)
         return ret;
-    while ( (s<src.size() && p<pat.size()) &&
-            (src[s]=='?' || src[s]==pat[p]) )
-    {
-        s++; 
-        p++;
-    }
 
-    // 1. * 을 만난 경우, (s+1, p) 를 서로 비교한다.
-    if ( src[s]=='*' )
-    {
-        for (size_t skip=p; skip<=pat.size(); ++skip)
-        {
-            if (isPatMatch(src,pat, s+1, skip))
-                goto success;
-        }
-    }
+    if( (s<src.size() && p<pat.size()) &&
+            (src[s]=='?' || pat[p]==src[s]) )
+        return ( ret = isPatMatch(src,pat,s+1,p+1) );
 
-    // 2. src, pat 모두 end를 바라보고 있다
-    if ( s>=src.size() && p>=pat.size() )
+    // s,p가 동시에 마지막을 가리키고 있는 경우
+    if ( s==src.size() && p==pat.size() )
         goto success;
 
-    // 3. 나머지는 전부 패턴매칭 실패
-    goto failure;
+    // '*'을 만난 경우
+    if ( src[s]=='*' )
+    {
+        if ( isPatMatch(src,pat,s+1,p)==SUCCESS ||
+                (p<pat.size() && isPatMatch(src,pat,s,p+1)==SUCCESS) )
+            goto success;
+    }
 
+    // 패턴매칭 실패
+    goto failure;
 success:
     return (ret = SUCCESS);
 failure:
