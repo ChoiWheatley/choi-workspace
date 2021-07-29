@@ -3,6 +3,7 @@
 #include<string>
 #include<cstring>
 #include<algorithm>
+#include<cstdio>
 using namespace std;
 enum DP{
     UNDEFINED=-1, FAILURE=0, SUCCESS=1
@@ -68,7 +69,8 @@ bool isPatMatch(const string& src, const string& pat,
                 size_t s, size_t p)
 {
 #ifdef DBG
-    printf("\t\t[ %s, %s ]  \tcache=%d\n", &src[s], &pat[p], cache[s][p]);
+    fprintf( stderr,"\t\t[ %s, %s ]  \tcache[%lu,%lu]=%d\n", 
+        &src[s], &pat[p], s,p, cache[s][p] );
 #endif 
 
     int& ret = cache[s][p];
@@ -81,20 +83,16 @@ bool isPatMatch(const string& src, const string& pat,
 
     // s,p가 동시에 마지막을 가리키고 있는 경우
     if ( s==src.size() && p==pat.size() )
-        goto success;
+        return (ret = SUCCESS);
 
     // '*'을 만난 경우
     if ( src[s]=='*' )
     {
-        if ( isPatMatch(src,pat,s+1,p)==SUCCESS ||
-                (p<pat.size() && isPatMatch(src,pat,s,p+1)==SUCCESS) )
-            goto success;
+        if ( isPatMatch(src,pat,s+1,p)==SUCCESS ||      // 0개 
+                (p<pat.size() && isPatMatch(src,pat,s,p+1)==SUCCESS) )//1개 이상
+            return (ret = SUCCESS);
     }
 
     // 패턴매칭 실패
-    goto failure;
-success:
-    return (ret = SUCCESS);
-failure:
     return (ret = FAILURE);
 }
