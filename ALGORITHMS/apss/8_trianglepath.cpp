@@ -3,17 +3,18 @@
 */
 
 #include<iostream>
-#include<string>
 #include<vector>
 #include<cstdlib>
 #include<cstdlib>
 #include<climits>
+#include<cstring>
 #include<cmath>
 using namespace std;
 
 #define MAX 100
 #define ERROR LONG_MAX
-vector< vector<size_t> > triangle;
+#define UNDEFINED 0
+size_t cache[MAX][MAX]={0};     // 0 means undefined
 
 void init_triangle(vector< vector<size_t> >& src, int size);
 void input_triangle(vector< vector<size_t> >& src, istream& ist);
@@ -25,10 +26,12 @@ int main(void)
 {
     int c;
     cin>>c;
+    vector< vector<size_t> > triangle;
     while(c-->0)
     {
         int n;
         cin>>n;
+        memset(cache, 0, MAX*MAX*8);
         init_triangle(triangle, n);
         input_triangle(triangle, std::cin);
         #ifdef DBG
@@ -51,13 +54,18 @@ size_t brute_force(const vector< vector<size_t> >& src, int y, int x)
     if ((size_t)y >= src.size())
         return 0;
 
-    #ifdef DBG
-        fprintf(stderr, "\tsrc[%d][%d]=%ld\n",y,x,src[y][x]);
-    #endif//DBG
-    return max(
-            brute_force(src, y+1, x) + src[y][x],
-            brute_force(src, y+1, x+1) + src[y][x]
-            );
+    if (cache[y][x]!=UNDEFINED)
+        return cache[y][x];
+
+#ifdef DBG
+    fprintf(stderr, "\tsrc[%d][%d]=%ld\n",y,x,src[y][x]);
+#endif//DBG
+    return ( cache[y][x]=
+            max(
+                brute_force(src, y+1, x) + src[y][x],
+                brute_force(src, y+1, x+1) + src[y][x]
+               )    
+           );
 }
 
 void init_triangle(vector< vector<size_t> >& src, int size)
