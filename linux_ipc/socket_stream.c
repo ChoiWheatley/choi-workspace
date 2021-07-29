@@ -19,6 +19,9 @@
         then\
     }
 
+size_t wrap_send(int sock, void *buf, size_t buflen, int flag);
+size_t wrap_recv(int sock, void *buf, size_t buflen, int flag);
+
 static void print_usage(const char *progname)
 {
     printf("%s <server | client>\n", progname);
@@ -88,7 +91,7 @@ static int do_server(void)
     puts("im receiving");
     memset(buf, 0, sizeof(buf));
     INSPECT(
-            (ret = recv( peer, buf, sizeof(buf), 0 )) != -1,
+            (ret = wrap_recv( peer, buf, sizeof(buf), 0 )) != -1,
             close(sock);
             return -1;
     );
@@ -101,6 +104,20 @@ static int do_server(void)
     return ret;
 }
 
+size_t wrap_recv(int sock, void *buf, size_t buflen, int flag)
+{
+    int received = 0, amt;
+    while(received < buflen)
+    {
+        // 앞의 바이트를 건너뛰고 나머지를 전송한다.
+        amt = recv(sock, (char *)buf + received, 
+                   buflen - received, flag);
+        if (amt < 0)
+            return amt;
+        received+=amt;
+    } 
+    return received;
+}
 static int do_client(void)
 {
 //socket
@@ -134,7 +151,7 @@ static int do_client(void)
     memset(buf, 0, sizeof(buf));
     snprintf(buf, sizeof(buf), "this is message from sock_stream! hello world!");
     INSPECT(
-            (ret = send(sock, buf, sizeof(buf), 0)) != -1,
+            (ret = wrap_send(sock, buf, sizeof(buf), 0)) != -1,
             close(sock);
             return -1;
            );
@@ -143,6 +160,23 @@ static int do_client(void)
     close(sock);
 
     return ret;
+}
+
+size_t wrap_send(int sock, void *buf, size_t buflen, int flag)
+{
+    int written = 0, amt=0;
+    while( written < buflen )
+    {
+        // 앞의 바이트를 건너뛰고 나머지를 전송한다.
+        amt = send(sock, (char *)buf + written, 
+                buflen - written, 
+                flag);
+        if (amt < 0)
+            return amt;
+        written+=amt;
+    }
+
+    return written;
 }
 
 int main(int argc, char **argv)
