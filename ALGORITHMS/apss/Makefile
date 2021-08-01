@@ -8,8 +8,8 @@ endef
 # 초기값은 현재 이 메이크파일의 이름이 저장되어있을 것이고, 
 # 
 CURDIR:= $(dir $(abspath $(firstword $(MAKEFILE_LIST))))
-SRCDIRS= $(CURDIR)/6_brute_force $(CURDIR)/7_divide_and_conquer $(CURDIR)/8_dynamic_programming
-OBJDIRS= $(CURDIR)/objs
+SRCDIRS= $(CURDIR)6_brute_force $(CURDIR)7_divide_and_conquer $(CURDIR)8_dynamic_programming
+OBJDIRS= $(CURDIR)objs
 INC:=-I$(CURDIR)
 
 ifeq ($(RELEASE), 1)
@@ -48,7 +48,7 @@ all: $(TARGET)
 $(TARGET): $(OBJ_OUT)
 	@echo $(tab)making binaries...
 #	$(CC) $(CFLAGS) $(OBJ) $(LDFLAGS) -o $(patsubst %.out, %.o, $@)
-	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $(patsubst $(OBJDIRS)/%.out, %.o, $@)
+	$(CC) $(CFLAGS) $< -o $(patsubst $(OBJDIRS)/%.out, %.o, $@)
 
 $(OBJ_OUT): $(SRCS)
 	@echo making object files...
