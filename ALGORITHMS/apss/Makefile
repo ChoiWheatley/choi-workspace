@@ -23,40 +23,35 @@ CC=g++-10
 LDFLAGS=-lrt
 
 $(info $(tab)start ...$(newline))
-$(info MAKEFILE_LIST=$(MAKEFILE_LIST))
 $(info $(tab)current directory=$(CURDIR))
 
 #SRCS=$(notdir $(wildcard $(SRCDIRS)/*.cpp))
 SRCS:=$(shell find $(SRCDIRS) -name '*.cpp')
-OBJS:=$(notdir $(SRCS:.cpp=.o))
-# OBJ_OUT = OBJS 파일 이름 앞에다 디렉토리 이름을 붙여준다.
-OBJ_OUT:=$(patsubst %.o, $(OBJDIRS)/%.o, $(OBJS))
+OBJS:=$(SRCS:.cpp=.o)
 TARGET:=$(SRCS:.cpp=.out)
-DEPS=$(OBJ_OUT:.o=.d)
+DEPS=$(OBJS:.o=.d)
 
 $(info $(tab)SRCS=$(SRCS)$(newline))
 $(info $(tab)OBJS=$(OBJS)$(newline))
-$(info $(tab)OBJ_OUT=$(OBJ_OUT)$(newline))
 $(info $(tab)TARGET=$(TARGET)$(newline))
-
 $(info $(tab)end ...$(newline))
 
 .PHONY: all
 all: $(TARGET)
-	@echo making target...
+	@mv $(OBJS) $(DEPS) $(OBJDIRS)/
 
-$(TARGET): $(OBJ_OUT)
+$(TARGET): $(OBJS)
 	@echo $(tab)making binaries...
 #	$(CC) $(CFLAGS) $(OBJ) $(LDFLAGS) -o $(patsubst %.out, %.o, $@)
-	$(CC) $(CFLAGS) $< -o $(patsubst $(OBJDIRS)/%.out, %.o, $@)
+	$(CC) $(CFLAGS) $(patsubst %.out,%.o,$@) -o $@
 
-$(OBJ_OUT): $(SRCS)
+$(OBJS): $(SRCS)
 	@echo making object files...
-	$(CC) $(CFLAGS) $(LDFLAGS) -c $< -MD -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) -c $(patsubst %.o,%.cpp,$@) -MD -o $@
 
 
 .PHONY: clean
 clean:
-	$(RM) $(TARGET) $(OBJ_OUT) $(DEPS)
+	$(RM) $(TARGET) $(OBJS) $(DEPS)
 
 -include $(DEPS)
