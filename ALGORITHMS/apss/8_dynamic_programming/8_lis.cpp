@@ -20,6 +20,7 @@ int using_dp(vector<int>& sequence);
 int using_dp_iter(const vector<int>& sequence, vector<int>::iterator it, int maxval=UNDEFINED);
 int efficient_lis(const vector<int>& seq);
 vector<int> efficient_list(const vector<int>& seq);
+vector<int> efficient_list_re(const vector<int>& seq);
 
 int main(void)
 {
@@ -35,24 +36,33 @@ int main(void)
             cin >> sequence[i];
         }
 
-        /* ret = efficient_lis(sequence); */
-        /* cout << ret << '\n'; */
+        #if DBG==1
+        for (auto i : sequence)
+            cout<< i << ' ';
+        cout <<'\n';
+        #endif
 
-        vector<int> lis = efficient_list(sequence);
-        ret = lis.size();
+
+        vector<int> lis = efficient_list_re(sequence);
+
         #if DBG==1
         for (auto i : lis)
-        {
-            cout << i << ',';
-        }
-        cout << "\b \n";
+            cout<<i<< ' ';
+        cout<<"\n=";
         #endif
-        cout << ret << '\n';
+
+        cout<<lis.size()<<'\n';
+
 
         #ifdef DBG
-            cout << "bruteforce::" << bruteforce(sequence, sequence.begin()) << '\n';
-            cout << "dp::" << max(ret, using_dp(sequence)) << '\n';
-            cout << "efficient_lis::" << efficient_lis(sequence) << "\n----------\n";
+        cout << "efficient_list::";
+        lis = efficient_list(sequence);
+        for (auto i : lis)
+            cout << i << ' ';
+        cout << " size = " << lis.size() << '\n';
+        cout << "bruteforce::" << bruteforce(sequence, sequence.begin()) << '\n';
+        cout << "dp::" << using_dp(sequence) << '\n';
+        cout << "efficient_lis::" << efficient_lis(sequence) << "\n----------\n";
         #endif
     }
     return 0;
@@ -177,13 +187,19 @@ vector<int> efficient_list(const vector<int>& seq)
         // k stands for the last index of ending
         // with X[k]
         P[i] = M[newL - 1];
-        #ifdef DBG
-        fprintf(stderr, "p[%lu]=%d\n", i, P[i]);
-        #endif
 
         // M stores or replace the largest 'j'
         // which can be LIS
         M[newL] = i;
+
+        #ifdef DBG
+        fprintf(stderr, "i=%lu, X[M]=[", i);
+        for (size_t j = 1; j < i; j++)
+        {
+            fprintf(stderr, "%d,", seq[M[j]]);
+        }
+        fprintf(stderr, "\b ]\tp[%lu]=%d\n", i, P[i]);
+        #endif
 
         if (newL > L)
             L = newL;
@@ -202,4 +218,64 @@ vector<int> efficient_list(const vector<int>& seq)
     }
 
     return  ret;
+}
+
+// X[i] : 입력으로 주어진 수열
+// M[k] : 수열 X의 길이 k인 부분수열 중에서 마지막 인덱스의
+// 값이 가장 작은 값을 저장.
+// P[i] : X[i]가 바라보고 있는 M 배열의 인덱스
+vector<int> efficient_list_re(const vector<int>& X)
+{
+    int M[MAXCACHE+1], P[MAXCACHE];
+    int L = 0, newL;
+
+    memset(M, 0, sizeof(M));
+    memset(P, 0, sizeof(P));
+    for (size_t i = 0; i < X.size(); ++i)
+    {
+        int lo = 1, hi = L, mid;
+        // find lower bound using binary search
+        while( lo<=hi )
+        {
+            mid = (lo+hi) / 2;
+            if (M[mid] < X[i])
+                lo = mid+1;
+            else
+                hi = mid-1;
+        }
+        // after binary search, lo gets 1 greater
+        // than L
+
+        // M replace (or append) new value X[i]
+        // and P keeps tracking on M's index
+        newL = lo;
+        M[newL] = X[i];
+        P[i] = newL;
+
+        #if DBG==1
+        fprintf(stderr,"newL=%d, M = [", newL);
+        for (int j = 0; j <= newL; j++)   
+            fprintf(stderr, "%d ", M[j]);
+        fprintf(stderr, "]\tP[%lu]=%d\n", i, P[i]);
+        #endif
+        // when append we have to set hi value
+        if (newL > L)
+            L = newL;
+    }
+
+    // backtracking to get LIS
+    // we only care when M gets appended!
+    vector<int> ret(L);
+    int r = L-1;
+    for (int i = (int)X.size()-1; i >= 0; --i)
+    {
+        if (L == P[i])
+        {
+            ret[r--] = X[i];
+            fprintf(stderr, "X[%d]=%d\n", i, X[i]);
+            L--;
+        }
+    }
+
+    return ret;
 }
