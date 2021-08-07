@@ -15,7 +15,9 @@ using namespace std;
 #define UNDEFINED -1
 static int cache[MAXCACHE] = {UNDEFINED};
 
-int bruteforce(const vector<int>& sequence, vector<int>::iterator it, int max_val=0);
+int bruteforce(const vector<int>& sequence, vector<int>::iterator it, int max_val=UNDEFINED);
+int using_memo(vector<int>& sequence);
+int using_memo_iter(const vector<int>& sequence, vector<int>::iterator it, int max_val=UNDEFINED);
 int using_dp(vector<int>& sequence);
 int using_dp_iter(const vector<int>& sequence, vector<int>::iterator it, int maxval=UNDEFINED);
 int efficient_lis(const vector<int>& seq);
@@ -46,9 +48,10 @@ int main(void)
         vector<int> lis = efficient_list_re(sequence);
 
         #if DBG==1
+        cout << "LIS array : ";
         for (auto i : lis)
             cout<<i<< ' ';
-        cout<<"\n=";
+        cout<<"\n size = ";
         #endif
 
         cout<<lis.size()<<'\n';
@@ -62,7 +65,9 @@ int main(void)
         cout << " size = " << lis.size() << '\n';
         cout << "bruteforce::" << bruteforce(sequence, sequence.begin()) << '\n';
         cout << "dp::" << using_dp(sequence) << '\n';
-        cout << "efficient_lis::" << efficient_lis(sequence) << "\n----------\n";
+        cout << "efficient_lis::" << efficient_lis(sequence) << "\n";
+        cout << "using_memo::" << using_memo(sequence) << '\n';
+        cout << "---------------------------------------\n\n";
         #endif
     }
     return 0;
@@ -74,8 +79,8 @@ int bruteforce(const vector<int>& sequence, vector<int>::iterator it, int max_va
         return 0;
 
     int ret = 0;
-#ifdef DBG
-//    fprintf(stderr, "[%lu]=%d\t", it-sequence.begin(), *it);
+#if 0
+    fprintf(stderr, "[%lu]=%d\t", it-sequence.begin(), *it);
 #endif
 
     // 부분수열에 넣는다.
@@ -84,6 +89,37 @@ int bruteforce(const vector<int>& sequence, vector<int>::iterator it, int max_va
 
     // 지나친다.
     ret = max( ret, bruteforce(sequence, it+1, max_val) );
+
+    return ret;
+}
+
+int using_memo(vector<int>& sequence)
+{
+    int ret = 0;
+    for (auto i = sequence.begin(); i != sequence.end(); i++)
+    {
+        memset(cache, UNDEFINED, sizeof(cache));
+        ret = max( ret, using_memo_iter(sequence, i) );
+    }
+    return ret;
+}
+
+int using_memo_iter(const vector<int>& sequence, vector<int>::iterator it, int max_val)
+{
+    if (it == sequence.end())
+        return 0;
+    size_t distance = it - sequence.begin();
+    int &ret = cache[distance];
+    if (ret != UNDEFINED)
+        return ret;
+    ret = 1;
+
+    // 부분수열에 넣는다.
+    if (max_val < *it)
+        ret = max( ret, 1 + using_memo_iter(sequence, it+1, *it) );   
+    
+    // 지나친다.
+    ret = max( ret, using_memo_iter(sequence, it+1, max_val) );
 
     return ret;
 }
@@ -192,7 +228,7 @@ vector<int> efficient_list(const vector<int>& seq)
         // which can be LIS
         M[newL] = i;
 
-        #ifdef DBG
+        #if DBG==0
         fprintf(stderr, "i=%lu, X[M]=[", i);
         for (size_t j = 1; j < i; j++)
         {
@@ -252,7 +288,7 @@ vector<int> efficient_list_re(const vector<int>& X)
         M[newL] = X[i];
         P[i] = newL;
 
-        #if DBG==1
+        #if DBG==0
         fprintf(stderr,"newL=%d, M = [", newL);
         for (int j = 0; j <= newL; j++)   
             fprintf(stderr, "%d ", M[j]);
@@ -272,7 +308,6 @@ vector<int> efficient_list_re(const vector<int>& X)
         if (L == P[i])
         {
             ret[r--] = X[i];
-            fprintf(stderr, "X[%d]=%d\n", i, X[i]);
             L--;
         }
     }
