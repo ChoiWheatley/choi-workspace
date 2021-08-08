@@ -16,8 +16,6 @@ using namespace std;
 static int cache[MAXCACHE] = {UNDEFINED};
 
 int bruteforce(const vector<int>& sequence, vector<int>::iterator it, int max_val=UNDEFINED);
-int using_memo(vector<int>& sequence);
-int using_memo_iter(const vector<int>& sequence, vector<int>::iterator it, int max_val=UNDEFINED);
 int using_dp(vector<int>& sequence);
 int using_dp_iter(const vector<int>& sequence, vector<int>::iterator it, int maxval=UNDEFINED);
 int efficient_lis(const vector<int>& seq);
@@ -66,7 +64,6 @@ int main(void)
         cout << "bruteforce::" << bruteforce(sequence, sequence.begin()) << '\n';
         cout << "dp::" << using_dp(sequence) << '\n';
         cout << "efficient_lis::" << efficient_lis(sequence) << "\n";
-        cout << "using_memo::" << using_memo(sequence) << '\n';
         cout << "---------------------------------------\n\n";
         #endif
     }
@@ -89,37 +86,6 @@ int bruteforce(const vector<int>& sequence, vector<int>::iterator it, int max_va
 
     // 지나친다.
     ret = max( ret, bruteforce(sequence, it+1, max_val) );
-
-    return ret;
-}
-
-int using_memo(vector<int>& sequence)
-{
-    int ret = 0;
-    for (auto i = sequence.begin(); i != sequence.end(); i++)
-    {
-        memset(cache, UNDEFINED, sizeof(cache));
-        ret = max( ret, using_memo_iter(sequence, i) );
-    }
-    return ret;
-}
-
-int using_memo_iter(const vector<int>& sequence, vector<int>::iterator it, int max_val)
-{
-    if (it == sequence.end())
-        return 0;
-    size_t distance = it - sequence.begin();
-    int &ret = cache[distance];
-    if (ret != UNDEFINED)
-        return ret;
-    ret = 1;
-
-    // 부분수열에 넣는다.
-    if (max_val < *it)
-        ret = max( ret, 1 + using_memo_iter(sequence, it+1, *it) );   
-    
-    // 지나친다.
-    ret = max( ret, using_memo_iter(sequence, it+1, max_val) );
 
     return ret;
 }
