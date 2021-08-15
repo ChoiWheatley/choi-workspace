@@ -17,7 +17,7 @@
 #include <sys/procfs.h> // PAGE_SIZE
 #include<CSHutil.h>
 
-#define SHMKEY_FILENAME "/tmp"
+#define SHMKEY_FILENAME "/dev"
 #define SHMKEY_PROJID 'r'
 #define MAX_BUF 1024
 
