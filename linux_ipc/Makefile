@@ -5,7 +5,7 @@ UTIL_DIR:=$(CURDIR)../util/
 INC:=-I. -I$(UTIL_DIR)
 DEBUG= -g -DDBG
 CFLAGS=$(INC) $(DEBUG) -Wall -Werror -pthread
-LINK+=-lrt
+LINK+=-lrt -lpthread
 CC=gcc-10 
 
 SRCS=$(wildcard *.c)
