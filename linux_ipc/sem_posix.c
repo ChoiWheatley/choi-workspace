@@ -20,9 +20,13 @@ static void print_usage(const char * progname)
     fprintf(stderr, "\
     show                # show current semaphore set status\n\
     | wait              # decrements  (locks) the semaphore pointed to by sem.\n\
-    | trywait           # if the  decrement  cannot be immediately performed, then call returns an error instead of blocking.\n\
-    | timedwait [sec]   # limit on the amount of time that the call should block if the decrement cannot be immediately performed.\n\
+    | trywait           # if the  decrement  cannot be immediately performed,\n\
+                          then call returns an error instead of blocking.\n\
+    | timedwait [sec]   # limit on the amount of time that the call should \n\
+                          block if the decrement cannot be immediately performed.\n\
     | release           # release semaphore with index\n\
+    | close             # closes the named semaphore\n\
+    | unlink            # removes the named semaphore\n\
     \n");
 }
 
@@ -32,6 +36,8 @@ static int release(sem_t *sem);
 static int wait	  (sem_t *sem);
 static int trywait(sem_t *sem);
 static int timedwait(sem_t *sem, int time_sec);
+static int myclose(sem_t *sem);
+static int myunlink(const char* name);
 
 int main(int argc, char ** argv)
 {
@@ -60,6 +66,12 @@ int main(int argc, char ** argv)
     else if (!strcmp(argv[1], "release")) {
         ret = release(sem_id);
     } 
+    else if (!strcmp(argv[1], "close")) {
+        ret = myclose(sem_id);
+    }
+    else if (!strcmp(argv[1], "unlink")){
+        ret = myunlink(SEM_ID);
+    }
     else {
         goto err;
     }
@@ -128,4 +140,14 @@ static int timedwait(sem_t *sem, int time_sec)
 	t.tv_nsec = 0;
 
 	return sem_timedwait(sem, &t);
+}
+
+static int myclose(sem_t *sem)
+{
+    return sem_close(sem);
+}
+
+static int myunlink(const char* name)
+{
+    return sem_unlink(name);
 }
