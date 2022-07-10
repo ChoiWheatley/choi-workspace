@@ -17,7 +17,7 @@
 #define INSPECT(expr, then) \
     if ((expr)==0) {\
         char errmsg[CSH_MAXBUF];\
-        sprintf(errmsg, "in function(%s), line number(%d),\n", __func__, __LINE__);\
+        fprintf(stderr, "in function `%s()`, line number `%d` ,\n", __func__, __LINE__);\
         sprintf(errmsg, "`%s` has error occured!\n", #expr);\
         perror(errmsg);\
         then\
