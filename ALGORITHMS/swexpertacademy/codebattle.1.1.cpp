@@ -36,19 +36,28 @@ auto scan() -> vector<vector<int>> {
   return ret;
 }
 
-auto print(const vector<vector<int>> &scaned) -> void {
-  for (auto i : scaned) {
-    const auto n = (int)sqrt(i.size());
-    auto cnt = 0;
+auto operator<<(ostream& os, const vector<int>& region) -> ostream& {
+  const auto size = region.size();
+  const auto side = static_cast<int>(sqrt(size));
+  auto cnt = 0;
 
-    for (auto j : i) {
-      cout << j << " ";
-      if (++cnt % n == 0) {
-        cout << "\n";
-      }
+  os << "[\n";
+  for (auto i : region) {
+    os << i << " ";
+    if (++cnt % side == 0) {
+      os << "\n";
     }
-    cout << "\n";
   }
+  os << "]\n";
+
+  return os;
+}
+
+auto operator<<(ostream& os, const vector<vector<int>>& scaned) -> ostream& {
+  for (auto i : scaned) {
+    os << i;
+  }
+  return os;
 }
 
 struct Point {
@@ -71,6 +80,12 @@ struct Point {
     return true;
   }
 };
+
+auto operator<<(ostream& os, const Point& pnt) -> ostream& {
+  os << "(" << pnt.y << "," << pnt.x << ")";
+  return os;
+}
+
 
 auto convertIndexFrom(const Point point, const int size) -> int {
   const auto side = static_cast<int>(sqrt(size));
@@ -98,6 +113,10 @@ auto countIslands(const vector<int> &region) -> int {
       const auto point = Point{.y = j, .x = i};
       const auto idx = convertIndexFrom(point, region.size());
 
+      // DEBUG
+      cout << "current point : " << point << "\n";
+      cout << "current visitStat : " << visitStat << "\n";
+
       if (idx < 0) {
         // something is wrong!
         return -1;
@@ -117,6 +136,11 @@ auto countIslands(const vector<int> &region) -> int {
       while (!moveStack.empty()) {
         const auto nextPoint = Point{moveStack.top()};
         moveStack.pop();
+
+        // DEBUG
+        // cout << "visitStat : " << visitStat;
+
+
         const auto idx = convertIndexFrom(nextPoint, size);
         if (idx < 0) {
           // index is not valid
@@ -134,6 +158,8 @@ auto countIslands(const vector<int> &region) -> int {
         moveStack.push(nextPoint.down());
         moveStack.push(nextPoint.right());
         moveStack.push(nextPoint.left());
+
+
       }
     }
   }
@@ -144,8 +170,8 @@ auto countIslands(const vector<int> &region) -> int {
 auto flood(const vector<int> &region) -> const vector<int> {
   auto ret = vector<int>{region};
 
-  for (auto i = ret.begin(); i != ret.end(); i++) {
-    *i = *i - 1;
+  for (auto i = 0; i < ret.size(); ++i) {
+    ret[i]--;
   }
 
   return ret;
@@ -169,7 +195,7 @@ auto solve(const vector<int> &region) -> int {
     if (best < current) {
       best = current;
     }
-    currentRegion = flood(region);
+    currentRegion = flood(currentRegion);
   }
 
   return best;
@@ -177,7 +203,7 @@ auto solve(const vector<int> &region) -> int {
 
 int main() {
   const auto scaned = scan();
-  print(scaned);
+  cout << scaned << "\n";
 
   auto count = 1;
   for (auto i : scaned) {
