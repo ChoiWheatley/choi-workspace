@@ -12,6 +12,9 @@
 #include <iostream>
 #include <vector>
 #include <stack>
+#if DBG == 1
+#include <cstdio>
+#endif
 
 using namespace std;
 
@@ -206,6 +209,9 @@ auto solve(const vector<int> &region) -> int {
 }
 
 int main() {
+#if DBG == 1
+  freopen("input.txt", "r", stdin);
+#endif
   const auto scaned = scan();
   /* cout << scaned << "\n"; */
 
