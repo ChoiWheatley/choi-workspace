@@ -63,6 +63,9 @@ auto operator<<(ostream& os, const vector<vector<int>>& scaned) -> ostream& {
 struct Point {
   int y;
   int x;
+  auto up() const -> Point {
+    return Point{.y = this->y - 1, .x = this->x};
+  }
   auto right() const -> Point {
     return Point{.y = this->y, .x = this->x + 1};
   }
@@ -114,18 +117,18 @@ auto countIslands(const vector<int> &region) -> int {
       const auto idx = convertIndexFrom(point, region.size());
 
       // DEBUG
-      cout << "current point : " << point << "\n";
-      cout << "current visitStat : " << visitStat << "\n";
+      /* cout << "current point : " << point << "\n"; */
+      /* cout << "current visitStat : " << visitStat << "\n"; */
 
       if (idx < 0) {
         // something is wrong!
         return -1;
       }
-      if (region[idx] <= 0) {
-        visitStat[idx] = SEA;
+      if (visitStat[idx] != NOT_VISITED) {
         continue;
       }
-      if (visitStat[idx] != NOT_VISITED) {
+      if (region[idx] <= 0) {
+        visitStat[idx] = SEA;
         continue;
       }
       visitStat[idx] = ++currentCount;
@@ -146,15 +149,16 @@ auto countIslands(const vector<int> &region) -> int {
           // index is not valid
           continue;
         }
+        if (visitStat[idx] != NOT_VISITED) {
+          continue;
+        }
         if (region[idx] <= 0) {
           visitStat[idx] = SEA;
           continue;
         }
-        if (visitStat[idx] != NOT_VISITED) {
-          continue;
-        }
         visitStat[idx] = currentCount;
-        // nextPoint로부터 좌, 우, 하단을 탐색한다.
+
+        moveStack.push(nextPoint.up());
         moveStack.push(nextPoint.down());
         moveStack.push(nextPoint.right());
         moveStack.push(nextPoint.left());
@@ -191,7 +195,7 @@ auto solve(const vector<int> &region) -> int {
   auto currentRegion = vector<int>{region};
 
   while (!isFloodingDone(currentRegion)) {
-    const auto current = countIslands(region);
+    const auto current = countIslands(currentRegion);
     if (best < current) {
       best = current;
     }
@@ -203,7 +207,7 @@ auto solve(const vector<int> &region) -> int {
 
 int main() {
   const auto scaned = scan();
-  cout << scaned << "\n";
+  /* cout << scaned << "\n"; */
 
   auto count = 1;
   for (auto i : scaned) {
