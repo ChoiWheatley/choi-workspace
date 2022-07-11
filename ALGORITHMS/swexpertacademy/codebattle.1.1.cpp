@@ -75,7 +75,7 @@ struct Point {
   auto down() const -> Point {
     return Point{.y = this->y + 1, .x = this->x};
   }
-  auto isValidate(const int size) const -> bool {
+  auto isValid(const int size) const -> bool {
     const auto side = static_cast<int>(sqrt(size));
     if (this->y < 0 || this->x < 0 || this->y >= side || this->x >= side) {
       return false;
@@ -92,7 +92,7 @@ auto operator<<(ostream& os, const Point& pnt) -> ostream& {
 
 auto convertIndexFrom(const Point point, const int size) -> int {
   const auto side = static_cast<int>(sqrt(size));
-  if (!point.isValidate(size)) {
+  if (!point.isValid(size)) {
     return -1;
   }
   return (side * point.y + point.x);
