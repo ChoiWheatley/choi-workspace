@@ -213,4 +213,6 @@ int main() {
   for (auto i : scaned) {
     cout << "#" << count++ << " " << solve(i) << "\n";
   }
+
+  return 0;
 }
