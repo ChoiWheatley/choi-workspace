@@ -403,3 +403,6 @@ MigrationBackup/
 
 **/*.DS_Store
 **/tags
+
+**/launch.json
+**/tasks.json

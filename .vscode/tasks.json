@@ -7,11 +7,13 @@
             "args": [
                 "-g",
                 "${file}",
+                "-D",
+                "DBG=1",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}.out"
             ],
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${fileDirname}"
             },
             "problemMatcher": [
                 "$gcc"
