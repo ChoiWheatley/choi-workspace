@@ -418,3 +418,4 @@ _deps
 
 **/*.DS_Store
 **/tags
+**/build/

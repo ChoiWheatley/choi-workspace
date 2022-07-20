@@ -1,12 +1,13 @@
 #include <iostream>
+#include <cstdint>
 
-extern int fibonacci(int);
+extern auto fibonacci(int order) -> int;
 
 int main(int argc, char **argv)
 {
   std::cout << "Hello, World\n";
   std::cout << "fib(1...100) : \n";
-  for (int i = 1; i <= 100; ++i)
+  for (int i = 1; i <= 20; ++i)
   {
     std::cout << "fib(" << i << ") = " << fibonacci(i) << "\n";
   }
