@@ -26,6 +26,12 @@ add_subdirectory(misc)
 add_subdirectory(src)
 add_subdirectory(lib)
 
+# 원하는 타겟의 최종 위치를 정할 수도 있다.
+set_target_properties(${SRC_TARGET}
+  PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+
 # 의존성 주입 및 전파는 루트에서
 target_link_libraries( # 타겟이 필요한 라이브러리를 정의.
   ${SRC_TARGET} # ./src/CMakeLists.txt::project name
