@@ -3,7 +3,7 @@
 # https://www.tuwlab.com/ece/27270
 # https://cgold.readthedocs.io/en/latest/tutorials.html
 cmake_minimum_required(VERSION 3.16) # 요구 CMake 최소 버전
-project(MyMain VERSION 1.0.1) # 프로젝트 이름 및 버전
+project(LEARN_GTEST VERSION 1.0.1) # 프로젝트 이름 및 버전
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE DEBUG) # 빌드 config 및 기타등등 옵션
@@ -21,8 +21,19 @@ set(MY_LIB_TARGET
 # 공통 컴파일 옵션, 링크 옵션
 add_compile_options(-Wall)
 
+# Googlt Test
+# declare a dependency on GoogleTest which is downloaded from github
+# FetchContent : https://cmake.org/cmake/help/latest/module/FetchContent.html
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG release-1.12.1
+)
+FetchContent_MakeAvailable(googletest)
+
 # 재귀적으로 하위 단위를 빌드
-add_subdirectory(misc)
+add_subdirectory(test)
 add_subdirectory(src)
 add_subdirectory(lib)
 
