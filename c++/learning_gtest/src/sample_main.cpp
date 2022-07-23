@@ -1,7 +1,6 @@
 #include <iostream>
 #include <cstdint>
-
-extern auto fibonacci(int order) -> int;
+#include <lib_arithmetic.h>
 
 int main(int argc, char **argv)
 {
@@ -9,7 +8,7 @@ int main(int argc, char **argv)
   std::cout << "fib(1...100) : \n";
   for (int i = 1; i <= 20; ++i)
   {
-    std::cout << "fib(" << i << ") = " << fibonacci(i) << "\n";
+    std::cout << "fib(" << i << ") = " << fibonacci<uint64_t>(i) << "\n";
   }
   return 0;
 }

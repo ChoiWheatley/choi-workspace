@@ -1,12 +1,12 @@
 enable_testing()
 
 add_executable(
-  hello_test
+  ${MY_TEST_TARGET}
   hello_test.cc
+  test_mymain.cpp
 )
-target_link_libraries(
-  hello_test
-  GTest::gtest_main
+target_link_libraries(${MY_TEST_TARGET}
+  PUBLIC GTest::gtest_main
 )
 include(GoogleTest)
-gtest_discover_tests(hello_test)
+gtest_discover_tests(${MY_TEST_TARGET})

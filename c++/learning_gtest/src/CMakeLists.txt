@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.16)
 # 빌드대상 바이너리 파일명 및 소스파일 목록
 set(
   SOURCE_FILES
-  sample_fibonacci.cpp
   sample_main.cpp
 )
 
