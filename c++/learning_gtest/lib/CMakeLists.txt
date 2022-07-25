@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 3.16)
 set(
   LIB_SOURCES
   lib_arithmetic.cpp
-  lib_queue.cpp
 )
 
 # 라이브러리 만들기 https://matgomes.com/add-library-cmake-create-libraries/

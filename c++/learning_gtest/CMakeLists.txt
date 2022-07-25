@@ -26,7 +26,7 @@ add_compile_options(-Wall)
 
 # current directory 변경하기 전에 공통적으로 include할 디렉토리를 지정할 수 있다.
 # target_include_directories는 항상 루트 디렉토리 기준으로 검색한다는 점과는 다르다.
-include_directories(include)
+include_directories(/usr/include include)
 
 # Googlt Test
 # declare a dependency on GoogleTest which is downloaded from github
@@ -47,7 +47,16 @@ add_subdirectory(test)
 # 원하는 타겟의 최종 위치를 정할 수도 있다.
 set_target_properties(${SRC_TARGET}
   PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)
+set_target_properties(${MY_LIB_TARGET}
+  PROPERTIES
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+  ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)
+set_target_properties(${MY_TEST_TARGET}
+  PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
 # 타겟이 필요한 라이브러리를 정의.
