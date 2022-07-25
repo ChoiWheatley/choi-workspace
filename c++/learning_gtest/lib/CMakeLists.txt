@@ -3,8 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 # 여기에는 라이브러리를 만드는 코드만 생성할 것임.
 set(
   LIB_SOURCES
-  sample_lib1.cpp
-  sample_lib2.cpp
+  lib_arithmetic.cpp
 )
 
 # 라이브러리 만들기 https://matgomes.com/add-library-cmake-create-libraries/
