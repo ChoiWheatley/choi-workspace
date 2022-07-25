@@ -2,27 +2,7 @@
 /// test fixture 라는 이름의 공통객체를 만들어 여러 개의 테스트에서 공유하는 구성을 만들 수 있다.
 #include <gtest/gtest.h>
 #include <my_queue.hpp>
-/// Creating fixture
-class QueueTest : public ::testing::Test
-{
-protected:
-  void SetUp() override
-  {
-    std::cerr << "Hello, Queue!";
-    q1_.Enqueue(1);
-    q2_.Enqueue(2);
-    q2_.Enqueue(3);
-  }
-  void TearDown() override
-  {
-    // Do nothing?
-    std::cerr << "I'm gonna be destructed soon!\n";
-  }
-
-  Queue<int> q0_;
-  Queue<int> q1_;
-  Queue<int> q2_;
-};
+#include "QueueFixture.hpp"
 
 /// Using fixture
 TEST_F(QueueTest, IsEmptyInitially)

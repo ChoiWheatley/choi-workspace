@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <memory>
 #include <lib_arithmetic.h>
-#include <my_queue.hpp>
+#include <my_queue_impl.hpp>
 
 template <typename E>
 class QueueWithPrint : public Queue<E>
