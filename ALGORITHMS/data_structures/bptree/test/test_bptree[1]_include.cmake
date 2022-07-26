@@ -1,5 +1,0 @@
-if(EXISTS "/home/chltm/workspace/choi-workspace/ALGORITHMS/data_structures/bptree/test/test_bptree[1]_tests.cmake")
-  include("/home/chltm/workspace/choi-workspace/ALGORITHMS/data_structures/bptree/test/test_bptree[1]_tests.cmake")
-else()
-  add_test(test_bptree_NOT_BUILT test_bptree_NOT_BUILT)
-endif()

@@ -1,8 +1,7 @@
 enable_testing()
 
 add_executable(${TEST_TARGET}
-
-  # TODO
+  test_bptree.cpp
 )
 
 target_link_libraries(${TEST_TARGET}
