@@ -35,3 +35,15 @@ TEST_F(BPTreeFixture, InsertAndQuery)
   // const auto key = record->mId;
   // mTree.insert(record, key);
 }
+
+TEST_F(BPTreeFixture, NodeSizeEqual)
+{
+  using AbstNode = typename bptree::AbstNode<Key, Record, M>;
+  using LeafNode = typename bptree::LeafNode<Key, Record, M>;
+  using NonLeafNode = typename bptree::NonLeafNode<Key, Record, M>;
+
+  std::cout << "sizeof(AbstNode) = " << sizeof(AbstNode) << "\n";
+  std::cout << "sizeof(LeafNode) = " << sizeof(LeafNode) << "\n";
+  std::cout << "sizeof(NonLeafNode) = " << sizeof(NonLeafNode) << "\n";
+  EXPECT_EQ(sizeof(LeafNode), sizeof(NonLeafNode));
+}

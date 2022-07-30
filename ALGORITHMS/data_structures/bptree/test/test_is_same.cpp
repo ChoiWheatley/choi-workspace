@@ -50,15 +50,3 @@ TEST_F(IsSameFixture, HasSameSize)
   std::cout << "sizeof(ANode) = " << sizeof(ANode) << ", sizeof(*pA) = " << sizeof(*pA) << "\n";
   std::cout << "sizeof(BNode) = " << sizeof(BNode) << ", sizeof(*pB) = " << sizeof(*pB) << "\n";
 }
-
-TEST_F(IsSameFixture, DeathTest)
-{
-  // 만약에 pA자리에 BNode로 placement new를 수행한다면?
-
-  // AbstNode *pA = new ANode{};
-  // AbstNode *pAToB = new (pA) BNode{};
-
-  // EXPECT_DEATH({ pAToB->~AbstNode(); pA->~AbstNode(); }, "abort");
-
-  // free 시에 잘못된 메모리를 해제하여 예외가 발생한다.
-}
