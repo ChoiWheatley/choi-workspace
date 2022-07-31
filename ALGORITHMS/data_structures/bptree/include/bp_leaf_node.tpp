@@ -16,6 +16,15 @@ namespace bptree
   using std::weak_ptr;
 
   template <class K, class R, size_t M>
+  class AbstNode;
+
+  template <class K, class R, size_t M>
+  class LeafNode;
+
+  template <class K, class R, size_t M>
+  class NonLeafNode;
+
+  template <class K, class R, size_t M>
   LeafNode<K, R, M>::LeafNode(weak_ptr<AbstNode<K, R, M>> parent, shared_ptr<LeafNode<K, R, M>> sibling)
       : mKeys{},
         mRecordPointers{},

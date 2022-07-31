@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <bptree.hpp>
 #include <memory>
+#include <vector>
 
 class LeafNodeFixture : public ::testing::Test
 {
@@ -33,7 +34,7 @@ protected:
   {
   }
   bptree::LeafNode<Key, Record, M> leafNode;
-  std::initializer_list<Record> const records;
+  std::vector<Record> const records;
 };
 
 TEST_F(LeafNodeFixture, KeySize)
