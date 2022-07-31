@@ -35,7 +35,7 @@ protected:
 //   mTree.insert(keyrecord);
 // }
 
-TEST_F(BPTreeFixture, NodeSizeEqual)
+TEST_F(BPTreeFixture, NodeSizeNotEqual)
 {
   using AbstNode = typename bptree::AbstNode<Key, Record, M>;
   using LeafNode = typename bptree::LeafNode<Key, Record, M>;
@@ -44,5 +44,5 @@ TEST_F(BPTreeFixture, NodeSizeEqual)
   std::cout << "sizeof(AbstNode) = " << sizeof(AbstNode) << "\n";
   std::cout << "sizeof(LeafNode) = " << sizeof(LeafNode) << "\n";
   std::cout << "sizeof(NonLeafNode) = " << sizeof(NonLeafNode) << "\n";
-  EXPECT_EQ(sizeof(LeafNode), sizeof(NonLeafNode));
+  EXPECT_NE(sizeof(LeafNode), sizeof(NonLeafNode));
 }
