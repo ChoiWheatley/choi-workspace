@@ -4,6 +4,9 @@ add_executable(${TEST_TARGET}
   test_bptree.cpp
   test_placement_new.cpp
   test_is_same.cpp
+  test_shared_ptr.cpp
+  test_std_array.cpp
+  test_leaf_node.cpp
 )
 
 target_link_libraries(${TEST_TARGET}

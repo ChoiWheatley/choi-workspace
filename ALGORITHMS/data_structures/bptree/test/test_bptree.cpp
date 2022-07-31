@@ -29,12 +29,11 @@ protected:
   bptree::BPTree<Key, Record, M> mTree;
 };
 
-TEST_F(BPTreeFixture, InsertAndQuery)
-{
-  // const auto record = std::make_shared<Record>(1, 1, "male", 100);
-  // const auto key = record->mId;
-  // mTree.insert(record, key);
-}
+// TEST_F(BPTreeFixture, InsertAndQuery)
+// {
+//   const auto record = std::make_shared<Record>(1, 1, "male", 100);
+//   mTree.insert(keyrecord);
+// }
 
 TEST_F(BPTreeFixture, NodeSizeEqual)
 {
