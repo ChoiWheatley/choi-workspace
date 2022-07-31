@@ -33,17 +33,19 @@ protected:
   {
   }
   bptree::LeafNode<Key, Record, M> leafNode;
-  const std::initializer_list<Record> records;
+  std::initializer_list<Record> const records;
 };
 
 TEST_F(LeafNodeFixture, KeySize)
 {
   size_t cnt = 0;
+  EXPECT_TRUE(leafNode.empty());
   for (auto const &r : records)
   {
     leafNode.insert(std::make_shared<Record>(r), r.id);
     EXPECT_EQ(leafNode.keySize(), ++cnt);
   }
+  EXPECT_TRUE(leafNode.full());
 }
 
 TEST_F(LeafNodeFixture, Validate)

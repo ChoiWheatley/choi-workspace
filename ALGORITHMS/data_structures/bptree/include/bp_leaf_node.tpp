@@ -3,6 +3,7 @@
 #include <optional>
 #include <string>
 #include <optional>
+#include <cmath>
 
 namespace bptree
 {
@@ -45,17 +46,17 @@ namespace bptree
     // key가 낑겨들어갈 index를 찾기
     size_t idx = static_cast<size_t>(size / 2);
     size_t remain = size;
-    while (1 <= remain)
+    while (1 < remain)
     {
       if (mKeys.at(idx).value() < key)
       {
-        idx = static_cast<size_t>((idx + size) / 2);
+        idx = static_cast<size_t>(round(((double)idx + (double)size) / 2));
       }
       else
       {
-        idx = static_cast<size_t>(idx / 2);
+        idx = static_cast<size_t>(round((double)idx / 2));
       }
-      remain = static_cast<size_t>(remain / 2);
+      remain = static_cast<size_t>(round((double)remain / 2));
     }
     if (size <= idx)
     {
@@ -69,8 +70,8 @@ namespace bptree
       // 뒤로 땡겨줘야 함. key, recordPointer 둘 다
       for (size_t i = size; i > idx; --i)
       {
-        mKeys.at(i) = mKeys.at(i - 1);
-        mRecordPointers.at(i) = mRecordPointers.at(i - 1);
+        mKeys.at(i).swap(mKeys.at(i - 1));
+        mRecordPointers.at(i).swap(mRecordPointers.at(i - 1));
       }
       mKeys.at(idx) = key;
       mRecordPointers.at(idx) = std::move(record);
@@ -83,21 +84,21 @@ namespace bptree
   {
     if (empty())
     {
-      throw bptree::node_is_empty{};
+      return;
     }
     auto found = false;
     const auto size = keySize();
     size_t idx = static_cast<size_t>(size / 2);
     size_t remain = size;
-    while (1 <= remain)
+    while (1 < remain)
     {
       if (mKeys.at(idx).value() < key)
       {
-        idx = static_cast<size_t>((idx + size) / 2);
+        idx = static_cast<size_t>(round(((double)idx + (double)size) / 2));
       }
       else if (key < mKeys.at(idx).value())
       {
-        idx = static_cast<size_t>(idx / 2);
+        idx = static_cast<size_t>(round((double)idx / 2));
       }
       else
       {
@@ -112,8 +113,8 @@ namespace bptree
       // 나머지들을 앞으로 땡겨줘야 함.
       for (size_t i = idx; i < size - 1; ++i)
       {
-        mKeys.at(i) = mKeys.at(i + 1);
-        mRecordPointers.at(i) = mRecordPointers.at(i + 1);
+        mKeys.at(i).swap(mKeys.at(i + 1));
+        mRecordPointers.at(i).swap(mRecordPointers.at(i + 1));
       }
       mKeys.at(size).reset();
       mRecordPointers.at(size).reset();
@@ -121,7 +122,7 @@ namespace bptree
     }
     else
     {
-      throw bptree::no_key_found{};
+      return;
     }
   }
 
@@ -159,7 +160,18 @@ namespace bptree
   template <class K, class R, size_t M>
   auto LeafNode<K, R, M>::validate() const noexcept -> bool
   {
-    return (keySize() == recordPointerSize());
+    auto flag = (keySize() == recordPointerSize());
+    // is key sorted?
+    for (size_t i = 0; i < keySize() - 1; ++i)
+    {
+      if (mKeys[i + 1] < mKeys[i])
+      {
+        flag = false;
+        break;
+      }
+    }
+
+    return flag;
   }
 
   template <class K, class R, size_t M>
