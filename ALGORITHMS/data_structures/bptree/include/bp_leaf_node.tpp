@@ -25,20 +25,6 @@ namespace bptree
   class NonLeafNode;
 
   template <class K, class R, size_t M>
-  LeafNode<K, R, M>::LeafNode(weak_ptr<AbstNode<K, R, M>> parent, shared_ptr<LeafNode<K, R, M>> sibling)
-      : mKeys{},
-        mRecordPointers{},
-        mParent{parent},
-        mSibling{sibling} {}
-
-  template <class K, class R, size_t M>
-  LeafNode<K, R, M>::LeafNode()
-      : mKeys{},
-        mRecordPointers{},
-        mParent{},
-        mSibling{} {}
-
-  template <class K, class R, size_t M>
   auto LeafNode<K, R, M>::keys() const noexcept -> const array<optional<K>, M> &
   {
     return mKeys;
@@ -55,9 +41,14 @@ namespace bptree
     // key가 낑겨들어갈 index를 찾기
     size_t idx = static_cast<size_t>(size / 2);
     size_t remain = size;
-    while (1 < remain)
+    while (remain)
     {
-      if (mKeys.at(idx).value() < key)
+      const auto &optVal = mKeys.at(idx);
+      if (!optVal)
+      {
+        break;
+      }
+      if (optVal.value() < key)
       {
         idx = static_cast<size_t>(round(((double)idx + (double)size) / 2));
       }
@@ -65,7 +56,7 @@ namespace bptree
       {
         idx = static_cast<size_t>(round((double)idx / 2));
       }
-      remain = static_cast<size_t>(round((double)remain / 2));
+      remain = static_cast<size_t>(remain / 2);
     }
     if (size <= idx)
     {
@@ -99,21 +90,27 @@ namespace bptree
     const auto size = keySize();
     size_t idx = static_cast<size_t>(size / 2);
     size_t remain = size;
-    while (1 < remain)
+    while (remain)
     {
-      if (mKeys.at(idx).value() < key)
+      const auto &optVal = mKeys.at(idx);
+      if (!optVal)
       {
-        idx = static_cast<size_t>(round(((double)idx + (double)size) / 2));
+        break;
       }
-      else if (key < mKeys.at(idx).value())
+      if (*optVal < key)
       {
-        idx = static_cast<size_t>(round((double)idx / 2));
+        idx = static_cast<size_t>((idx + size) / 2);
+      }
+      else if (key < *optVal)
+      {
+        idx = static_cast<size_t>(idx / 2);
       }
       else
       {
         found = true;
         break;
       }
+      remain = static_cast<size_t>(remain / 2);
     }
     if (found)
     {
@@ -125,8 +122,8 @@ namespace bptree
         mKeys.at(i).swap(mKeys.at(i + 1));
         mRecordPointers.at(i).swap(mRecordPointers.at(i + 1));
       }
-      mKeys.at(size).reset();
-      mRecordPointers.at(size).reset();
+      mKeys.at(size - 1).reset();
+      mRecordPointers.at(size - 1).reset();
       return;
     }
     else
@@ -170,6 +167,10 @@ namespace bptree
   auto LeafNode<K, R, M>::validate() const noexcept -> bool
   {
     auto flag = (keySize() == recordPointerSize());
+    if (empty())
+    {
+      return true;
+    }
     // is key sorted?
     for (size_t i = 0; i < keySize() - 1; ++i)
     {
@@ -205,4 +206,26 @@ namespace bptree
   template <class K, class R, size_t M>
   LeafNode<K, R, M>::~LeafNode() {}
 
+  template <class K, class R, size_t M>
+  LeafNode<K, R, M>::LeafNode(weak_ptr<AbstNode<K, R, M>> parent, shared_ptr<LeafNode<K, R, M>> sibling)
+      : mKeys{},
+        mRecordPointers{},
+        mParent{parent},
+        mSibling{sibling} {}
+
+  template <class K, class R, size_t M>
+  LeafNode<K, R, M>::LeafNode()
+      : mKeys{},
+        mRecordPointers{},
+        mParent{},
+        mSibling{} {}
+
+  template <class K, class R, size_t M>
+  LeafNode<K, R, M>::LeafNode(LeafNode &&other)
+  {
+    this->mKeys = other.mKeys;
+    this->mRecordPointers = other.mRecordPointers;
+    this->mParent = other.mParent;
+    this->mSibling = other.mSibling;
+  }
 } // namespace bptree

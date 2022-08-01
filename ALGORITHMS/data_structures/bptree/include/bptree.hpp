@@ -109,6 +109,8 @@ namespace bptree
 
     explicit LeafNode(weak_ptr<Node> parent, shared_ptr<LeafNode> sibling);
     explicit LeafNode();
+    LeafNode(LeafNode &&);
+    LeafNode(const LeafNode &) = delete;
     ~LeafNode() override;
 
   private:

@@ -28,7 +28,6 @@ protected:
   }
   auto SetUp() -> void override
   {
-    leafNode = bptree::LeafNode<Key, Record, M>{};
   }
   auto TearDown() -> void override
   {
@@ -37,7 +36,7 @@ protected:
   std::vector<Record> const records;
 };
 
-TEST_F(LeafNodeFixture, KeySize)
+TEST_F(LeafNodeFixture, KeySizeWhenInsert)
 {
   size_t cnt = 0;
   EXPECT_TRUE(leafNode.empty());
@@ -45,15 +44,32 @@ TEST_F(LeafNodeFixture, KeySize)
   {
     leafNode.insert(std::make_shared<Record>(r), r.id);
     EXPECT_EQ(leafNode.keySize(), ++cnt);
+    EXPECT_TRUE(leafNode.validate());
   }
   EXPECT_TRUE(leafNode.full());
 }
 
-TEST_F(LeafNodeFixture, Validate)
+TEST_F(LeafNodeFixture, KeySizeWhenRemove)
 {
-  for (auto const &r : records)
+  size_t cnt = 0;
+  for (const auto &r : records)
   {
     leafNode.insert(std::make_shared<Record>(r), r.id);
+    ++cnt;
+    EXPECT_EQ(leafNode.keySize(), cnt);
+    EXPECT_TRUE(leafNode.validate());
+  }
+  cnt = 5;
+  // remove wrong key
+  const int key = -100;
+  leafNode.remove(key);
+  EXPECT_EQ(leafNode.keySize(), cnt);
+  for (const auto &r : records)
+  {
+    const auto key = r.id;
+    leafNode.remove(key);
+    --cnt;
+    EXPECT_EQ(leafNode.keySize(), cnt);
     EXPECT_TRUE(leafNode.validate());
   }
 }
