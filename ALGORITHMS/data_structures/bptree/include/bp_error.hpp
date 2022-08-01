@@ -9,10 +9,6 @@ namespace bptree
   {
     virtual auto what() const noexcept -> const char * = 0;
   };
-  struct node_is_empty : bp_error
-  {
-    auto what() const noexcept -> const char * override { return "tree is empty.\n"; }
-  };
   struct no_key_found : bp_error
   {
     auto what() const noexcept -> const char * override { return "key is not found.\n"; }

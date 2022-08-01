@@ -96,4 +96,5 @@ TEST_F(LeafNodeFixture, KeySizeWhenRemove)
       continue;
     }
   }
+  EXPECT_THROW({ leafNode.remove(1); }, bptree::node_underflow);
 }
