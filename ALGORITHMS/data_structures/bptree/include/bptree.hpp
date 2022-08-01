@@ -118,6 +118,9 @@ namespace bptree
     array<optional<RecordPTR>, M> mRecordPointers;
     weak_ptr<Node> mParent;
     shared_ptr<LeafNode> mSibling;
+
+    auto doInsert(shared_ptr<R> record, K key, size_t idx);
+    auto doRemove(K key, size_t idx);
   };
 
   /*

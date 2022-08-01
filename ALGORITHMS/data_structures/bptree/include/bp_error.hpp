@@ -15,7 +15,7 @@ namespace bptree
   };
   struct no_key_found : bp_error
   {
-    auto what() const noexcept -> const char * override { return "key is not queried.\n"; }
+    auto what() const noexcept -> const char * override { return "key is not found.\n"; }
   };
   struct node_overflow : bp_error
   {

@@ -37,11 +37,17 @@ namespace bptree
     {
       throw bptree::node_overflow{};
     }
+    if (empty())
+    {
+      doInsert(std::move(record), key, 0);
+      return;
+    }
     const auto size = keySize();
     // key가 낑겨들어갈 index를 찾기
-    size_t idx = static_cast<size_t>(size / 2);
-    size_t remain = size;
-    while (remain)
+    size_t left = 0;
+    size_t right = size;
+    size_t idx = static_cast<size_t>((left + right) / 2);
+    while (left < right)
     {
       const auto &optVal = mKeys.at(idx);
       if (!optVal)
@@ -49,34 +55,18 @@ namespace bptree
         break;
       }
       if (optVal.value() < key)
+      // move right
       {
-        idx = static_cast<size_t>(round(((double)idx + (double)size) / 2));
+        left = (left == idx) ? (left + 1) : idx;
       }
       else
+      // move left
       {
-        idx = static_cast<size_t>(round((double)idx / 2));
+        right = (right == idx) ? (right - 1) : idx;
       }
-      remain = static_cast<size_t>(remain / 2);
+      idx = static_cast<size_t>((left + right) / 2);
     }
-    if (size <= idx)
-    {
-      // 어차피 이 뒤는 전부 nullopt임.
-      mKeys.at(idx) = key;
-      mRecordPointers.at(idx) = std::move(record);
-      return;
-    }
-    else
-    {
-      // 뒤로 땡겨줘야 함. key, recordPointer 둘 다
-      for (size_t i = size; i > idx; --i)
-      {
-        mKeys.at(i).swap(mKeys.at(i - 1));
-        mRecordPointers.at(i).swap(mRecordPointers.at(i - 1));
-      }
-      mKeys.at(idx) = key;
-      mRecordPointers.at(idx) = std::move(record);
-      return;
-    }
+    doInsert(std::move(record), key, idx);
   }
 
   template <class K, class R, size_t M>
@@ -84,13 +74,13 @@ namespace bptree
   {
     if (empty())
     {
-      return;
+      throw bptree::node_underflow{};
     }
-    auto found = false;
     const auto size = keySize();
-    size_t idx = static_cast<size_t>(size / 2);
-    size_t remain = size;
-    while (remain)
+    size_t left = 0;
+    size_t right = size;
+    size_t idx = static_cast<size_t>((left + right) / 2);
+    while (left < right)
     {
       const auto &optVal = mKeys.at(idx);
       if (!optVal)
@@ -98,37 +88,20 @@ namespace bptree
         break;
       }
       if (*optVal < key)
+      // move right
       {
-        idx = static_cast<size_t>((idx + size) / 2);
+        left = (left == idx) ? (left + 1) : idx;
       }
       else if (key < *optVal)
+      // move left
       {
-        idx = static_cast<size_t>(idx / 2);
+        right = (right == idx) ? (right - 1) : idx;
       }
-      else
+      else /* key == *optVal */
       {
-        found = true;
-        break;
+        doRemove(key, idx);
       }
-      remain = static_cast<size_t>(remain / 2);
-    }
-    if (found)
-    {
-      mKeys.at(idx).reset();
-      mRecordPointers.at(idx).reset();
-      // 나머지들을 앞으로 땡겨줘야 함.
-      for (size_t i = idx; i < size - 1; ++i)
-      {
-        mKeys.at(i).swap(mKeys.at(i + 1));
-        mRecordPointers.at(i).swap(mRecordPointers.at(i + 1));
-      }
-      mKeys.at(size - 1).reset();
-      mRecordPointers.at(size - 1).reset();
-      return;
-    }
-    else
-    {
-      return;
+      idx = static_cast<size_t>((left + right) / 2);
     }
   }
 
@@ -227,5 +200,46 @@ namespace bptree
     this->mRecordPointers = other.mRecordPointers;
     this->mParent = other.mParent;
     this->mSibling = other.mSibling;
+  }
+
+  template <class K, class R, size_t M>
+  auto LeafNode<K, R, M>::doInsert(shared_ptr<R> record, K key, size_t idx)
+  {
+    const auto size = keySize();
+    if (size <= idx)
+    {
+      // 어차피 이 뒤는 전부 nullopt임.
+      mKeys.at(idx) = key;
+      mRecordPointers.at(idx) = std::move(record);
+      return;
+    }
+    else
+    {
+      // 뒤로 땡겨줘야 함. key, recordPointer 둘 다
+      for (size_t i = size; i > idx; --i)
+      {
+        mKeys.at(i).swap(mKeys.at(i - 1));
+        mRecordPointers.at(i).swap(mRecordPointers.at(i - 1));
+      }
+      mKeys.at(idx) = key;
+      mRecordPointers.at(idx) = std::move(record);
+      return;
+    }
+  }
+
+  template <class K, class R, size_t M>
+  auto LeafNode<K, R, M>::doRemove(K key, size_t idx)
+  {
+    const auto size = keySize();
+    mKeys.at(idx).reset();
+    mRecordPointers.at(idx).reset();
+    // 나머지들을 앞으로 땡겨줘야 함.
+    for (size_t i = idx; i < size - 1; ++i)
+    {
+      mKeys.at(i).swap(mKeys.at(i + 1));
+      mRecordPointers.at(i).swap(mRecordPointers.at(i + 1));
+    }
+    mKeys.at(size - 1).reset();
+    mRecordPointers.at(size - 1).reset();
   }
 } // namespace bptree
