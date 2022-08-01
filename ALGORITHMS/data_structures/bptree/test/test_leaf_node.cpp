@@ -58,7 +58,7 @@ TEST_F(LeafNodeFixture, KeySizeWhenInsert)
   for (auto const &r : records)
   {
     leafNode.insert(std::make_shared<Record>(r), r.id);
-    EXPECT_EQ(leafNode.keySize(), ++cnt);
+    EXPECT_EQ(leafNode.keyCount(), ++cnt);
     EXPECT_TRUE(leafNode.validate());
   }
   EXPECT_TRUE(leafNode.full());
@@ -71,13 +71,13 @@ TEST_F(LeafNodeFixture, KeySizeWhenRemove)
   {
     leafNode.insert(std::make_shared<Record>(r), r.id);
     ++cnt;
-    EXPECT_EQ(leafNode.keySize(), cnt);
+    EXPECT_EQ(leafNode.keyCount(), cnt);
     EXPECT_TRUE(leafNode.validate());
   }
   // remove wrong key
   const int key = -100;
   leafNode.remove(key);
-  EXPECT_EQ(leafNode.keySize(), cnt);
+  EXPECT_EQ(leafNode.keyCount(), cnt);
   const auto set = std::set<Record>{records.begin(), records.end()};
   for (const auto &r : set)
   {
@@ -87,7 +87,7 @@ TEST_F(LeafNodeFixture, KeySizeWhenRemove)
       const auto key = r.id;
       leafNode.remove(key);
       // --cnt;
-      // EXPECT_EQ(leafNode.keySize(), cnt);
+      // EXPECT_EQ(leafNode.keyCount(), cnt);
       EXPECT_TRUE(leafNode.validate());
     }
     catch (const std::exception &e)
