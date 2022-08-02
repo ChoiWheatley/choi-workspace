@@ -89,7 +89,7 @@ namespace bptree
   {
   public:
     // TODO: array<optional<T>,M>을 vector<T>로 바꾸자.
-    virtual auto keys() const noexcept -> const array<optional<K>, M> & = 0;
+    virtual auto keys() const noexcept -> const vector<K> & = 0;
     virtual auto keyCount() const noexcept -> size_t = 0;
     virtual auto parent() const noexcept -> weak_ptr<AbstNode> = 0;
     virtual auto full() const noexcept -> bool = 0;
@@ -112,12 +112,12 @@ namespace bptree
     auto full() const noexcept -> bool override;
     auto empty() const noexcept -> bool override;
     auto validate() const noexcept -> bool override;
-    auto keys() const noexcept -> const array<optional<K>, M> & override;
+    auto keys() const noexcept -> const vector<K> & override;
     auto keyCount() const noexcept -> size_t override;
 
     // TODO: 파라메터 순서 Key, RecordPtr 순으로 변경하기
     auto insert(RecordPtr record, K key) -> void;
-    auto records() const noexcept -> const array<RecordPtr, M> &;
+    auto records() const noexcept -> const vector<RecordPtr> &;
     auto recordCount() const noexcept -> size_t;
     auto remove(K key) -> void;
     auto sibling() -> shared_ptr<LeafNode>;
@@ -131,13 +131,13 @@ namespace bptree
     ~LeafNode() override;
 
   private:
-    array<optional<K>, M> mKeys;
-    array<optional<RecordPtr>, M> mRecordPointers;
+    vector<K> mKeys;
+    vector<RecordPtr> mRecordPointers;
     weak_ptr<Node> mParent;
     shared_ptr<LeafNode> mSibling;
 
     auto doInsert(shared_ptr<R> record, K key, size_t idx);
-    auto doRemove(K key, size_t idx);
+    auto doRemove(size_t idx);
   };
 
   /*
@@ -155,7 +155,7 @@ namespace bptree
     auto full() const noexcept -> bool override;
     auto empty() const noexcept -> bool override;
     auto validate() const noexcept -> bool override;
-    auto keys() const noexcept -> const array<optional<K>, M> & override;
+    auto keys() const noexcept -> const vector<K> & override;
     auto keyCount() const noexcept -> size_t override;
 
     auto insert(K key) -> void;
@@ -173,8 +173,8 @@ namespace bptree
     ~NonLeafNode() override;
 
   private:
-    array<shared_ptr<Node>, M + 1> mChildNodes;
-    array<optional<K>, M> mKeys;
+    vector<shared_ptr<Node>> mChildNodes;
+    vector<K> mKeys;
     weak_ptr<Node> mParent;
 
     auto findIdxBy(K key) const noexcept -> size_t;
