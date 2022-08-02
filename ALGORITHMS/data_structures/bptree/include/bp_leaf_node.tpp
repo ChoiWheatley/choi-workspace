@@ -33,7 +33,7 @@ namespace bptree
   template <class K, class R, size_t M>
   auto LeafNode<K, R, M>::full() const noexcept -> bool
   {
-    return (keyCount() == mKeys.size());
+    return (keyCount() == M);
   }
 
   template <class K, class R, size_t M>
@@ -61,12 +61,8 @@ namespace bptree
     size_t idx = static_cast<size_t>((left + right) / 2);
     while (left < right)
     {
-      const auto &optVal = mKeys.at(idx);
-      if (!optVal)
-      {
-        break;
-      }
-      if (optVal.value() < key)
+      const auto &val = mKeys.at(idx);
+      if (val < key)
       // move right
       {
         left = (left == idx) ? (left + 1) : idx;
@@ -82,7 +78,7 @@ namespace bptree
   }
 
   template <class K, class R, size_t M>
-  auto LeafNode<K, R, M>::keys() const noexcept -> const array<optional<K>, M> &
+  auto LeafNode<K, R, M>::keys() const noexcept -> const vector<K> &
   {
     return mKeys;
   }
@@ -90,24 +86,17 @@ namespace bptree
   template <class K, class R, size_t M>
   auto LeafNode<K, R, M>::keyCount() const noexcept -> size_t
   {
-    for (size_t cnt = 0; cnt < mKeys.size(); ++cnt)
-    {
-      if (!mKeys[cnt].has_value())
-      {
-        return cnt;
-      }
-    }
     return mKeys.size();
   }
 
   template <class K, class R, size_t M>
   auto LeafNode<K, R, M>::validate() const noexcept -> bool
   {
-    auto flag = (keyCount() == recordCount());
     if (empty())
     {
       return true;
     }
+    auto flag = (keyCount() == recordCount());
     // is key sorted?
     for (size_t i = 0; i < keyCount() - 1; ++i)
     {
@@ -122,7 +111,7 @@ namespace bptree
   }
 
   template <class K, class R, size_t M>
-  auto LeafNode<K, R, M>::records() const noexcept -> const array<RecordPtr, M> &
+  auto LeafNode<K, R, M>::records() const noexcept -> const vector<RecordPtr> &
   {
     return mRecordPointers;
   }
@@ -130,13 +119,6 @@ namespace bptree
   template <class K, class R, size_t M>
   auto LeafNode<K, R, M>::recordCount() const noexcept -> size_t
   {
-    for (size_t cnt = 0; cnt < mRecordPointers.size(); ++cnt)
-    {
-      if (!mRecordPointers[cnt].has_value())
-      {
-        return cnt;
-      }
-    }
     return mRecordPointers.size();
   }
 
@@ -153,24 +135,20 @@ namespace bptree
     size_t idx = static_cast<size_t>((left + right) / 2);
     while (left < right)
     {
-      const auto &optVal = mKeys.at(idx);
-      if (!optVal)
-      {
-        break;
-      }
-      if (*optVal < key)
+      const auto &val = mKeys.at(idx);
+      if (val < key)
       // move right
       {
         left = (left == idx) ? (left + 1) : idx;
       }
-      else if (key < *optVal)
+      else if (key < val)
       // move left
       {
         right = (right == idx) ? (right - 1) : idx;
       }
-      else /* key == *optVal */
+      else /* key == *val */
       {
-        doRemove(key, idx);
+        doRemove(idx);
       }
       idx = static_cast<size_t>((left + right) / 2);
     }
@@ -223,41 +201,14 @@ namespace bptree
   template <class K, class R, size_t M>
   auto LeafNode<K, R, M>::doInsert(shared_ptr<R> record, K key, size_t idx)
   {
-    const auto size = keyCount();
-    if (size <= idx)
-    {
-      // 어차피 이 뒤는 전부 nullopt임.
-      mKeys.at(idx) = key;
-      mRecordPointers.at(idx) = std::move(record);
-      return;
-    }
-    else
-    {
-      // 뒤로 땡겨줘야 함. key, recordPointer 둘 다
-      for (size_t i = size; i > idx; --i)
-      {
-        mKeys.at(i).swap(mKeys.at(i - 1));
-        mRecordPointers.at(i).swap(mRecordPointers.at(i - 1));
-      }
-      mKeys.at(idx) = key;
-      mRecordPointers.at(idx) = std::move(record);
-      return;
-    }
+    mKeys.insert(mKeys.begin() + idx, key);
+    mRecordPointers.insert(mRecordPointers.begin() + idx, record);
   }
 
   template <class K, class R, size_t M>
-  auto LeafNode<K, R, M>::doRemove(K key, size_t idx)
+  auto LeafNode<K, R, M>::doRemove(size_t idx)
   {
-    const auto size = keyCount();
-    mKeys.at(idx).reset();
-    mRecordPointers.at(idx).reset();
-    // 나머지들을 앞으로 땡겨줘야 함.
-    for (size_t i = idx; i < size - 1; ++i)
-    {
-      mKeys.at(i).swap(mKeys.at(i + 1));
-      mRecordPointers.at(i).swap(mRecordPointers.at(i + 1));
-    }
-    mKeys.at(size - 1).reset();
-    mRecordPointers.at(size - 1).reset();
+    mKeys.erase(mKeys.begin() + idx);
+    mRecordPointers.erase(mRecordPointers.begin() + idx);
   }
 } // namespace bptree

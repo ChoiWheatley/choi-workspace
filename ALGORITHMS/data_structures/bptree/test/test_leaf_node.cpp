@@ -62,6 +62,8 @@ TEST_F(LeafNodeFixture, KeySizeWhenInsert)
     EXPECT_TRUE(leafNode.validate());
   }
   EXPECT_TRUE(leafNode.full());
+  const auto r = Record{100, 5, "male", 1};
+  EXPECT_THROW({ leafNode.insert(std::make_shared<Record>(r), r.id); }, bptree::node_overflow);
 }
 
 TEST_F(LeafNodeFixture, KeySizeWhenRemove)
