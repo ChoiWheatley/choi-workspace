@@ -1,6 +1,7 @@
 #ifndef BPTREE_BPTREE
 #define BPTREE_BPTREE
 
+#include "bp_helpers.hpp"
 #include "bp_error.hpp"
 #include <memory>
 #include <array>
@@ -20,6 +21,10 @@ namespace bptree
   using std::weak_ptr;
 
   using index_t = size_t;
+
+  /*
+  forward declarations
+  */
 
   template <class K, class R, size_t M>
   class AbstNode;
@@ -41,6 +46,14 @@ namespace bptree
   /// key와 일치하거나 들어갈 수 있는 리프노드를 리턴한다.
   template <class Key, class Record, size_t M>
   auto tour(const Key &key, shared_ptr<AbstNode<Key, Record, M>> pRoot) -> const shared_ptr<LeafNode<Key, Record, M>>;
+
+  /// all group element must be smaller than `compareTo`
+  template <typename T>
+  auto operator<(const vector<T> &group, const T &compareTo) -> bool;
+
+  /// all group element must be smaller or equal than `compareTo`
+  template <typename T>
+  auto operator<=(const vector<T> &group, const T &compareTo) -> bool;
 
   /*
   BPTree
@@ -75,6 +88,9 @@ namespace bptree
   class AbstNode
   {
   public:
+    // TODO: array<optional<T>,M>을 vector<T>로 바꾸자.
+    virtual auto keys() const noexcept -> const array<optional<K>, M> & = 0;
+    virtual auto keyCount() const noexcept -> size_t = 0;
     virtual auto parent() const noexcept -> weak_ptr<AbstNode> = 0;
     virtual auto full() const noexcept -> bool = 0;
     virtual auto empty() const noexcept -> bool = 0;
@@ -84,6 +100,7 @@ namespace bptree
 
   /*
   LeafNode
+    중복을 허용하는 Key
   */
   template <class K, class R, size_t M>
   class LeafNode : public AbstNode<K, R, M>
@@ -95,10 +112,11 @@ namespace bptree
     auto full() const noexcept -> bool override;
     auto empty() const noexcept -> bool override;
     auto validate() const noexcept -> bool override;
+    auto keys() const noexcept -> const array<optional<K>, M> & override;
+    auto keyCount() const noexcept -> size_t override;
 
+    // TODO: 파라메터 순서 Key, RecordPtr 순으로 변경하기
     auto insert(RecordPtr record, K key) -> void;
-    auto keys() const noexcept -> const array<optional<K>, M> &;
-    auto keyCount() const noexcept -> size_t;
     auto records() const noexcept -> const array<RecordPtr, M> &;
     auto recordCount() const noexcept -> size_t;
     auto remove(K key) -> void;
@@ -124,6 +142,9 @@ namespace bptree
 
   /*
   NonLeafNode
+    중복을 허용하지 않는 Key
+    validate 할 때에만 childNodes의 key를 비교하지, insert, remove에는
+    자기가 저장하고 있는 key만 수정한다.
   */
   template <class K, class R, size_t M>
   class NonLeafNode : public AbstNode<K, R, M>
@@ -134,22 +155,29 @@ namespace bptree
     auto full() const noexcept -> bool override;
     auto empty() const noexcept -> bool override;
     auto validate() const noexcept -> bool override;
+    auto keys() const noexcept -> const array<optional<K>, M> & override;
+    auto keyCount() const noexcept -> size_t override;
 
-    auto insert(K key);
-    auto keys() const noexcept -> const array<optional<K>, M> &;
-    auto keyCount() const noexcept -> size_t;
+    auto insert(K key) -> void;
     auto remove(K key) -> void;
-    auto childNodes() const -> const array<shared_ptr<Node>, M + 1> &;
+    auto childNodes() const noexcept -> const array<shared_ptr<Node>, M + 1> &;
+    auto childCount() const noexcept -> size_t;
     auto attach(shared_ptr<Node> child);
     auto detachChildBy(index_t idx);
+    auto swapChild(shared_ptr<Node> with, index_t idx) noexcept -> void;
+    auto validateChildNodes() const noexcept -> bool;
+    auto doInsert(K key, index_t idx);
+    auto doRemove(index_t idx);
 
     NonLeafNode(weak_ptr<Node> parent = nullptr);
     ~NonLeafNode() override;
 
   private:
-    array<shared_ptr<Node>, M + 1> mChildren;
+    array<shared_ptr<Node>, M + 1> mChildNodes;
     array<optional<K>, M> mKeys;
     weak_ptr<Node> mParent;
+
+    auto findIdxBy(K key) const noexcept -> size_t;
   };
 
 }; // namespace bptree
