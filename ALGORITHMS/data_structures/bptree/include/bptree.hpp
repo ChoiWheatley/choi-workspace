@@ -43,26 +43,6 @@ namespace bptree
   template <class K, class R, size_t M>
   class ChildContainer;
 
-  /// insert 시 발생한 오버플로를 ceil(M/2) 크기의 벡터로 쪼갠다.
-  template <class Key, size_t M>
-  auto unsaturate(const vector<Key> &saturated) noexcept -> vector<array<index_t, M>>;
-
-  /// node가 LeafNode인지 확인한다.
-  template <class Key, class Record, size_t M>
-  inline auto isLeaf(AbstNode<Key, Record, M> *node) -> bool;
-
-  /// key와 일치하거나 들어갈 수 있는 리프노드를 리턴한다.
-  template <class Key, class Record, size_t M>
-  auto tour(const Key &key, shared_ptr<AbstNode<Key, Record, M>> pRoot) -> const shared_ptr<LeafNode<Key, Record, M>>;
-
-  /// all group element must be smaller than `compareTo`
-  template <typename T>
-  auto operator<(const vector<T> &group, const T &compareTo) -> bool;
-
-  /// all group element must be smaller or equal than `compareTo`
-  template <typename T>
-  auto operator<=(const vector<T> &group, const T &compareTo) -> bool;
-
   /*
   BPTree
   */
@@ -161,9 +141,11 @@ namespace bptree
     using NodePtr = shared_ptr<Node>;
     virtual auto childNodes() const noexcept -> const vector<NodePtr> & = 0;
     virtual auto childCount() const noexcept -> size_t = 0;
-    virtual auto attach(NodePtr child) -> void = 0;
+    virtual auto attach(NodePtr child, const vector<K> &fromKey) -> void = 0;
     virtual auto detachChildBy(index_t idx) -> NodePtr = 0;
     virtual auto swapChild(NodePtr with) noexcept -> void = 0;
+    virtual auto full() const noexcept -> bool = 0;
+    virtual auto empty() const noexcept -> bool = 0;
 
     virtual ~ChildContainable(){};
   };
@@ -205,8 +187,6 @@ namespace bptree
     ~NonLeafNode() override;
 
   private:
-    auto findIdxBy(K key) const noexcept -> size_t;
-
     ChildContainablePtr mChildContainer;
     vector<K> mKeys;
     weak_ptr<Node> mParent;

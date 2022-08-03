@@ -1,9 +1,8 @@
-#include <memory>
 #include <array>
+#include <cmath>
+#include <memory>
 #include <optional>
 #include <string>
-#include <optional>
-#include <cmath>
 
 namespace bptree
 {
@@ -54,27 +53,8 @@ namespace bptree
       doInsert(std::move(record), key, 0);
       return;
     }
-    const auto size = keyCount();
     // key가 낑겨들어갈 index를 찾기
-    size_t left = 0;
-    size_t right = size;
-    size_t idx = static_cast<size_t>((left + right) / 2);
-    while (left < right)
-    {
-      const auto &val = mKeys.at(idx);
-      if (val < key)
-      // move right
-      {
-        left = (left == idx) ? (left + 1) : idx;
-      }
-      else
-      // move left
-      {
-        right = (right == idx) ? (right - 1) : idx;
-      }
-      idx = static_cast<size_t>((left + right) / 2);
-    }
-    doInsert(std::move(record), key, idx);
+    doInsert(std::move(record), key, minIdxLargerThan(key, keys(), false));
   }
 
   template <class K, class R, size_t M>
@@ -129,29 +109,35 @@ namespace bptree
     {
       throw bptree::node_underflow{};
     }
-    const auto size = keyCount();
-    size_t left = 0;
-    size_t right = size;
-    size_t idx = static_cast<size_t>((left + right) / 2);
-    while (left < right)
+    const auto left = maxIdxLessThan(key, keys(), true);
+    const auto right = minIdxLargerThan(key, keys(), false);
+    for (auto i = left; i < right; ++i)
     {
-      const auto &val = mKeys.at(idx);
-      if (val < key)
-      // move right
-      {
-        left = (left == idx) ? (left + 1) : idx;
-      }
-      else if (key < val)
-      // move left
-      {
-        right = (right == idx) ? (right - 1) : idx;
-      }
-      else /* key == *val */
-      {
-        doRemove(idx);
-      }
-      idx = static_cast<size_t>((left + right) / 2);
+      doRemove(left);
     }
+    // const auto size = keyCount();
+    // size_t left = 0;
+    // size_t right = size;
+    // size_t idx = static_cast<size_t>((left + right) / 2);
+    // while (left < right)
+    // {
+    //   const auto &val = mKeys.at(idx);
+    //   if (val < key)
+    //   // move right
+    //   {
+    //     left = (left == idx) ? (left + 1) : idx;
+    //   }
+    //   else if (key < val)
+    //   // move left
+    //   {
+    //     right = (right == idx) ? (right - 1) : idx;
+    //   }
+    //   else /* key == *val */
+    //   {
+    //     doRemove(idx);
+    //   }
+    //   idx = static_cast<size_t>((left + right) / 2);
+    // }
   }
 
   template <class K, class R, size_t M>

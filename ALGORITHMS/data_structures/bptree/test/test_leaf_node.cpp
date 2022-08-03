@@ -1,8 +1,8 @@
-#include <gtest/gtest.h>
 #include <bptree.hpp>
+#include <gtest/gtest.h>
 #include <memory>
-#include <vector>
 #include <set>
+#include <vector>
 
 class LeafNodeFixture : public ::testing::Test
 {
@@ -19,24 +19,24 @@ protected:
     }
   };
   using Key = int;
-  static constexpr int M = 6;
+  static constexpr int M = 11;
 
   LeafNodeFixture()
       : records{
-            Record{20, 1, "male", 300},
-            Record{10, 1, "male", 301},
-            Record{30, 2, "female", 250},
-            Record{40, 2, "female", 350},
-            Record{50, 3, "male", 150},
+            Record{2, 1, "male", 300},
+            Record{4, 1, "male", 301},
+            Record{8, 2, "female", 250},
+            Record{16, 2, "female", 350},
+            Record{3, 3, "male", 150},
+            Record{6, 3, "female", 350},
+            Record{12, 3, "female", 350},
+            Record{4, 3, "female", 650},
+            Record{8, 3, "female", 350},
+            Record{16, 3, "female", 700},
+            Record{32, 3, "female", 350},
+            Record{5, 3, "female", 350},
             Record{10, 3, "female", 350},
-            Record{10, 3, "female", 350},
-            Record{10, 3, "female", 350},
-            Record{10, 3, "female", 350},
-            Record{10, 3, "female", 350},
-            Record{10, 3, "female", 350},
-            Record{10, 3, "female", 350},
-            Record{10, 3, "female", 350},
-            Record{10, 3, "female", 350},
+            Record{20, 3, "female", 350},
         }
   {
   }
@@ -83,14 +83,16 @@ TEST_F(LeafNodeFixture, KeySizeWhenRemove)
   const auto set = std::set<Record>{records.begin(), records.end()};
   for (const auto &r : set)
   {
-    std::cerr << "r.id = " << r.id << "\n";
     try
     {
       const auto key = r.id;
       leafNode.remove(key);
-      // --cnt;
-      // EXPECT_EQ(leafNode.keyCount(), cnt);
       EXPECT_TRUE(leafNode.validate());
+      for (const auto e : leafNode.keys())
+      {
+        std::cerr << e << ", ";
+      }
+      std::cerr << "\n";
     }
     catch (const std::exception &e)
     {

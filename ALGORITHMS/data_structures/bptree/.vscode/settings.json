@@ -45,6 +45,13 @@
     "tuple": "cpp",
     "typeinfo": "cpp",
     "utility": "cpp",
-    "array": "cpp"
-  }
+    "array": "cpp",
+    "bit": "cpp",
+    "memory": "cpp"
+  },
+  "C_Cpp.codeAnalysis.clangTidy.checks.disabled": [
+    "readability-magic-numbers",
+    "cppcoreguidelines-avoid-magic-numbers",
+    "clang-diagnostic-error"
+  ]
 }

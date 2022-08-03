@@ -95,9 +95,7 @@ namespace bptree
       doInsert(key, 0);
       return;
     }
-    const auto kKeySize = keyCount();
-    const auto kKeys = keys();
-    doInsert(key, findIdxBy(key));
+    doInsert(key, maxIdxLessThan(key, keys(), false));
   }
 
   template <class K, class R, size_t M>
@@ -120,7 +118,7 @@ namespace bptree
   template <class K, class R, size_t M>
   auto NonLeafNode<K, R, M>::attach(NodePtr child) -> void
   {
-    mChildContainer->attach(child);
+    mChildContainer->attach(child, keys());
   }
 
   template <class K, class R, size_t M>
@@ -219,20 +217,6 @@ namespace bptree
   template <class K, class R, size_t M>
   auto NonLeafNode<K, R, M>::doRemove(index_t idx) -> void
   {
-  }
-
-  template <class K, class R, size_t M>
-  auto NonLeafNode<K, R, M>::findIdxBy(K key) const noexcept -> size_t
-  {
-    // key가 낑겨들어갈 또는 정확한 위치의 index를 찾기
-    // const auto kKeyCount = keyCount();
-    // size_t left = 0;
-    // size_t right = kKeyCount;
-    // size_t idx = static_cast<size_t>((left + right) / 2);
-    // while (left < right)
-    // {
-    //   const auto &k =
-    // }
   }
 
   template <class K, class R, size_t M>

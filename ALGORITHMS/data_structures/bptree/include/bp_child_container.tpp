@@ -1,10 +1,10 @@
-#include "bp_helpers.hpp"
 #include "bp_error.hpp"
-#include <memory>
+#include "bp_helpers.hpp"
 #include <array>
+#include <memory>
 #include <optional>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace bptree
 {
@@ -27,15 +27,48 @@ namespace bptree
     using Node = typename bptree::AbstNode<K, R, M>;
     using NodePtr = shared_ptr<Node>;
 
-    auto childNodes() const noexcept -> const vector<NodePtr> & override {}
+    auto childNodes() const noexcept -> const vector<NodePtr> & override
+    {
+      return mChildNodes;
+    }
+
     auto childCount() const noexcept -> size_t override
     {
-      // TODO: implement
-      return 0;
+      return mChildNodes.size();
     }
-    auto attach(NodePtr child) -> void override {}
+
+    auto attach(NodePtr child, const vector<K> &fromKey) -> void override
+    {
+      if (full())
+      {
+        throw bptree::child_overflow{};
+      }
+      if (fromKey.empty())
+      {
+        // no way to attach, throw.
+        throw bptree::child_out_of_range{};
+      }
+        }
+
     auto detachChildBy(index_t idx) -> NodePtr override {}
+
     auto swapChild(NodePtr with) noexcept -> void override {}
+
+    auto full() const noexcept -> bool override
+    {
+      return (childCount() >= M + 1);
+    }
+
+    auto empty() const noexcept -> bool override
+    {
+      return (childCount() == 0);
+    }
+
+  private:
+    auto doAttach(NodePtr child, index_t idx) -> void {}
+
+    vector<NodePtr> mChildNodes;
+    vector<index_t> mLookupTable;
   };
 
 } // namespace bptree
