@@ -1,11 +1,10 @@
 
 #include "ranged-compare.hpp"
-#include <memory>
+#include <algorithm>
 #include <array>
+#include <memory>
 #include <optional>
 #include <string>
-#include <optional>
-#include <algorithm>
 
 namespace bptree
 {
@@ -109,23 +108,35 @@ namespace bptree
   template <class K, class R, size_t M>
   auto NonLeafNode<K, R, M>::childNodes() const noexcept -> const vector<NodePtr> &
   {
-    return mChildContainer.childNodes();
+    return mChildContainer->childNodes();
   }
 
   template <class K, class R, size_t M>
   auto NonLeafNode<K, R, M>::childCount() const noexcept -> size_t
   {
-    return mChildContainer.childCount();
+    return mChildContainer->childCount();
+  }
+
+  template <class K, class R, size_t M>
+  auto NonLeafNode<K, R, M>::attach(NodePtr child) -> void
+  {
+    mChildContainer->attach(child);
+  }
+
+  template <class K, class R, size_t M>
+  auto NonLeafNode<K, R, M>::detachChildBy(index_t idx) -> NodePtr
+  {
+    return mChildContainer->detachChildBy(idx);
   }
 
   template <class K, class R, size_t M>
   auto NonLeafNode<K, R, M>::swapChild(shared_ptr<Node> with, index_t idx) noexcept -> void
   {
-    std::swap(mChildContainer.childNodes()[idx], with);
+    mChildContainer->swapChild(with, idx);
   }
 
   template <class K, class R, size_t M>
-  auto NonLeafNode<K, R, M>::validateChildNodes() const noexcept -> bool
+  auto NonLeafNode<K, R, M>::validateChildNodes() const -> bool
   // Do every key in child nodes fit in a right index?
   // <----------key[0]----------key[1]----------...----------key[m]------------>
   //  (child[0])      [child[1])      [child[2])...[child[m])      [child[m+1])
@@ -201,6 +212,16 @@ namespace bptree
   }
 
   template <class K, class R, size_t M>
+  auto NonLeafNode<K, R, M>::doInsert(K key, index_t idx) -> void
+  {
+  }
+
+  template <class K, class R, size_t M>
+  auto NonLeafNode<K, R, M>::doRemove(index_t idx) -> void
+  {
+  }
+
+  template <class K, class R, size_t M>
   auto NonLeafNode<K, R, M>::findIdxBy(K key) const noexcept -> size_t
   {
     // key가 낑겨들어갈 또는 정확한 위치의 index를 찾기
@@ -215,7 +236,7 @@ namespace bptree
   }
 
   template <class K, class R, size_t M>
-  NonLeafNode<K, R, M>::NonLeafNode(ChildContainable_ &childContainer, weak_ptr<Node> parent)
+  NonLeafNode<K, R, M>::NonLeafNode(ChildContainablePtr childContainer, weak_ptr<Node> parent)
       : mChildContainer{childContainer}, mKeys{}, mParent{parent}
   {
   }

@@ -16,6 +16,10 @@ namespace bptree
 
   using index_t = size_t;
 
+  /*
+  ChildContainer
+    NonLeafNode의 책임을 덜어주기 위해 나온 객체이다.
+  */
   template <class K, class R, size_t M>
   class ChildContainer : public bptree::ChildContainable<K, R, M>
   {
@@ -24,7 +28,11 @@ namespace bptree
     using NodePtr = shared_ptr<Node>;
 
     auto childNodes() const noexcept -> const vector<NodePtr> & override {}
-    auto childCount() const noexcept -> size_t override {}
+    auto childCount() const noexcept -> size_t override
+    {
+      // TODO: implement
+      return 0;
+    }
     auto attach(NodePtr child) -> void override {}
     auto detachChildBy(index_t idx) -> NodePtr override {}
     auto swapChild(NodePtr with) noexcept -> void override {}

@@ -1,13 +1,13 @@
 #ifndef BPTREE_BPTREE
 #define BPTREE_BPTREE
 
-#include "bp_helpers.hpp"
 #include "bp_error.hpp"
-#include <memory>
+#include "bp_helpers.hpp"
 #include <array>
+#include <memory>
 #include <optional>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace bptree
 {
@@ -64,30 +64,6 @@ namespace bptree
   auto operator<=(const vector<T> &group, const T &compareTo) -> bool;
 
   /*
-  BPFactory
-  */
-
-  template <class K, class R, size_t M>
-  class BPFactory
-  {
-  public:
-    using Node = typename bptree::AbstNode<K, R, M>;
-    using Leaf = typename bptree::LeafNode<K, R, M>;
-    using NonLeaf = typename bptree::NonLeafNode<K, R, M>;
-    using ChildContainer_ = typename bptree::ChildContainer<K, R, M>;
-
-    auto childContainer() -> ChildContainable<K, R, M> &;
-    auto leafNode(weak_ptr<Node> parent = weak_ptr<Node>{},
-                  shared_ptr<Leaf> sibling = shared_ptr<Leaf>{}) -> shared_ptr<Node>;
-    auto nonLeafNode(weak_ptr<Node> parent = weak_ptr<Node>{}) -> shared_ptr<Node>;
-
-    explicit BPFactory();
-
-  private:
-    ChildContainer_ mChildContainer;
-  };
-
-  /*
   BPTree
   */
   template <class Key, class Record, size_t M>
@@ -124,6 +100,7 @@ namespace bptree
     virtual auto keys() const noexcept -> const vector<K> & = 0;
     virtual auto keyCount() const noexcept -> size_t = 0;
     virtual auto parent() const noexcept -> weak_ptr<AbstNode> = 0;
+    // TODO: parent setter가 필요함
     virtual auto full() const noexcept -> bool = 0;
     virtual auto empty() const noexcept -> bool = 0;
     virtual auto validate() const noexcept -> bool = 0;
@@ -172,6 +149,10 @@ namespace bptree
     auto doRemove(size_t idx);
   };
 
+  /*
+  ChildContainable
+    NonLeafNode가 childNodes를 회피하려는 책임을 명시하고 있는 인터페이스 목록이다.
+  */
   template <class K, class R, size_t M>
   class ChildContainable
   {
@@ -200,6 +181,7 @@ namespace bptree
     using Node = typename bptree::AbstNode<K, R, M>;
     using NodePtr = shared_ptr<Node>;
     using ChildContainable_ = typename bptree::ChildContainable<K, R, M>;
+    using ChildContainablePtr = shared_ptr<ChildContainable_>;
 
     auto parent() const noexcept -> weak_ptr<Node> override;
     auto full() const noexcept -> bool override;
@@ -212,30 +194,30 @@ namespace bptree
     auto remove(K key) -> void;
     auto childNodes() const noexcept -> const vector<NodePtr> &;
     auto childCount() const noexcept -> size_t;
-    auto attach(NodePtr child);
-    auto detachChildBy(index_t idx);
+    auto attach(NodePtr child) -> void;
+    auto detachChildBy(index_t idx) -> NodePtr;
     auto swapChild(NodePtr with, index_t idx) noexcept -> void;
-    auto validateChildNodes() const noexcept -> bool;
+    auto validateChildNodes() const -> bool;
     auto doInsert(K key, index_t idx) -> void;
     auto doRemove(index_t idx) -> void;
 
-    NonLeafNode(ChildContainable_ &childContainer, weak_ptr<Node> parent = NodePtr{});
+    NonLeafNode(ChildContainablePtr childContainer, weak_ptr<Node> parent = NodePtr{});
     ~NonLeafNode() override;
 
   private:
-    ChildContainable_ &mChildContainer;
+    auto findIdxBy(K key) const noexcept -> size_t;
+
+    ChildContainablePtr mChildContainer;
     vector<K> mKeys;
     weak_ptr<Node> mParent;
-
-    auto findIdxBy(K key) const noexcept -> size_t;
   };
 
 }; // namespace bptree
 
 #include "bp_child_container.tpp"
 #include "bp_factory.tpp"
-#include "bptree.tpp"
 #include "bp_leaf_node.tpp"
 #include "bp_nonleaf_node.tpp"
+#include "bptree.tpp"
 
 #endif // BPTREE_BPTREE
