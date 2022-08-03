@@ -1,3 +1,6 @@
+#ifndef BP_HELPERS
+#define BP_HELPERS
+
 #include <vector>
 
 namespace bptree
@@ -31,3 +34,5 @@ namespace bptree
   }
 
 } // namespace bptree
+
+#endif // BP_HELPERS

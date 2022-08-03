@@ -7,6 +7,7 @@ add_executable(${TEST_TARGET}
   test_shared_ptr.cpp
   test_std_array.cpp
   test_leaf_node.cpp
+  test_nonleaf_node.cpp
 )
 
 target_link_libraries(${TEST_TARGET}
