@@ -34,7 +34,7 @@ namespace bptree
   template <class K, class R, size_t M>
   auto NonLeafNode<K, R, M>::full() const noexcept -> bool
   {
-    return (keyCount() == mKeys.size());
+    return (keyCount() == M);
   }
 
   template <class K, class R, size_t M>
@@ -95,12 +95,17 @@ namespace bptree
       doInsert(key, 0);
       return;
     }
-    doInsert(key, maxIdxLessThan(key, keys(), false));
+    doInsert(key, minIdxLargerThan(key, keys(), false));
   }
 
   template <class K, class R, size_t M>
   auto NonLeafNode<K, R, M>::remove(K key) -> void
   {
+    if (empty())
+    {
+      throw bptree::node_underflow{};
+    }
+    doRemove(maxIdxLessThan(key, keys(), true));
   }
 
   template <class K, class R, size_t M>
@@ -212,23 +217,21 @@ namespace bptree
   template <class K, class R, size_t M>
   auto NonLeafNode<K, R, M>::doInsert(K key, index_t idx) -> void
   {
+    mKeys.insert(mKeys.begin() + idx, key);
   }
 
   template <class K, class R, size_t M>
   auto NonLeafNode<K, R, M>::doRemove(index_t idx) -> void
   {
+    mKeys.erase(mKeys.begin() + idx);
   }
 
   template <class K, class R, size_t M>
   NonLeafNode<K, R, M>::NonLeafNode(ChildContainablePtr childContainer, weak_ptr<Node> parent)
-      : mChildContainer{childContainer}, mKeys{}, mParent{parent}
-  {
-  }
+      : mChildContainer{childContainer}, mKeys{}, mParent{parent}{}
 
   template <class K, class R, size_t M>
   NonLeafNode<K, R, M>::~NonLeafNode()
   {
-    mKeys.~vector();
-    mParent.reset();
   }
 } // namespace bptree
