@@ -38,6 +38,20 @@ namespace bptree
   }
 
   template <typename T>
+  auto operator<(const T &compareTo, const std::vector<T> &group) -> bool
+  /// all group element must be smaller than `compareTo`
+  {
+    for (const auto element : group)
+    {
+      if (element <= compareTo)
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  template <typename T>
   auto operator<=(const std::vector<T> &group, const T &compareTo) -> bool
   /// all group element must be smaller or equal than `compareTo`
   {
@@ -50,6 +64,33 @@ namespace bptree
     }
     return true;
   }
+
+  template <typename T>
+  auto operator<=(const T &compareTo, const std::vector<T> &group) -> bool
+  /// all group element must be smaller or equal than `compareTo`
+  {
+    for (const auto element : group)
+    {
+      if (element < compareTo)
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // template <class K, class R, size_t M>
+  // auto operator<(const AbstNode<K, R, M> &node, const K &key) -> bool
+  // /// Every key in a node must fit into given range
+  // {
+  //   const auto keys = node.keys();
+  // }
+
+  // template <class K, class R, size_t M>
+  // auto operator<=(const AbstNode<K, R, M> &node, const K &key) -> bool
+  // /// Every key in a node must fit into given range
+  // {
+  // }
 
   template <typename T>
   auto maxIdxLessThan(T given, const vector<T> &from, bool equal = false) noexcept -> index_t
@@ -116,7 +157,6 @@ namespace bptree
     }
     return idx;
   }
-
 } // namespace bptree
 
 #endif // BP_HELPERS
