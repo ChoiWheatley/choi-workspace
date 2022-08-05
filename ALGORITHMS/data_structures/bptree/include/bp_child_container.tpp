@@ -91,7 +91,7 @@ namespace bptree
       else
       {
         bool flag = false;
-        for (size_t i = 1; i < myKeys.size() - 1; ++i)
+        for (size_t i = 1; i < myKeys.size(); ++i)
         {
           if (myKeys[i - 1] <= childKeys && childKeys < myKeys[i])
           {

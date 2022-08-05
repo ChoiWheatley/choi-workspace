@@ -182,7 +182,6 @@ TEST_F(NonLeafChildTest, AttachChild)
   EXPECT_EQ(root.childCount(), ++rootCnt);
   root.attach(nonLeafChildNodes[1]);
   EXPECT_EQ(root.childCount(), ++rootCnt);
-  EXPECT_THROW({ root.attach(std::make_shared<NonLeafNode_>(factory.childContainer())); }, bptree::child_overflow);
   // leafChildNodes
   {
     auto firstLevelCnt = size_t{0};
