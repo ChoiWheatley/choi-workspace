@@ -1,8 +1,11 @@
+#include "bp_error.hpp"
+#include "bp_helpers.hpp"
 #include <array>
 #include <cmath>
 #include <memory>
 #include <optional>
-#include <string>
+#include <utility>
+#include <vector>
 
 namespace bptree
 {
@@ -14,14 +17,47 @@ namespace bptree
   using std::unique_ptr;
   using std::weak_ptr;
 
+  /*
+  LeafNode
+    중복을 허용하는 Key
+  */
   template <class K, class R, size_t M>
-  class AbstNode;
+  class LeafNode : public AbstNode<K, R, M>
+  {
+  public:
+    using Node = typename bptree::AbstNode<K, R, M>;
+    using RecordPtr = shared_ptr<R>;
+    auto parent() const noexcept -> weak_ptr<Node> override;
+    auto full() const noexcept -> bool override;
+    auto empty() const noexcept -> bool override;
+    auto validate() const noexcept -> bool override;
+    auto keys() const noexcept -> const vector<K> & override;
+    auto keyCount() const noexcept -> size_t override;
 
-  template <class K, class R, size_t M>
-  class LeafNode;
+    // TODO: 파라메터 순서 Key, RecordPtr 순으로 변경하기
+    auto insert(RecordPtr record, K key) -> void;
+    auto records() const noexcept -> const vector<RecordPtr> &;
+    auto recordCount() const noexcept -> size_t;
+    auto remove(K key) -> void;
+    auto sibling() -> shared_ptr<LeafNode>;
+    auto attach(shared_ptr<LeafNode> sibling);
+    auto detachSibling();
 
-  template <class K, class R, size_t M>
-  class NonLeafNode;
+    explicit LeafNode(weak_ptr<Node> parent, shared_ptr<LeafNode> sibling);
+    explicit LeafNode();
+    LeafNode(LeafNode &&);
+    LeafNode(const LeafNode &) = delete;
+    ~LeafNode() override;
+
+  private:
+    vector<K> mKeys;
+    vector<RecordPtr> mRecordPointers;
+    weak_ptr<Node> mParent;
+    shared_ptr<LeafNode> mSibling;
+
+    auto doInsert(shared_ptr<R> record, K key, size_t idx);
+    auto doRemove(size_t idx);
+  };
 
   template <class K, class R, size_t M>
   auto LeafNode<K, R, M>::parent() const noexcept -> weak_ptr<Node>

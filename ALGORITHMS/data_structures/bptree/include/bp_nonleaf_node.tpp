@@ -16,6 +16,48 @@ namespace bptree
   using std::vector;
   using std::weak_ptr;
 
+  /*
+  NonLeafNode
+    중복을 허용하지 않는 Key
+    validate 할 때에만 childNodes의 key를 비교하지, insert, remove에는
+    자기가 저장하고 있는 key만 수정한다.
+  */
+  template <class K, class R, size_t M>
+  class NonLeafNode : public AbstNode<K, R, M>
+  {
+  public:
+    using Node = typename bptree::AbstNode<K, R, M>;
+    using NodePtr = shared_ptr<Node>;
+    using ChildContainable_ = typename bptree::ChildContainable<K, R, M>;
+    using ChildContainablePtr = shared_ptr<ChildContainable_>;
+
+    auto parent() const noexcept -> weak_ptr<Node> override;
+    auto full() const noexcept -> bool override;
+    auto empty() const noexcept -> bool override;
+    auto validate() const noexcept -> bool override;
+    auto keys() const noexcept -> const vector<K> & override;
+    auto keyCount() const noexcept -> size_t override;
+
+    auto insert(K key) -> void;
+    auto remove(K key) -> void;
+    auto childNodes() const noexcept -> const vector<NodePtr> &;
+    auto childCount() const noexcept -> size_t;
+    auto attach(NodePtr child) -> void;
+    auto detachChildBy(index_t idx) -> NodePtr;
+    auto swapChild(NodePtr with, index_t idx) noexcept -> void;
+    auto validateChildNodes() const -> bool;
+    auto doInsert(K key, index_t idx) -> void;
+    auto doRemove(index_t idx) -> void;
+
+    NonLeafNode(ChildContainablePtr childContainer, weak_ptr<Node> parent = NodePtr{});
+    ~NonLeafNode() override;
+
+  private:
+    ChildContainablePtr mChildContainer;
+    vector<K> mKeys;
+    weak_ptr<Node> mParent;
+  };
+
   template <class K, class R, size_t M>
   class AbstNode;
 
@@ -228,7 +270,7 @@ namespace bptree
 
   template <class K, class R, size_t M>
   NonLeafNode<K, R, M>::NonLeafNode(ChildContainablePtr childContainer, weak_ptr<Node> parent)
-      : mChildContainer{childContainer}, mKeys{}, mParent{parent}{}
+      : mChildContainer{childContainer}, mKeys{}, mParent{parent} {}
 
   template <class K, class R, size_t M>
   NonLeafNode<K, R, M>::~NonLeafNode()

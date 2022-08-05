@@ -17,6 +17,27 @@ namespace bptree
   using index_t = size_t;
 
   /*
+  ChildContainable
+    NonLeafNode가 childNodes를 회피하려는 책임을 명시하고 있는 인터페이스 목록이다.
+  */
+  template <class K, class R, size_t M>
+  class ChildContainable
+  {
+  public:
+    using Node = typename bptree::AbstNode<K, R, M>;
+    using NodePtr = shared_ptr<Node>;
+    virtual auto childNodes() const noexcept -> const vector<NodePtr> & = 0;
+    virtual auto childCount() const noexcept -> size_t = 0;
+    virtual auto attach(NodePtr child, const vector<K> &fromKey) -> void = 0;
+    virtual auto detachChildBy(index_t idx) -> NodePtr = 0;
+    virtual auto swapChild(NodePtr with) noexcept -> void = 0;
+    virtual auto full() const noexcept -> bool = 0;
+    virtual auto empty() const noexcept -> bool = 0;
+
+    virtual ~ChildContainable(){};
+  };
+
+  /*
   ChildContainer
     NonLeafNode의 책임을 덜어주기 위해 나온 객체이다.
   */
