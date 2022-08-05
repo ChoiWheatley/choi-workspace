@@ -114,9 +114,8 @@ namespace bptree
     {
       try
       {
-        auto &target = mChildNodes.at(idx);
-        auto ret = target;
-        target.reset();
+        auto ret = mChildNodes[idx];
+        mChildNodes[idx].reset();
         return ret;
       }
       catch (const std::exception &e)
