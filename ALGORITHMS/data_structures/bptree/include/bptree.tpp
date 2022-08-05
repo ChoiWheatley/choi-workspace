@@ -1,5 +1,5 @@
-#include <memory>
 #include <array>
+#include <memory>
 #include <optional>
 #include <string>
 
@@ -8,6 +8,32 @@ namespace bptree
   using std::array;
   using std::optional;
   using std::shared_ptr;
+
+  /*
+  BPTree
+  */
+  template <class Key, class Record, size_t M>
+  class BPTree
+  {
+  public:
+    using Node = typename bptree::AbstNode<Key, Record, M>;
+    using Leaf = typename bptree::LeafNode<Key, Record, M>;
+    using NonLeaf = typename bptree::NonLeafNode<Key, Record, M>;
+
+    auto insert(shared_ptr<Record> record, Key key);
+    auto remove(Key key);
+    auto query(Key key) const noexcept -> optional<Record>;
+    auto size() const noexcept -> size_t;
+    auto depth() const noexcept -> size_t;
+    // TODO: BPTree iterator 만들어보기
+    // TODO: Bulk Loading 구현해보기
+
+    BPTree();
+
+  private:
+    shared_ptr<Node> mRoot;
+    size_t mSizeCache = 0;
+  };
 
   template <class Key, class Record, size_t M>
   inline auto isLeaf(AbstNode<Key, Record, M> *node) -> bool
