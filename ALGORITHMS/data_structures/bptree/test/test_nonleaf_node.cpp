@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 #include <set>
+#include <string>
 #include <vector>
 
 class NonLeafKeyTest : public ::testing::Test
@@ -84,7 +85,7 @@ protected:
   struct Record
   {
     int id;
-    std::string name;
+    const char *name;
   };
   static constexpr int M = 3;
   using BPFactory_ = typename bptree::BPFactory<Key, Record, M>;
@@ -96,8 +97,8 @@ protected:
   NonLeafChildTest()
       : factory{},
         root{factory.childContainer()},
-        nonLeafChildNodes{2, factory.nonLeafNode()},
-        leafChildNodes{5},
+        nonLeafChildNodes{},
+        leafChildNodes{},
         records{
             Record{10, "a"},
             Record{20, "b"},
@@ -109,19 +110,29 @@ protected:
             Record{80, "h"},
             Record{90, "i"},
             Record{100, "j"},
-        } {};
-  auto SetUp() -> void override
+        }
   {
-    /*
-    [70, , ]
-    ├─[30, 50, ]
-    │ ├─[10, 20, ]
-    │ ├─[30, 40, ]
-    │ └─[50, 60, ]
-    └─[90, , ]
-      ├─[70, 80, ]
-      └─[90, 100, ]
-    */
+    for (size_t i = 0; i < 2; ++i)
+    {
+      nonLeafChildNodes.push_back(std::make_shared<NonLeafNode_>(factory.childContainer()));
+    }
+    for (size_t i = 0; i < 5; ++i)
+    {
+      leafChildNodes.push_back(std::make_shared<LeafNode_>());
+    }
+  };
+  auto SetUp() -> void override
+  /*
+  [70, , ]
+  ├─[30, 50, ]
+  │ ├─[10, 20, ]
+  │ ├─[30, 40, ]
+  │ └─[50, 60, ]
+  └─[90, , ]
+    ├─[70, 80, ]
+    └─[90, 100, ]
+  */
+  {
     root.insert(70);
     nonLeafChildNodes[0]->insert(30);
     nonLeafChildNodes[0]->insert(50);
@@ -154,6 +165,14 @@ protected:
   std::vector<LeafNodePtr> leafChildNodes;
   std::vector<Record> records;
 };
+
+TEST_F(NonLeafChildTest, AttachSingleChild)
+{
+  auto rootCnt = size_t{0};
+  EXPECT_EQ(root.childCount(), rootCnt);
+  root.attach(nonLeafChildNodes[0]);
+  EXPECT_EQ(root.childCount(), ++rootCnt);
+}
 
 TEST_F(NonLeafChildTest, AttachChild)
 {

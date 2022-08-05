@@ -52,6 +52,7 @@
   "C_Cpp.codeAnalysis.clangTidy.checks.disabled": [
     "readability-magic-numbers",
     "cppcoreguidelines-avoid-magic-numbers",
-    "clang-diagnostic-error"
+    "clang-diagnostic-error",
+    "cppcoreguidelines-non-private-member-variables-in-classes"
   ]
 }
