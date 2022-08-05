@@ -40,7 +40,7 @@ namespace bptree
 
     auto insert(K key) -> void;
     auto remove(K key) -> void;
-    auto childNodes() const noexcept -> const vector<NodePtr> &;
+    auto childNodes() const noexcept -> const vector<optional<NodePtr>> &;
     auto childCount() const noexcept -> size_t;
     auto attach(NodePtr child) -> void;
     auto detachChildBy(index_t idx) -> NodePtr;
@@ -151,7 +151,7 @@ namespace bptree
   }
 
   template <class K, class R, size_t M>
-  auto NonLeafNode<K, R, M>::childNodes() const noexcept -> const vector<NodePtr> &
+  auto NonLeafNode<K, R, M>::childNodes() const noexcept -> const vector<optional<NodePtr>> &
   {
     return mChildContainer->childNodes();
   }

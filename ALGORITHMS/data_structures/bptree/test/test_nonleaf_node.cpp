@@ -222,26 +222,49 @@ TEST_F(NonLeafChildTest, GetChildNodes)
   const auto childNodesOfRoot = root.childNodes();
   for (size_t i = 0; i < root.childCount(); ++i)
   {
-    EXPECT_TRUE(childNodesOfRoot.at(i)->keys() == nonLeafChildNodes.at(i)->keys());
+    if (const auto keysOfRoot = childNodesOfRoot.at(i))
+    {
+      EXPECT_TRUE(
+          (*keysOfRoot)->keys() == nonLeafChildNodes.at(i)->keys());
+    }
+    // EXPECT_TRUE(
+    //     childNodesOfRoot.at(i)->keys() ==
+    //     nonLeafChildNodes.at(i)->keys());
   }
+}
+TEST(Temporary, SharedPointerCount)
+{
+  auto p1 = std::make_shared<int>(0);
+  auto p2 = std::make_shared<int>(1);
+  EXPECT_EQ(p1.use_count(), 1);
+  EXPECT_EQ(p2.use_count(), 1);
+  p2.reset();
+  EXPECT_EQ(p2.use_count(), 0);
+  p1.swap(p2);
+  EXPECT_EQ(p2.use_count(), 1);
+  EXPECT_EQ(p1.use_count(), 0);
 }
 
 TEST_F(NonLeafChildTest, DetachChild)
 {
   {
+    EXPECT_EQ(nonLeafChildNodes[0].use_count(), 1);
+    EXPECT_EQ(nonLeafChildNodes[1].use_count(), 1);
     root.attach(nonLeafChildNodes[0]);
     root.attach(nonLeafChildNodes[1]);
     EXPECT_EQ(root.childCount(), 2);
     EXPECT_EQ(nonLeafChildNodes[0].use_count(), 2);
     EXPECT_EQ(nonLeafChildNodes[1].use_count(), 2);
     // d0 would be a node [30, 50, ]
-    const auto d0 = root.detachChildBy(0);
+    auto d0 = root.detachChildBy(0);
     EXPECT_EQ(d0->keys().at(0), 30);
+    d0.reset();
     EXPECT_EQ(root.childCount(), 1);
     EXPECT_EQ(nonLeafChildNodes[0].use_count(), 1);
     // d1 would be a node [90, , ]
-    const auto d1 = root.detachChildBy(1);
+    auto d1 = root.detachChildBy(1);
     EXPECT_EQ(d1->keys().at(0), 90);
+    d1.reset();
     EXPECT_EQ(root.childCount(), 0);
     EXPECT_EQ(nonLeafChildNodes[1].use_count(), 1);
   }
@@ -257,18 +280,21 @@ TEST_F(NonLeafChildTest, DetachChild)
     EXPECT_EQ(leafChildNodes[1].use_count(), 3); // sibling count
     EXPECT_EQ(leafChildNodes[2].use_count(), 3); // sibling count
     // d0 = [10, 20, ]
-    const auto d0 = firstLevel->detachChildBy(0);
+    auto d0 = firstLevel->detachChildBy(0);
     EXPECT_EQ(d0->keys().at(0), 10);
+    d0.reset();
     EXPECT_EQ(firstLevel->childCount(), 2);
     EXPECT_EQ(leafChildNodes.at(0).use_count(), 1);
     // d1 = [30, 40, ]
-    const auto d1 = firstLevel->detachChildBy(0);
+    auto d1 = firstLevel->detachChildBy(1);
     EXPECT_EQ(d1->keys().at(0), 30);
+    d1.reset();
     EXPECT_EQ(firstLevel->childCount(), 1);
     EXPECT_EQ(leafChildNodes[1].use_count(), 2);
     // d2 = [50, 60, ]
-    const auto d2 = firstLevel->detachChildBy(0);
+    auto d2 = firstLevel->detachChildBy(2);
     EXPECT_EQ(d2->keys().at(0), 50);
+    d2.reset();
     EXPECT_EQ(firstLevel->childCount(), 0);
     EXPECT_EQ(leafChildNodes[2].use_count(), 2);
   }
@@ -280,13 +306,15 @@ TEST_F(NonLeafChildTest, DetachChild)
     EXPECT_EQ(leafChildNodes[3].use_count(), 3); // sibling count
     EXPECT_EQ(leafChildNodes[4].use_count(), 3); // sibling count
     // d0 = [70, 80, ]
-    const auto d0 = firstLevel->detachChildBy(0);
+    auto d0 = firstLevel->detachChildBy(0);
     EXPECT_EQ(d0->keys().at(0), 70);
+    d0.reset();
     EXPECT_EQ(firstLevel->childCount(), 1);
     EXPECT_EQ(leafChildNodes[3].use_count(), 2);
     // d1 = [90, 100, ]
-    const auto d1 = firstLevel->detachChildBy(0);
+    auto d1 = firstLevel->detachChildBy(1);
     EXPECT_EQ(d1->keys().at(0), 90);
+    d1.reset();
     EXPECT_EQ(firstLevel->childCount(), 0);
     EXPECT_EQ(leafChildNodes[4].use_count(), 2);
   }
