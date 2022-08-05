@@ -214,6 +214,18 @@ TEST_F(NonLeafChildTest, AttachChild)
   EXPECT_EQ(root.childCount(), rootCnt);
 }
 
+TEST_F(NonLeafChildTest, GetChildNodes)
+{
+  // inversed-insert child nodes
+  root.attach(nonLeafChildNodes[1]);
+  root.attach(nonLeafChildNodes[0]);
+  const auto childNodesOfRoot = root.childNodes();
+  for (size_t i = 0; i < root.childCount(); ++i)
+  {
+    EXPECT_TRUE(childNodesOfRoot.at(i)->keys() == nonLeafChildNodes.at(i)->keys());
+  }
+}
+
 TEST_F(NonLeafChildTest, DetachChild)
 {
   {

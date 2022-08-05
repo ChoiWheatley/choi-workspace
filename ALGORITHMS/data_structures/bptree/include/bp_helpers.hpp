@@ -79,6 +79,24 @@ namespace bptree
     return true;
   }
 
+  template <typename T>
+  auto operator==(const std::vector<T> &a, const std::vector<T> &b) -> bool
+  {
+    if (a.size() != b.size())
+    {
+      return false;
+    }
+    const size_t size = a.size();
+    for (size_t i = 0; i < size; ++i)
+    {
+      if (a.at(i) != b.at(i))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
   // template <class K, class R, size_t M>
   // auto operator<(const AbstNode<K, R, M> &node, const K &key) -> bool
   // /// Every key in a node must fit into given range

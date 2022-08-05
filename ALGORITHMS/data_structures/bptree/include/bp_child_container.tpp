@@ -26,7 +26,7 @@ namespace bptree
   public:
     using Node = typename bptree::AbstNode<K, R, M>;
     using NodePtr = shared_ptr<Node>;
-    virtual auto childNodes() const noexcept -> const vector<NodePtr> & = 0;
+    virtual auto childNodes() noexcept -> const vector<NodePtr> & = 0;
     virtual auto childCount() const noexcept -> size_t = 0;
     virtual auto attach(NodePtr child, const vector<K> &fromKey) -> void = 0;
     virtual auto detachChildBy(index_t idx) -> NodePtr = 0;
@@ -48,13 +48,19 @@ namespace bptree
     using Node = typename bptree::AbstNode<K, R, M>;
     using NodePtr = shared_ptr<Node>;
 
-    auto childNodes() const noexcept -> const vector<NodePtr> & override
+    auto childNodes() noexcept -> const vector<NodePtr> & override
     {
-      // TODO: check cache is valid
-      if (mChildNodesRearranged.empty())
+      // check cache is valid
+      if (mCache.empty())
       {
+        mCache.resize(childCount());
+        size_t childIdx = 0;
+        for (const auto &idx : mLookupTable)
+        {
+          mCache[idx] = mChildNodes[childIdx++];
+        }
       }
-      return mChildNodesRearranged;
+      return mCache;
     }
 
     auto childCount() const noexcept -> size_t override
@@ -106,7 +112,7 @@ namespace bptree
         }
       }
       // reset cached output
-      mChildNodesRearranged.clear();
+      mCache.clear();
     }
 
     auto detachChildBy(index_t idx) -> NodePtr override {}
@@ -126,7 +132,7 @@ namespace bptree
   private:
     auto doAttach(NodePtr child, index_t idx) -> void {}
 
-    vector<NodePtr> mChildNodesRearranged{};
+    vector<NodePtr> mCache{};
     vector<NodePtr> mChildNodes{};
     vector<index_t> mLookupTable{};
   };
