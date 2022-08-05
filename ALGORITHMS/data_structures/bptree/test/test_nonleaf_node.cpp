@@ -262,12 +262,12 @@ TEST_F(NonLeafChildTest, DetachChild)
     EXPECT_EQ(firstLevel->childCount(), 2);
     EXPECT_EQ(leafChildNodes.at(0).use_count(), 1);
     // d1 = [30, 40, ]
-    const auto d1 = firstLevel->detachChildBy(0);
+    const auto d1 = firstLevel->detachChildBy(1);
     EXPECT_EQ(d1->keys().at(0), 30);
     EXPECT_EQ(firstLevel->childCount(), 1);
     EXPECT_EQ(leafChildNodes[1].use_count(), 2);
     // d2 = [50, 60, ]
-    const auto d2 = firstLevel->detachChildBy(0);
+    const auto d2 = firstLevel->detachChildBy(2);
     EXPECT_EQ(d2->keys().at(0), 50);
     EXPECT_EQ(firstLevel->childCount(), 0);
     EXPECT_EQ(leafChildNodes[2].use_count(), 2);
@@ -285,11 +285,23 @@ TEST_F(NonLeafChildTest, DetachChild)
     EXPECT_EQ(firstLevel->childCount(), 1);
     EXPECT_EQ(leafChildNodes[3].use_count(), 2);
     // d1 = [90, 100, ]
-    const auto d1 = firstLevel->detachChildBy(0);
+    const auto d1 = firstLevel->detachChildBy(1);
     EXPECT_EQ(d1->keys().at(0), 90);
     EXPECT_EQ(firstLevel->childCount(), 0);
     EXPECT_EQ(leafChildNodes[4].use_count(), 2);
   }
+}
+
+TEST_F(NonLeafChildTest, WhenDeleteTooManyChilds)
+{
+  root.attach(nonLeafChildNodes[0]);
+  root.attach(nonLeafChildNodes[1]);
+  root.detachChildBy(0);
+  root.detachChildBy(1);
+  EXPECT_EQ(root.childCount(), 0);
+  // AGAIN????
+  auto foo = root.detachChildBy(0);
+  EXPECT_FALSE(foo);
 }
 
 TEST_F(NonLeafChildTest, ChildValidation)

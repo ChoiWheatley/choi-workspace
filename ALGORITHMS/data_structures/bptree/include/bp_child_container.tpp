@@ -3,6 +3,7 @@
 #include <array>
 #include <memory>
 #include <optional>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -26,7 +27,7 @@ namespace bptree
   public:
     using Node = typename bptree::AbstNode<K, R, M>;
     using NodePtr = shared_ptr<Node>;
-    virtual auto childNodes() noexcept -> const vector<NodePtr> & = 0;
+    virtual auto childNodes() const noexcept -> const vector<NodePtr> & = 0;
     virtual auto childCount() const noexcept -> size_t = 0;
     virtual auto attach(NodePtr child, const vector<K> &fromKey) -> void = 0;
     virtual auto detachChildBy(index_t idx) -> NodePtr = 0;
@@ -48,24 +49,23 @@ namespace bptree
     using Node = typename bptree::AbstNode<K, R, M>;
     using NodePtr = shared_ptr<Node>;
 
-    auto childNodes() noexcept -> const vector<NodePtr> & override
+    auto childNodes() const noexcept -> const vector<NodePtr> & override
     {
-      // check cache is valid
-      if (mCache.empty())
-      {
-        mCache.resize(childCount());
-        size_t childIdx = 0;
-        for (const auto &idx : mLookupTable)
-        {
-          mCache[idx] = mChildNodes[childIdx++];
-        }
-      }
-      return mCache;
+      return mChildNodes;
     }
 
     auto childCount() const noexcept -> size_t override
+    /// not a vector size, but number of non-nullptr element
     {
-      return mChildNodes.size();
+      size_t cnt = 0;
+      for (const auto &e : childNodes())
+      {
+        if (e)
+        {
+          cnt++;
+        }
+      }
+      return cnt;
     }
 
     auto attach(NodePtr child, const vector<K> &fromKey) -> void override
@@ -84,14 +84,12 @@ namespace bptree
       // [0]
       if (childKeys < myKeys[0])
       {
-        mChildNodes.push_back(child);
-        mLookupTable.push_back(0);
+        doAttach(child, 0);
       }
       // [Last]
       else if (myKeys.back() <= childKeys)
       {
-        mChildNodes.push_back(child);
-        mLookupTable.push_back(myKeys.size());
+        doAttach(child, myKeys.size());
       }
       // between [1] and [M-2]
       else
@@ -101,8 +99,7 @@ namespace bptree
         {
           if (myKeys[i - 1] <= childKeys && childKeys < myKeys[i])
           {
-            mChildNodes.push_back(child);
-            mLookupTable.push_back(i);
+            doAttach(child, i);
             flag = true;
           }
         }
@@ -111,13 +108,27 @@ namespace bptree
           throw bptree::child_out_of_range{};
         }
       }
-      // reset cached output
-      mCache.clear();
     }
 
-    auto detachChildBy(index_t idx) -> NodePtr override {}
+    auto detachChildBy(index_t idx) -> NodePtr override
+    {
+      try
+      {
+        auto &target = mChildNodes.at(idx);
+        auto ret = target;
+        target.reset();
+        return ret;
+      }
+      catch (const std::exception &e)
+      {
+        return nullptr;
+      }
+    }
 
-    auto swapChild(NodePtr with) noexcept -> void override {}
+    auto swapChild(NodePtr with) noexcept -> void override
+    {
+      // TODO: implement
+    }
 
     auto full() const noexcept -> bool override
     {
@@ -130,11 +141,16 @@ namespace bptree
     }
 
   private:
-    auto doAttach(NodePtr child, index_t idx) -> void {}
+    auto doAttach(NodePtr child, index_t idx) -> void
+    {
+      if (mChildNodes.size() <= idx)
+      {
+        mChildNodes.resize(idx + 1);
+      }
+      mChildNodes.at(idx) = child;
+    }
 
-    vector<NodePtr> mCache{};
     vector<NodePtr> mChildNodes{};
-    vector<index_t> mLookupTable{};
   };
 
 } // namespace bptree
