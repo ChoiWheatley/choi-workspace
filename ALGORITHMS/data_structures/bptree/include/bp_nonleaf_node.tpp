@@ -102,7 +102,7 @@ namespace bptree
     {
       return false;
     }
-    // TODO: is key sorted?
+    // is key sorted?
     for (size_t i = 0; i < kKeyCount - 1; ++i)
     {
       if (mKeys[i + 1] <= mKeys[i])
@@ -185,75 +185,44 @@ namespace bptree
   // Do every key in child nodes fit in a right index?
   // <----------key[0]----------key[1]----------...----------key[m]------------>
   //  (child[0])      [child[1])      [child[2])...[child[m])      [child[m+1])
-  //
-  // child[i] < key[i] <= child[i+1], i in range[0,keyCount)
-  //
-  // every child key 'n' in mChildContainer.childNodes() must in range where key index 'i'
-  // CASE 0 )
-  //   n < key[i]
-  //
-  // CASE 1...<keyCount - 1 )
-  //   key[i] <= n < key[i+1]
-  //
-  // CASE keyCount )
-  //   key[i] <= n
   {
     // 일단 내 key 개수 == child 수 - 1 인 걸 증명하자.
     if (!validate())
     {
       return false;
     }
-    // CASE 0 )
-    // const auto kChildNodes = std::vector<shared_ptr<Node>>{
-    //     [children{childNodes()}]()
-    //     {
-    //       auto ret = std::vector<shared_ptr<Node>>{};
-    //       for (const shared_ptr<Node> n : children)
-    //       {
-    //         n ? ret.push_back(n): ;
-    //       }
-    //       return ret;
-    //     }()};
-    // const auto kMyKeys = std::vector<K>{
-    //     [keysArray{keys()}]()
-    //     {
-    //       auto ret = std::vector<K>{};
-    //       for (const optional<K> k : keysArray)
-    //       {
-    //         k ? ret.push_back(k): ;
-    //       }
-    //       return ret;
-    //     }()};
-
-    // for (const optional<K> &n : kChildKeys0)
-    // {
-    //   if (n.has_value() && mKeys[0] <= n)
-    //   {
-    //     return false;
-    //   }
-    // }
-    // // CASE 1..<keyCount )
-    // for (size_t i = 1; i < keyCount; ++i)
-    // {
-    //   const auto kChildKeys = childNodes[i].keys();
-    //   for (const optional<K> &n : kChildKeys)
-    //   {
-    //     if (n.has_value() and not(mKeys[i - 1] <= n && n < mKeys[i]))
-    //     {
-    //       return false;
-    //     }
-    //   }
-    // }
-    //  // CASE keyCount )
-    // const vector<K>, M> &kChildKeysLast = childNodes[keyCount].keys();
-    // for (const optional<K> &n : kChildKeysLast)
-    // {
-    //   if (n.has_value() and n < mKeys[keyCount - 1])
-    //   {
-    //     return false;
-    //   }
-    // }
-    // return true;
+    if (empty())
+    {
+      return true;
+    }
+    const vector<NodePtr> &kChildNodes = childNodes();
+    const vector<K> &kKeys = keys();
+    // [0]
+    const auto firstChild = kChildNodes.front();
+    const auto firstChildKeys = firstChild->keys();
+    const auto firstKey = kKeys.at(0);
+    if (!(firstChildKeys < firstKey))
+    {
+      return false;
+    }
+    // [Last]
+    const auto lastChild = kChildNodes.back();
+    const auto lastChildKeys = lastChild->keys();
+    const auto lastKey = kKeys.back();
+    if (!(lastKey <= lastChildKeys))
+    {
+      return false;
+    }
+    // between [1] and [M-2]
+    for (size_t i = 1; i < kKeys.size(); ++i)
+    {
+      const auto childKeys = kChildNodes.at(i)->keys();
+      if (!(kKeys.at(i - 1) <= childKeys && childKeys < kKeys.at(i)))
+      {
+        return false;
+      }
+    }
+    return true;
   }
 
   template <class K, class R, size_t M>

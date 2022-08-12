@@ -313,14 +313,26 @@ TEST_F(NonLeafChildTest, WhenDeleteTooManyChilds)
 
 TEST_F(NonLeafChildTest, ChildValidation)
 {
+  // non-empty keys & empty childNodes
+  EXPECT_FALSE(root.validateChildNodes());
+  EXPECT_FALSE(nonLeafChildNodes[0]->validateChildNodes());
+  EXPECT_FALSE(nonLeafChildNodes[1]->validateChildNodes());
+  // after attach
+  // root
   root.attach(nonLeafChildNodes[0]);
+  EXPECT_FALSE(root.validateChildNodes());
   root.attach(nonLeafChildNodes[1]);
-  EXPECT_NO_THROW({ root.validateChildNodes(); });
+  EXPECT_TRUE(root.validateChildNodes());
+  // nonleafchild[0]
   nonLeafChildNodes[0]->attach(leafChildNodes[0]);
+  EXPECT_FALSE(nonLeafChildNodes[0]->validateChildNodes());
   nonLeafChildNodes[0]->attach(leafChildNodes[1]);
+  EXPECT_FALSE(nonLeafChildNodes[0]->validateChildNodes());
   nonLeafChildNodes[0]->attach(leafChildNodes[2]);
-  EXPECT_NO_THROW({ nonLeafChildNodes[0]->validateChildNodes(); });
+  EXPECT_TRUE(nonLeafChildNodes[0]->validateChildNodes());
+  // nonleafchild[1]
   nonLeafChildNodes[1]->attach(leafChildNodes[3]);
+  EXPECT_FALSE(nonLeafChildNodes[1]->validateChildNodes());
   nonLeafChildNodes[1]->attach(leafChildNodes[4]);
-  EXPECT_NO_THROW({ nonLeafChildNodes[1]->validateChildNodes(); });
+  EXPECT_TRUE(nonLeafChildNodes[1]->validateChildNodes());
 }
