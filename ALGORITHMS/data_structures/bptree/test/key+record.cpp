@@ -1,4 +1,4 @@
-#include "entities/bptree.hpp"
+#include <bptree.hpp>
 #include <string>
 
 namespace bptree
@@ -32,12 +32,11 @@ namespace bptree
       Senior = 4,
     } grade;
 
-    ~Record_() override;
+    ~Record_() override{};
     Record_(uint32_t id, const string &name, Gender gender, uint32_t score, Grade grade)
         : id{id}, name{name}, gender{gender}, score{score}, grade{grade} {};
-    Record_(const Record_ &other)
-        : id{other.id}, name{other.name}, gender{other.gender}, score{other.score}, grade{other.grade} {}
-    Record_(Record_ &&other);
+    Record_(const Record_ &other) = default;
+    Record_(Record_ &&other) = default;
 
     auto operator=(Record_ other) -> Record_ &;
     auto operator=(const Record_ &other) -> Record_ & = default;
@@ -51,19 +50,6 @@ namespace bptree
   using std::string;
 
   auto Record_::key() -> Key { return Key{id}; }
-
-  Record_::Record_(Record_ &&other)
-      : Record_{other.id,
-                std::move(other.name),
-                other.gender,
-                other.score,
-                other.grade}
-  {
-    other.id = 0;
-    other.gender = Male;
-    other.score = 0;
-    other.grade = Freshman;
-  }
 
   auto Record_::operator=(Record_ other) -> Record_ &
   {

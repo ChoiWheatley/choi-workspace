@@ -16,7 +16,7 @@ namespace bptree
   struct Record
   {
     virtual auto key() -> Key = 0;
-    virtual ~Record() = 0;
+    virtual ~Record(){};
   };
 
   // <<interface>>
@@ -26,8 +26,7 @@ namespace bptree
   public:
     virtual auto Add(Key key, shared_ptr<Record> record) -> void = 0;
     virtual auto Delete(Key key) -> void = 0;
-    // Nullable Record
-    virtual auto Find(Key key) -> Record * = 0;
+    virtual auto Find(Key key) -> /*Nullable*/ Record * = 0;
 
     virtual ~BPTree() = 0;
   };

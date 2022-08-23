@@ -17,7 +17,7 @@ set(TEST_TARGET
 
 add_compile_options(-Wall)
 
-include_directories(/usr/include)
+include_directories(/usr/include include)
 
 include(FetchContent)
 FetchContent_Declare(

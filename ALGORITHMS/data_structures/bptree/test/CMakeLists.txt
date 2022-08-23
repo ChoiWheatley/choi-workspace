@@ -1,6 +1,7 @@
 enable_testing()
 
 add_executable(${TEST_TARGET}
+  key+record.cpp
   test.cpp
 )
 
