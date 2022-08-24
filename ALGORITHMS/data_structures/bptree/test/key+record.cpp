@@ -1,57 +1,63 @@
 #include <bptree.hpp>
 #include <string>
 
-using bptree::Key;
-using std::string;
-
-// unique key
-struct Key_ : public bptree::Key
+namespace mytest
 {
-  uint32_t id;
-};
+  using std::string;
 
-struct Record_ : public bptree::Record
-{
-  auto key() -> Key * override;
-
-  Key_ id;
-  string name;
-  enum Gender
+  // unique key
+  struct Key
   {
-    Male = 0,
-    Female = 1,
-    Other = 2,
-  } gender;
-  uint32_t score;
-  enum Grade
+    uint32_t id;
+  };
+
+  template <class Key>
+  struct Record_ : public bptree::Record<Key>
   {
-    Freshman = 1,
-    Sophomore = 2,
-    Junior = 3,
-    Senior = 4,
-  } grade;
+    auto key() -> Key override;
 
-  ~Record_() override{};
-  Record_(Key_ id, const string &name, Gender gender, uint32_t score, Grade grade)
-      : id{id}, name{name}, gender{gender}, score{score}, grade{grade} {};
-  Record_(const Record_ &other) = default;
-  Record_(Record_ &&other) = default;
+    Key id;
+    string name;
+    enum Gender
+    {
+      Male = 0,
+      Female = 1,
+      Other = 2,
+    } gender;
+    uint32_t score;
+    enum Grade
+    {
+      Freshman = 1,
+      Sophomore = 2,
+      Junior = 3,
+      Senior = 4,
+    } grade;
 
-  auto operator=(Record_ other) -> Record_ &;
-  auto operator=(const Record_ &other) -> Record_ & = default;
-  auto operator=(Record_ &&other) -> Record_ & = default;
-};
+    ~Record_() override{};
+    Record_(Key id, const string &name, Gender gender, uint32_t score, Grade grade)
+        : id{id}, name{name}, gender{gender}, score{score}, grade{grade} {};
+    Record_(const Record_ &other) = default;
+    Record_(Record_ &&other) = default;
 
-// implementations
+    auto operator=(Record_ other) -> Record_ &;
+    auto operator=(const Record_ &other) -> Record_ & = default;
+    auto operator=(Record_ &&other) -> Record_ & = default;
+  };
 
-auto Record_::key() -> Key * { return &id; }
+  // implementations
+  using R = Record_<Key>;
 
-auto Record_::operator=(Record_ other) -> Record_ &
-{
-  id = other.id;
-  name = other.name;
-  gender = other.gender;
-  score = other.score;
-  grade = other.grade;
-  return *this;
-}
+  template <>
+  auto R::key() -> Key { return id; }
+
+  template <>
+  auto R::operator=(R other) -> R &
+  {
+    id = other.id;
+    name = other.name;
+    gender = other.gender;
+    score = other.score;
+    grade = other.grade;
+    return *this;
+  }
+} // namespace mytest
