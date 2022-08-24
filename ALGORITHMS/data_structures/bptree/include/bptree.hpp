@@ -27,7 +27,7 @@ namespace bptree
   public:
     using R = Record<Key>;
 
-    virtual auto Add(Key key, shared_ptr<R> record) -> void = 0;
+    virtual auto Add(shared_ptr<R> record) -> void = 0;
     virtual auto Delete(Key key) -> void = 0;
     virtual auto Find(Key key) -> /*Nullable*/ R * = 0;
 

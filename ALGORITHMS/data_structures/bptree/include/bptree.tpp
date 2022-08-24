@@ -11,14 +11,14 @@ namespace bptree
     using F = NodeFactory<Key>;
 
     unique_ptr<N> rootNode = nullptr;
-    unique_ptr<F> nodeFactory;
+    const F &nodeFactory;
 
   public:
-    auto Add(Key key, shared_ptr<Record<Key>> record) -> void override
+    auto Add(shared_ptr<Record<Key>> record) -> void override
     {
       if (!rootNode)
       {
-        rootNode = nodeFactory->makeNode(Has::RecordPointers);
+        rootNode = nodeFactory.makeNode(Has::RecordPointers);
         rootNode->records().push_back(record);
       }
     }
@@ -31,9 +31,10 @@ namespace bptree
       // TODO: impl
     }
 
-    BPTreeImpl(unique_ptr<F> concreteFactory)
-        : nodeFactory{std::move(concreteFactory)} {};
+    BPTreeImpl(const F &concreteFactory)
+        : nodeFactory{concreteFactory} {};
     BPTreeImpl(const BPTreeImpl &other) = delete;
+    BPTreeImpl(BPTreeImpl &&other) = delete;
     ~BPTreeImpl(){};
   }; // class BPTreeImpl
 

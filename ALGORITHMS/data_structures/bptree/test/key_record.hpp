@@ -15,9 +15,9 @@ struct Key
 template <class Key>
 struct RecordImpl : public bptree::Record<Key>
 {
-  auto key() -> Key override { return id; };
+  auto key() -> Key override { return Key{id}; };
 
-  Key id;
+  uint32_t id;
   string name;
   enum Gender
   {
@@ -35,7 +35,7 @@ struct RecordImpl : public bptree::Record<Key>
   } grade;
 
   ~RecordImpl() override{};
-  RecordImpl(Key id, const string &name, Gender gender, uint32_t score, Grade grade)
+  RecordImpl(uint32_t id, const string &name, Gender gender, uint32_t score, Grade grade)
       : id{id}, name{name}, gender{gender}, score{score}, grade{grade} {};
   RecordImpl(const RecordImpl &other) = default;
   RecordImpl(RecordImpl &&other) = default;

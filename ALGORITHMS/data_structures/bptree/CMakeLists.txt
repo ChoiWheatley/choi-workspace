@@ -14,7 +14,7 @@ set(TEST_TARGET
 
 add_compile_options(-Wall)
 
-include_directories(/usr/include include)
+include_directories(/usr/include ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 include(FetchContent)
 FetchContent_Declare(
