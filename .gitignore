@@ -420,3 +420,5 @@ _deps
 **/tags
 **/build/
 **.dSYM/
+
+**/.vscode/
