@@ -8,14 +8,16 @@ namespace bptree
   using std::vector;
 
   // <<interface>>
-  // Holds key value, forwarded decl
-  struct Key;
+  // Holds key value
+  struct Key
+  {
+  };
 
   // <<interface>>
   // Record holds pointer of real data
   struct Record
   {
-    virtual auto key() -> Key = 0;
+    virtual auto key() -> /*Non-Null*/ Key * = 0;
     virtual ~Record(){};
   };
 

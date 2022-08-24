@@ -17,5 +17,8 @@ namespace bptree
 /// Implementation
 namespace bptree
 {
-
+  auto BPTreeImpl::Add(Key key, shared_ptr<Record> record) -> void
+  {
+    // TODO: impl
+  }
 } // namespace bptree
