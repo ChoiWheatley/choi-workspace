@@ -42,7 +42,6 @@ namespace bptree
     RecordPointers,
   };
 
-  // <<interface>>
   // Node can hold child nodes OR records
   template <class Key>
   struct Node
@@ -50,25 +49,28 @@ namespace bptree
     using R = Record<Key>;
     using N_p = shared_ptr<Node>;
     using R_p = shared_ptr<R>;
-    /// is Node LeafNode? Non LeafNode?
-    virtual auto has() const -> Has = 0;
-    virtual auto childNodes() -> vector<N_p> & = 0;
-    virtual auto records() -> vector<R_p> & = 0;
 
-    Node(){};
-    virtual ~Node(){};
+    const Has has;
+    Key key;
+    vector<N_p> childNodes;
+    vector<R_p> records;
+
+    auto childKeys() const -> const vector<Key>
+    {
+      vector<Key> ret{};
+      for (const auto k : childNodes)
+      {
+        ret.push_back(k->key());
+      }
+      return ret;
+    }
+
+    Node(Has has) : has{has} {};
+    ~Node(){};
   };
 
   // <<interface>>
   // abstract factory pattern
-  template <class Key>
-  class NodeFactory
-  {
-  public:
-    using N = Node<Key>;
-    virtual auto makeNode(Has has) const -> unique_ptr<N> = 0;
-  }; // class NodeFactory
-
   template <class Key>
   class TreeFactory
   {
@@ -80,6 +82,5 @@ namespace bptree
 } // namespace bptree
 
 #include "bptree.tpp"
-#include "node.tpp"
 
 #endif // BPTREE

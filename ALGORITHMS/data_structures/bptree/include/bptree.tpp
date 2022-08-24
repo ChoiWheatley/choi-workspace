@@ -7,23 +7,20 @@ namespace bptree
   class BPTreeImpl : public BPTree<Key>
   {
     using R = Record<Key>;
-    using N = Node<Key>;
-    using F = NodeFactory<Key>;
 
-    unique_ptr<N> rootNode = nullptr;
-    const F &nodeFactory;
+    unique_ptr<Node<Key>> rootNode = nullptr;
 
   public:
     auto Add(shared_ptr<Record<Key>> record) -> void override
     {
       if (!rootNode)
       {
-        rootNode = nodeFactory.makeNode(Has::RecordPointers);
-        rootNode->records().push_back(record);
+        rootNode = std::make_unique<Node<Key>>(RecordPointers);
+        rootNode->records.push_back(record);
         return;
       }
       auto cursor = rootNode.get();
-      while (cursor->has() != RecordPointers)
+      while (cursor->has != RecordPointers)
       {
       }
     }
@@ -36,8 +33,7 @@ namespace bptree
       // TODO: impl
     }
 
-    BPTreeImpl(const F &concreteFactory)
-        : nodeFactory{concreteFactory} {};
+    BPTreeImpl() = default;
     BPTreeImpl(const BPTreeImpl &other) = delete;
     BPTreeImpl(BPTreeImpl &&other) = delete;
     ~BPTreeImpl(){};

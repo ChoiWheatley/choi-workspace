@@ -19,7 +19,6 @@ TEST(Init, ForBetterCompilation)
 
   const auto realFactory = RealFactory<Key>{};
   const auto bpt = realFactory.makeTree(M);
-  NodeImpl<Key> node(Has::RecordPointers);
 
   for (const auto &r : records)
   {
