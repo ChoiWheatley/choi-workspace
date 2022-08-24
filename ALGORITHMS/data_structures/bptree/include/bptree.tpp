@@ -20,6 +20,11 @@ namespace bptree
       {
         rootNode = nodeFactory.makeNode(Has::RecordPointers);
         rootNode->records().push_back(record);
+        return;
+      }
+      auto cursor = rootNode.get();
+      while (cursor->has() != RecordPointers)
+      {
       }
     }
     auto Delete(Key key) -> void override
