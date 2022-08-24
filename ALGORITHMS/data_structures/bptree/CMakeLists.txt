@@ -8,9 +8,6 @@ set(CMAKE_EXECUTABLE_SUFFIX .out)
 set(PROJECT_TARGET
   ${CMAKE_PROJECT_NAME}.${CMAKE_PROJECT_VERSION}
 )
-set(LIB_TARGET
-  libbptree
-)
 set(TEST_TARGET
   test_bptree
 )

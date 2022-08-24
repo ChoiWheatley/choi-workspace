@@ -1,3 +1,6 @@
+#ifndef BPTREE
+#define BPTREE
+
 #include <memory>
 #include <vector>
 
@@ -28,7 +31,7 @@ namespace bptree
     virtual auto Delete(Key key) -> void = 0;
     virtual auto Find(Key key) -> /*Nullable*/ R * = 0;
 
-    virtual ~BPTree() = 0;
+    virtual ~BPTree(){};
   };
 
   // Enumeration
@@ -47,13 +50,36 @@ namespace bptree
     using R = Record<Key>;
     using N_p = shared_ptr<Node>;
     using R_p = shared_ptr<R>;
+    /// is Node LeafNode? Non LeafNode?
     virtual auto has() const -> Has = 0;
     virtual auto childNodes() -> vector<N_p> & = 0;
     virtual auto records() -> vector<R_p> & = 0;
 
-    virtual ~Node() = 0;
+    Node(){};
+    virtual ~Node(){};
   };
+
+  // <<interface>>
+  // abstract factory pattern
+  template <class Key>
+  class NodeFactory
+  {
+  public:
+    using N = Node<Key>;
+    virtual auto makeNode(Has has) const -> unique_ptr<N> = 0;
+  }; // class NodeFactory
+
+  template <class Key>
+  class TreeFactory
+  {
+  public:
+    using T = BPTree<Key>;
+    virtual auto makeTree(size_t childCount) const -> unique_ptr<T> = 0;
+  }; // class TreeFactory
 
 } // namespace bptree
 
 #include "bptree.tpp"
+#include "node.tpp"
+
+#endif // BPTREE

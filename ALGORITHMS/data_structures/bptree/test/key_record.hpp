@@ -1,3 +1,6 @@
+#ifndef KEYRECORD
+#define KEYRECORD
+
 #include <bptree.hpp>
 #include <string>
 
@@ -55,3 +58,5 @@ auto R::operator=(R other) -> R &
   grade = other.grade;
   return *this;
 }
+
+#endif // KEYRECORD
