@@ -44,6 +44,7 @@ namespace bptree
         return;
       }
       // Tour until leaf node
+      vector<_Node *> history{};
       _Node *cursor = rootNode.get();
       while (cursor->has != RecordPointers)
       {
@@ -61,6 +62,15 @@ namespace bptree
       if (MAX_KEY < cursor->records.size())
       {
         // TODO: impl
+        // unsaturate big chunk and ascend the bigger one
+        const auto halfIndex = cursor->records.size() / 2;
+        const auto &left = std::vector<_Record>{
+            cursor->records.begin(),
+            cursor->records.begin() + halfIndex};
+        const auto &right = std::vector<_Record>{
+            cursor->records.begin() + halfIndex,
+            cursor->records.end()};
+        cursor->records = vector(left.begin(), left.end());
       }
     }
 
