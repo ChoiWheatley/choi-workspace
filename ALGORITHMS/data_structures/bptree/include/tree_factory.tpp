@@ -1,3 +1,6 @@
+#ifndef TREE_FACTORY
+#define TREE_FACTORY
+
 #include "forward_decl.hpp"
 #include <memory>
 
@@ -16,3 +19,5 @@ namespace bptree
   }; // class TreeFactory
 
 }
+
+#endif // TREE_FACTORY

@@ -1,3 +1,6 @@
+#ifndef RECORD
+#define RECORD
+
 namespace bptree
 {
   // <<interface>>
@@ -9,3 +12,5 @@ namespace bptree
     virtual ~Record(){};
   };
 }
+
+#endif // RECORD
