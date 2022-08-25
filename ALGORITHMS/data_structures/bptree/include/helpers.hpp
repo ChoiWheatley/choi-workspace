@@ -14,6 +14,10 @@ namespace bptree
   template <class Key>
   auto findIndexBetween(const vector<Key> &keys, const Key &searchKey) -> size_t
   {
+    if (keys.empty())
+    {
+      return 0;
+    }
     if (searchKey < keys[0])
     {
       return 0;
@@ -31,6 +35,7 @@ namespace bptree
         return i + 1;
       }
     }
+    // ERROR
     return static_cast<size_t>(-1);
   }
 
