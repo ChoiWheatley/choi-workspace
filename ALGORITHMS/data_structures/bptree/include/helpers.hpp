@@ -1,3 +1,6 @@
+#ifndef HELPERS
+#define HELPERS
+
 #include <memory>
 #include <vector>
 
@@ -30,4 +33,7 @@ namespace bptree
     }
     return static_cast<size_t>(-1);
   }
+
 } // namespace bptree
+
+#endif // HELPERS

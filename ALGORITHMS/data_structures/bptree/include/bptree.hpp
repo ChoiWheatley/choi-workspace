@@ -60,7 +60,7 @@ namespace bptree
       vector<Key> ret{};
       for (const auto k : childNodes)
       {
-        ret.push_back(k->key());
+        ret.push_back(k->key);
       }
       return ret;
     }

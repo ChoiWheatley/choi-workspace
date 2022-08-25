@@ -1,3 +1,4 @@
+#include "helpers.hpp"
 #include <memory>
 #include <vector>
 
@@ -22,6 +23,9 @@ namespace bptree
       auto cursor = rootNode.get();
       while (cursor->has != RecordPointers)
       {
+        const auto nextIndex = findIndexBetween(
+            cursor->childKeys(),
+            record->key());
       }
     }
     auto Delete(Key key) -> void override

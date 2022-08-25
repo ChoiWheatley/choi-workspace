@@ -8,11 +8,6 @@ using std::string;
 
 // unique key
 using Key = uint32_t;
-// struct Key
-// {
-//   uint32_t id;
-// };
-
 template <class Key>
 struct RecordImpl : public bptree::Record<Key>
 {
