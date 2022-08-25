@@ -1,3 +1,4 @@
+#include "forward_decl.hpp"
 #include "helpers.hpp"
 #include <algorithm>
 #include <cassert>
@@ -6,6 +7,25 @@
 
 namespace bptree
 {
+  using std::shared_ptr;
+  using std::unique_ptr;
+  using std::vector;
+
+  // <<interface>>
+  // Do a real logic
+  template <class Key>
+  class BPTree
+  {
+  public:
+    using R = Record<Key>;
+
+    virtual auto Add(shared_ptr<R> record) -> void = 0;
+    virtual auto Delete(Key key) -> void = 0;
+    virtual auto Find(Key key) -> /*Nullable*/ R * = 0;
+
+    virtual ~BPTree(){};
+  };
+
   template <class Key>
   class BPTreeImpl : public BPTree<Key>
   {

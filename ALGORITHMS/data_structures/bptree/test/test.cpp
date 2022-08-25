@@ -1,6 +1,7 @@
 #include "helpers.hpp"
 #include "key_record.hpp"
 #include "real_factory.hpp"
+#include <bptree.hpp>
 #include <gtest/gtest.h>
 #include <tuple>
 
