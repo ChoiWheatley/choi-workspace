@@ -40,7 +40,7 @@ namespace bptree
     /// childNodes: {{},{20,25,__},{},__}
     /// index where key insert: 0
     /// index where child insert: 1
-    auto Ascend() -> void
+    auto Ascend() -> _NodePtr
     {
       _Node newParent{Has::ChildNodes};
       if (parent())
@@ -56,6 +56,18 @@ namespace bptree
         // push descender node from index `nextIndex`+1
         newParent.childNodes.insert(newParent.childNodes.begin() + nextIndex + 1, descender_);
 
+        // size exceeds control
+        if (MAX_KEY < newParent.keys.size())
+        {
+          // unsaturate big chunk and ascend the second one
+          auto unsaturatedChildNodes = split(newParent.childNodes);
+          auto unsaturatedKeys = split(newParent.keys);
+
+          // find ascender and do ascend
+          const auto &ascender = unsaturatedChildNodes.second;
+          // TODO: ascender is vector<Node> type!!!
+        }
+
         // COMMIT
         parent() = std::make_shared<_Node>(newParent);
       }
@@ -65,6 +77,7 @@ namespace bptree
         newParent.childNodes.push_back(cursor_);
         // TODO: impl
       }
+      return nullptr;
     }
 
     // pop from history stack and cache it
@@ -94,10 +107,6 @@ namespace bptree
     }
 
   private:
-    auto isSaturated() -> bool
-    {
-      return (MAX_KEY < parent()->keys.size());
-    }
   }; // class Ascender
 } // namespace bptree
 

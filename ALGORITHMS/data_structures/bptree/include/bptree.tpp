@@ -79,11 +79,15 @@ namespace bptree
         // unsaturate big chunk and ascend the bigger one
         auto unsaturated = split(newRecords);
 
-        // TODO: find ascender and do ascend
+        // find ascender and do ascend
         const auto &ascender = unsaturated.second;
-        Ascender<Key>(ascender, std::move(history), cursor).Ascend();
+        _NodePtr newParent = Ascender<Key>(ascender, std::move(history), cursor).Ascend();
 
         // commit
+        if (newParent)
+        {
+          rootNode = std::move(newParent);
+        }
         auto newSibling = std::make_shared<_Node>(Has::RecordPointers);
         newSibling->records = std::move(unsaturated.first);
 

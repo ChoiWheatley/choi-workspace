@@ -1,6 +1,7 @@
 #ifndef HELPERS
 #define HELPERS
 
+#include <cmath>
 #include <memory>
 #include <tuple>
 #include <vector>
@@ -44,7 +45,7 @@ namespace bptree
   template <class _T>
   auto split(const vector<_T> &vec) -> std::pair<vector<_T>, vector<_T>>
   {
-    const size_t halfIndex = vec.size() / 2;
+    const size_t halfIndex = static_cast<size_t>(ceil(double(vec.size()) / 2.0f));
 
     auto left = vector<_T>{
         vec.begin(),
