@@ -1,13 +1,17 @@
 #include "forward_decl.hpp"
 #include "helpers.hpp"
+#include "node.tpp"
+#include "record.tpp"
 #include <algorithm>
 #include <cassert>
 #include <memory>
+#include <stack>
 #include <vector>
 
 namespace bptree
 {
   using std::shared_ptr;
+  using std::stack;
   using std::unique_ptr;
   using std::vector;
 
@@ -32,45 +36,51 @@ namespace bptree
     using _Node = Node<Key>;
     using _Record = Record<Key>;
 
-    unique_ptr<Node<Key>> rootNode = nullptr;
+    unique_ptr<_Node> rootNode = nullptr;
 
   public:
-    auto Add(shared_ptr<Record<Key>> record) -> void override
+    auto Add(shared_ptr<_Record> record) -> void override
     {
       if (!rootNode)
       {
-        rootNode = std::make_unique<Node<Key>>(RecordPointers);
+        rootNode = std::make_unique<_Node>(RecordPointers);
         rootNode->records.push_back(record);
         return;
       }
+
       // Tour until leaf node
-      vector<_Node *> history{};
+      stack<_Node *> history{};
       _Node *cursor = rootNode.get();
       while (cursor->has != RecordPointers)
       {
+        history.push(cursor);
         const auto nextIndex = findIndexBetween(
             cursor->childKeys(),
             record->key());
         cursor = cursor->childNodes[nextIndex].get();
       }
+
       assert(cursor->has == RecordPointers);
       assert(!cursor->records.empty());
+
+      const shared_ptr<_Node> oldSibling = cursor->sibling;
+
       // push new record no matter it exceeds
       cursor->records.push_back(record);
       std::sort(cursor->records.begin(), cursor->records.end());
+
       // size exceeds control
       if (MAX_KEY < cursor->records.size())
       {
         // TODO: impl
         // unsaturate big chunk and ascend the bigger one
-        const auto halfIndex = cursor->records.size() / 2;
-        const auto &left = std::vector<_Record>{
-            cursor->records.begin(),
-            cursor->records.begin() + halfIndex};
-        const auto &right = std::vector<_Record>{
-            cursor->records.begin() + halfIndex,
-            cursor->records.end()};
-        cursor->records = vector(left.begin(), left.end());
+        auto unsaturated = split(cursor->records);
+
+        auto newSibling = std::make_shared<_Node>(Has::RecordPointers);
+        newSibling->records = std::move(unsaturated.first);
+
+        cursor->records = std::move(unsaturated.second);
+        cursor->sibling = newSibling;
       }
     }
 

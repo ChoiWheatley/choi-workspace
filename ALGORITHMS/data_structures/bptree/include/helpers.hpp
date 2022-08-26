@@ -2,6 +2,7 @@
 #define HELPERS
 
 #include <memory>
+#include <tuple>
 #include <vector>
 
 namespace bptree
@@ -37,6 +38,22 @@ namespace bptree
     }
     // ERROR
     return static_cast<size_t>(-1);
+  }
+
+  /// split long vector into two half-sized (floor value if size is odd) vectors
+  template <class _T>
+  auto split(const vector<_T> &vec) -> std::pair<vector<_T>, vector<_T>>
+  {
+    const size_t halfIndex = vec.size() / 2;
+
+    auto left = vector<_T>{
+        vec.begin(),
+        vec.begin() + halfIndex};
+    auto right = vector<_T>{
+        vec.begin() + halfIndex,
+        vec.end()};
+
+    return std::make_pair(left, right);
   }
 
 } // namespace bptree
