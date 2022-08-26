@@ -11,32 +11,33 @@ namespace bptree
   using std::unique_ptr;
   using std::vector;
 
-  // Node can hold child nodes OR records
+  /// Node can hold child nodes OR records
   template <class Key>
   struct Node
   {
     using _Record = Record<Key>;
-    // using N_p = shared_ptr<Node>;
-    // using R_p = shared_ptr<R>;
 
-    const Has has;
-    Key key;
-    vector<shared_ptr<Node>> childNodes;
-    vector<shared_ptr<_Record>> records;
-    shared_ptr<Node> sibling;
-
-    auto childKeys() const -> const vector<Key>
-    {
-      vector<Key> ret{};
-      for (const auto &k : childNodes)
-      {
-        ret.push_back(k->key);
-      }
-      return ret;
-    }
+    const Has has;                       // Both
+    vector<Key> keys;                    // Has::ChildNodes
+    vector<shared_ptr<Node>> childNodes; // Has::ChildNodes
+    vector<shared_ptr<_Record>> records; // Has::RecordPointers
+    shared_ptr<Node> sibling;            // Has::RecordPointers
 
     Node(Has has) : has{has} {};
+    Node(const Node &other)
+        : has{other.has}, keys{other.keys}, childNodes{other.childNodes},
+          records{other.records}, sibling{other.sibling} {}
     ~Node(){};
+
+    /// copy EXCEPT `has`
+    auto operator=(const Node &other)
+    {
+      keys = other.keys;
+      childNodes = other.childNodes;
+      records = other.records;
+      sibling = other.sibling;
+      return *this;
+    }
   };
 
 } // namespace bptree

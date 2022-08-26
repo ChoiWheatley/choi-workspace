@@ -4,6 +4,7 @@ add_executable(${TEST_TARGET}
   test.cpp
   real_factory.hpp
   key_record.hpp
+  stacktest.cpp
 )
 
 target_link_libraries(${TEST_TARGET}

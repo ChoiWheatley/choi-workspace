@@ -1,3 +1,4 @@
+#include "ascender.hpp"
 #include "forward_decl.hpp"
 #include "helpers.hpp"
 #include "node.tpp"
@@ -34,10 +35,11 @@ namespace bptree
   class BPTreeImpl : public BPTree<Key>
   {
     using _Node = Node<Key>;
+    using _NodePtr = shared_ptr<_Node>;
     using _Record = Record<Key>;
     using _RecordPtr = shared_ptr<_Record>;
 
-    unique_ptr<_Node> rootNode = nullptr;
+    _NodePtr rootNode = nullptr;
 
   public:
     auto Add(shared_ptr<_Record> record) -> void override
@@ -50,33 +52,38 @@ namespace bptree
       }
 
       // Tour until leaf node
-      stack<_Node *> history{};
-      _Node *cursor = rootNode.get();
+      stack<_NodePtr> history{};
+      _NodePtr cursor = rootNode;
       while (cursor->has != RecordPointers)
       {
         history.push(cursor);
         const auto nextIndex = findIndexBetween(
-            cursor->childKeys(),
+            cursor->keys,
             record->key());
-        cursor = cursor->childNodes[nextIndex].get();
+        cursor = cursor->childNodes[nextIndex];
       }
 
       assert(cursor->has == RecordPointers);
       assert(!cursor->records.empty());
 
-      const shared_ptr<_Node> oldSibling = cursor->sibling;
-      auto newRecords = vector<_RecordPtr>(cursor->records);
+      const _NodePtr oldSibling = cursor->sibling;
+      auto newRecords = vector<_RecordPtr>(cursor->records); // copy ctor?
 
       // push new record no matter it exceeds
       newRecords.push_back(record);
       std::sort(newRecords.begin(), newRecords.end());
 
       // size exceeds control
-      if (isSaturated(cursor))
+      if (isSaturated(newRecords))
       {
         // unsaturate big chunk and ascend the bigger one
         auto unsaturated = split(newRecords);
 
+        // TODO: find ascender and do ascend
+        const auto &ascender = unsaturated.second;
+        Ascender<Key>(ascender, std::move(history), cursor).Ascend();
+
+        // commit
         auto newSibling = std::make_shared<_Node>(Has::RecordPointers);
         newSibling->records = std::move(unsaturated.first);
 
@@ -87,16 +94,17 @@ namespace bptree
 
       // commit
       cursor->records = std::move(newRecords);
-    }
+    } // Add
 
     auto Delete(Key key) -> void override
     {
       // TODO: impl
-    }
+    } // Delete
+
     auto Find(Key key) -> /*Nullable*/ _Record * override
     {
       // TODO: impl
-    }
+    } // Find
 
     BPTreeImpl() = default;
     BPTreeImpl(const BPTreeImpl &other) = delete;
@@ -106,7 +114,13 @@ namespace bptree
   private:
     auto isSaturated(_Node *node) -> bool
     {
-      return (MAX_KEY < node->records.size());
+      switch (node->has)
+      {
+      case Has::ChildNodes:
+        return (MAX_KEY < node->keys.size());
+      case Has::RecordPointers:
+        return (MAX_KEY < node->records.size());
+      }
     }
     auto isSaturated(vector<_RecordPtr> records) -> bool
     {
