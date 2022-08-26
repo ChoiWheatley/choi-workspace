@@ -35,6 +35,7 @@ namespace bptree
   {
     using _Node = Node<Key>;
     using _Record = Record<Key>;
+    using _RecordPtr = shared_ptr<_Record>;
 
     unique_ptr<_Node> rootNode = nullptr;
 
@@ -64,24 +65,28 @@ namespace bptree
       assert(!cursor->records.empty());
 
       const shared_ptr<_Node> oldSibling = cursor->sibling;
+      auto newRecords = vector<_RecordPtr>(cursor->records);
 
       // push new record no matter it exceeds
-      cursor->records.push_back(record);
-      std::sort(cursor->records.begin(), cursor->records.end());
+      newRecords.push_back(record);
+      std::sort(newRecords.begin(), newRecords.end());
 
       // size exceeds control
-      if (MAX_KEY < cursor->records.size())
+      if (isSaturated(cursor))
       {
-        // TODO: impl
         // unsaturate big chunk and ascend the bigger one
-        auto unsaturated = split(cursor->records);
+        auto unsaturated = split(newRecords);
 
         auto newSibling = std::make_shared<_Node>(Has::RecordPointers);
         newSibling->records = std::move(unsaturated.first);
 
-        cursor->records = std::move(unsaturated.second);
+        newRecords = std::move(unsaturated.second);
         cursor->sibling = newSibling;
+        newSibling->sibling = oldSibling;
       }
+
+      // commit
+      cursor->records = std::move(newRecords);
     }
 
     auto Delete(Key key) -> void override
@@ -97,6 +102,16 @@ namespace bptree
     BPTreeImpl(const BPTreeImpl &other) = delete;
     BPTreeImpl(BPTreeImpl &&other) = delete;
     ~BPTreeImpl(){};
+
+  private:
+    auto isSaturated(_Node *node) -> bool
+    {
+      return (MAX_KEY < node->records.size());
+    }
+    auto isSaturated(vector<_RecordPtr> records) -> bool
+    {
+      return (MAX_KEY < records.size());
+    }
   }; // class BPTreeImpl
 
 } // namespace bptree
