@@ -122,7 +122,7 @@ namespace bptree
         return (MAX_KEY < node->records.size());
       }
     }
-    auto isSaturated(vector<_RecordPtr> records) -> bool
+    auto isSaturated(const vector<_RecordPtr> &records) -> bool
     {
       return (MAX_KEY < records.size());
     }
