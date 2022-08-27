@@ -43,6 +43,7 @@ namespace bptree
     auto Ascend() -> _NodePtr
     {
       _NodePtr newParent = std::make_shared<_Node>(Has::ChildNodes);
+      _NodePtr root = nullptr;
       if (parent())
       {
         assert(parent()->has == ChildNodes);
@@ -61,26 +62,33 @@ namespace bptree
         if (MAX_KEY < newParent->keys.size())
         {
           // unsaturate big chunk and ascend the second one
-          auto const unsaturated = split(*newParent);
+          std::pair<_Node, _Node> const unsaturated = split(*newParent);
 
           // find ascender and do ascend
           _NodePtr const ascender = std::make_shared<_Node>(unsaturated.second);
-          _NodePtr const root = Ascender(ascender, std::move(history_), cursor_).Ascend();
+          root = Ascender(ascender, std::move(history_), newParent).Ascend();
 
           // COMMIT
-          return root;
+          newParent = std::make_shared<_Node>(std::move(unsaturated.first));
         }
 
         // COMMIT
         parent() = std::move(newParent);
       }
       else
-      // cursor was root
+      // parent was root
+      // start from empty parent and link to cursor
       {
+        Key const ascendKey = ascender_->keys.front();
+        newParent->keys.push_back(ascendKey);
         newParent->childNodes.push_back(cursor_);
-        // TODO: impl
+        // push descender node from second to last element
+        newParent->childNodes.push_back(descender());
+
+        // COMMIT
+        root = std::move(newParent);
       }
-      return nullptr;
+      return root;
     }
 
   protected:

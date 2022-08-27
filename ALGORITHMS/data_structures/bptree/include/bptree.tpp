@@ -82,13 +82,13 @@ namespace bptree
 
         // find ascender and do ascend
         _NodePtr const ascender = std::make_shared<_Node>(unsaturated.second);
-        _NodePtr newParent = Ascender<Key>(ascender, std::move(history), cursor).Ascend();
+        _NodePtr newRoot = Ascender<Key>(ascender, std::move(history), cursor).Ascend();
 
         // commit
-        if (newParent)
+        if (newRoot)
         {
           // depth + 1
-          rootNode = std::move(newParent);
+          rootNode = std::move(newRoot);
         }
         _Node newSibling = std::move(unsaturated.second);
         newCursor = std::make_shared<_Node>(std::move(unsaturated.first));
