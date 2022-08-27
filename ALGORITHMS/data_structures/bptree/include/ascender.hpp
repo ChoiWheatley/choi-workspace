@@ -42,44 +42,48 @@ namespace bptree
     /// index where child insert: 1
     auto Ascend() -> _NodePtr
     {
-      _Node newParent{Has::ChildNodes};
+      _NodePtr newParent = std::make_shared<_Node>(Has::ChildNodes);
       if (parent())
       {
-        newParent = _Node{*parent()};
-        // vector<Key> keys = newParent.keys;
-        // vector<_NodePtr> &childNodes = newParent.childNodes;
+        assert(parent()->has == ChildNodes);
+
+        newParent->keys = vector<Key>(parent()->keys);                  // copy ctor
+        newParent->childNodes = vector<_NodePtr>(parent()->childNodes); // copy ctor
 
         const Key ascendKey = ascender_->keys.front();
-        const size_t nextIndex = findIndexBetween(newParent.keys, ascendKey);
+        const size_t nextIndex = findIndexBetween(newParent->keys, ascendKey);
         // push key back from index `nextIndex`
-        newParent.keys.insert(newParent.keys.begin() + nextIndex, ascendKey);
+        newParent->keys.insert(newParent->keys.begin() + nextIndex, ascendKey);
         // push descender node from index `nextIndex`+1
-        newParent.childNodes.insert(newParent.childNodes.begin() + nextIndex + 1, descender());
+        newParent->childNodes.insert(newParent->childNodes.begin() + nextIndex + 1, descender());
 
         // size exceeds control
-        if (MAX_KEY < newParent.keys.size())
+        if (MAX_KEY < newParent->keys.size())
         {
           // unsaturate big chunk and ascend the second one
-          auto unsaturatedChildNodes = split(newParent.childNodes);
-          auto unsaturatedKeys = split(newParent.keys);
+          auto const unsaturated = split(*newParent);
 
           // find ascender and do ascend
-          const auto &ascender = unsaturatedChildNodes.second;
-          // TODO: ascender is const Node & type!!!
+          _NodePtr const ascender = std::make_shared<_Node>(unsaturated.second);
+          _NodePtr const root = Ascender(ascender, std::move(history_), cursor_).Ascend();
+
+          // COMMIT
+          return root;
         }
 
         // COMMIT
-        parent() = std::make_shared<_Node>(newParent);
+        parent() = std::move(newParent);
       }
       else
       // cursor was root
       {
-        newParent.childNodes.push_back(cursor_);
+        newParent->childNodes.push_back(cursor_);
         // TODO: impl
       }
       return nullptr;
     }
 
+  protected:
     // pop from history stack and cache it
     auto parent() -> /*Nullable*/ _NodePtr
     {
@@ -90,7 +94,6 @@ namespace bptree
       if (!parent_)
       {
         parent_ = history_.top();
-        assert(parent_->has == ChildNodes);
         history_.pop();
       }
       return parent_;
@@ -115,6 +118,11 @@ namespace bptree
       }
     }
 
+    auto ascender() const -> _NodePtr { return ascender_; }
+    auto history() const -> stack<_NodePtr> { return history_; }
+    auto cursor() const -> _NodePtr { return cursor_; }
+
+  public:
     Ascender(const _NodePtr ascender,
              stack<_NodePtr> &&history,
              _NodePtr cursor)
