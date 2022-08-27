@@ -40,6 +40,51 @@ namespace bptree
     }
   };
 
+  /* helper functions related to Node */
+
+  /// split (child nodes and keys) OR (records)
+  template <class Key>
+  auto split(const Node<Key> &node) -> std::pair<Node<Key>, Node<Key>>
+  {
+    switch (node.has)
+    {
+    case Has::ChildNodes:
+    {
+      const auto keySplitted = split(node.keys);
+      const auto childSplitted = split(node.childNodes);
+      Node<Key> first{Has::ChildNodes};
+      Node<Key> second{Has::ChildNodes};
+      first.keys = keySplitted.first;
+      first.childNodes = childSplitted.first;
+      second.keys = keySplitted.second;
+      second.childNodes = childSplitted.second;
+
+      return std::make_pair(first, second);
+    }
+
+    case Has::RecordPointers:
+      const auto recordSplitted = split(node.records);
+      Node<Key> first{Has::RecordPointers};
+      Node<Key> second{Has::RecordPointers};
+      first.records = recordSplitted.first;
+      second.records = recordSplitted.second;
+
+      return std::make_pair(first, second);
+    }
+  }
+
+  template <class Key>
+  auto isSaturated(const Node<Key> &node) -> bool
+  {
+    switch (node.has)
+    {
+    case Has::ChildNodes:
+      return (MAX_KEY < node.keys.size());
+    case Has::RecordPointers:
+      return (MAX_KEY < node.records.size());
+    }
+  }
+
 } // namespace bptree
 
 #endif // NODE

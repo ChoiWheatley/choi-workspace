@@ -66,38 +66,38 @@ namespace bptree
       assert(cursor->has == RecordPointers);
       assert(!cursor->records.empty());
 
-      const _NodePtr oldSibling = cursor->sibling;
-      auto newRecords = vector<_RecordPtr>(cursor->records); // copy ctor?
+      _NodePtr const oldSibling = cursor->sibling;
+      _NodePtr newCursor = std::make_shared<_Node>(Has::RecordPointers);
+      newCursor->records = vector<_RecordPtr>(cursor->records); // copy ctor?
 
       // push new record no matter it exceeds
-      newRecords.push_back(record);
-      std::sort(newRecords.begin(), newRecords.end());
+      newCursor->records.push_back(record);
+      std::sort(newCursor->records.begin(), newCursor->records.end());
 
       // size exceeds control
-      if (isSaturated(newRecords))
+      if (isSaturated(*newCursor))
       {
         // unsaturate big chunk and ascend the bigger one
-        auto unsaturated = split(newRecords);
+        auto unsaturated = split(*newCursor);
 
         // find ascender and do ascend
-        const auto &ascender = unsaturated.second;
+        _NodePtr const ascender = std::make_shared<_Node>(unsaturated.second);
         _NodePtr newParent = Ascender<Key>(ascender, std::move(history), cursor).Ascend();
 
         // commit
         if (newParent)
         {
+          // depth + 1
           rootNode = std::move(newParent);
         }
-        auto newSibling = std::make_shared<_Node>(Has::RecordPointers);
-        newSibling->records = std::move(unsaturated.first);
-
-        newRecords = std::move(unsaturated.second);
-        cursor->sibling = newSibling;
-        newSibling->sibling = oldSibling;
+        _Node newSibling = std::move(unsaturated.second);
+        newCursor = std::make_shared<_Node>(std::move(unsaturated.first));
+        newCursor->sibling = std::make_shared<_Node>(std::move(newSibling));
+        newSibling.sibling = oldSibling;
       }
 
       // commit
-      cursor->records = std::move(newRecords);
+      cursor = std::move(newCursor);
     } // Add
 
     auto Delete(Key key) -> void override
@@ -116,20 +116,6 @@ namespace bptree
     ~BPTreeImpl(){};
 
   private:
-    auto isSaturated(_Node *node) -> bool
-    {
-      switch (node->has)
-      {
-      case Has::ChildNodes:
-        return (MAX_KEY < node->keys.size());
-      case Has::RecordPointers:
-        return (MAX_KEY < node->records.size());
-      }
-    }
-    auto isSaturated(const vector<_RecordPtr> &records) -> bool
-    {
-      return (MAX_KEY < records.size());
-    }
   }; // class BPTreeImpl
 
 } // namespace bptree
