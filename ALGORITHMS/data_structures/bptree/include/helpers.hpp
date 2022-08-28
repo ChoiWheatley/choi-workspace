@@ -41,11 +41,11 @@ namespace bptree
     return static_cast<size_t>(-1);
   }
 
-  /// split long vector into two half-sized (floor value if size is odd) vectors
+  /// split long vector into two half-sized (first one is smaller if size is odd) vectors
   template <class _T>
   auto split(const vector<_T> &vec) -> std::pair<vector<_T>, vector<_T>>
   {
-    const size_t halfIndex = static_cast<size_t>(ceil(double(vec.size()) / 2.0f));
+    const size_t halfIndex = static_cast<size_t>(floor(double(vec.size()) / 2.0f));
 
     auto left = vector<_T>{
         vec.begin(),

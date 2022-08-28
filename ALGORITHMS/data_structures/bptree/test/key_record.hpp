@@ -35,10 +35,8 @@ struct RecordImpl : public bptree::Record<Key>
 };
 
 // implementations
-using R = RecordImpl<Key>;
-
-template <>
-auto R::operator=(R other) -> R &
+template <class Key>
+auto RecordImpl<Key>::operator=(RecordImpl<Key> other) -> RecordImpl<Key> &
 {
   id = other.id;
   name = other.name;

@@ -7,6 +7,8 @@
 
 TEST(Init, ForBetterCompilation)
 {
+  using R = RecordImpl<Key>;
+
   constexpr size_t M = 3;
   const vector<R> records{
       R{1, "name", R::Freshman},
@@ -29,30 +31,4 @@ TEST(Init, ForBetterCompilation)
   bpt->Find(Key{1});
 
   bpt->Delete(Key{1});
-}
-
-/// 냠냠
-///
-class Helpers : public ::testing::Test
-{
-protected:
-  auto SetUp() -> void override
-  {
-  }
-  auto TearDown() -> void override
-  {
-  }
-  using KeyAnswerPair = std::pair<Key, size_t>;
-  const vector<Key> sampleKeys1 = {10, 20, 30, 40, 50};
-  const vector<Key> sampleKeys2 = {10, 20, 15, 30, 12, 24, 36, 11, 22, 33, 44};
-}; // class Helpers
-
-TEST_F(Helpers, FindIndexBetween1)
-{
-  const vector<KeyAnswerPair> searchAnswerPairs =
-      {{9, 0}, {10, 1}, {19, 1}, {20, 2}, {29, 2}, {30, 3}, {39, 3}, {40, 4}, {49, 4}, {50, 5}, {100, 5}};
-  for (const auto &pair : searchAnswerPairs)
-  {
-    EXPECT_EQ(findIndexBetween(sampleKeys1, pair.first), pair.second);
-  }
 }

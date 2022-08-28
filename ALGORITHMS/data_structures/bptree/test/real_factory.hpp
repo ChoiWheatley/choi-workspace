@@ -1,3 +1,6 @@
+#ifndef REAL_FACTORY
+#define REAL_FACTORY
+
 #include <bptree.hpp>
 
 using namespace bptree;
@@ -15,3 +18,5 @@ public:
     return std::make_unique<T_Impl>();
   }
 }; // class RealFactory
+
+#endif // REAL_FACTORY
