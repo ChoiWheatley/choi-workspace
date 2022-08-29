@@ -15,7 +15,7 @@ class RealFactory
 public:
   auto makeTree(size_t childCount) const -> unique_ptr<T> override
   {
-    return std::make_unique<T_Impl>();
+    return std::make_unique<T_Impl>(childCount);
   }
 }; // class RealFactory
 

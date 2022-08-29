@@ -73,18 +73,6 @@ namespace bptree
     }
   }
 
-  template <class Key>
-  auto isSaturated(const Node<Key> &node) -> bool
-  {
-    switch (node.has)
-    {
-    case Has::ChildNodes:
-      return (MAX_KEY < node.keys.size());
-    case Has::RecordPointers:
-      return (MAX_KEY < node.records.size());
-    }
-  }
-
 } // namespace bptree
 
 #endif // NODE

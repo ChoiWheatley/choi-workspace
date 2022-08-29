@@ -30,6 +30,8 @@ namespace bptree
 
     _NodePtr parent_ = nullptr;
     _NodePtr descender_ = nullptr;
+    size_t const kMaxKey;
+    size_t const kMaxChild;
 
   public:
     /// do ascend, recursiveness if saturated is true
@@ -59,14 +61,14 @@ namespace bptree
         newParent->childNodes.insert(newParent->childNodes.begin() + nextIndex + 1, descender());
 
         // size exceeds control
-        if (MAX_KEY < newParent->keys.size())
+        if (kMaxKey < newParent->keys.size())
         {
           // unsaturate big chunk and ascend the second one
           std::pair<_Node, _Node> const unsaturated = split(*newParent);
 
           // find ascender and do ascend
           _NodePtr const ascender = std::make_shared<_Node>(unsaturated.second);
-          root = Ascender(ascender, std::move(history_), newParent).Ascend();
+          root = Ascender(ascender, std::move(history_), newParent, kMaxKey).Ascend();
 
           // COMMIT
           newParent = std::make_shared<_Node>(std::move(unsaturated.first));
@@ -133,12 +135,13 @@ namespace bptree
   public:
     Ascender(const _NodePtr ascender,
              stack<_NodePtr> &&history,
-             _NodePtr cursor)
+             _NodePtr cursor,
+             size_t maxKey)
         : ascender_{ascender},
           history_{history},
-          cursor_{cursor}
-    {
-    }
+          cursor_{cursor},
+          kMaxKey{maxKey},
+          kMaxChild{maxKey + 1} {}
 
   private:
   }; // class Ascender

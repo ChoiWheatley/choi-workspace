@@ -8,8 +8,8 @@ namespace bptree
 {
   using std::size_t;
 
-  constexpr size_t MAX_KEY = 3;
-  constexpr size_t MAX_CHILD = MAX_KEY + 1;
+  // constexpr size_t MAX_KEY = 3;
+  // constexpr size_t MAX_CHILD = MAX_KEY + 1;
 
   template <class Key>
   struct Record;

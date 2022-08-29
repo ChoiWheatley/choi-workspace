@@ -40,6 +40,8 @@ namespace bptree
     using _RecordPtr = shared_ptr<_Record>;
 
     _NodePtr rootNode = nullptr;
+    size_t const kMaxKey;
+    size_t const kMaxChild;
 
   public:
     auto Add(shared_ptr<_Record> record) -> void override
@@ -75,14 +77,14 @@ namespace bptree
       std::sort(newCursor->records.begin(), newCursor->records.end());
 
       // size exceeds control
-      if (isSaturated(*newCursor))
+      if (kMaxKey < newCursor->keys.size())
       {
         // unsaturate big chunk and ascend the bigger one
         auto unsaturated = split(*newCursor);
 
         // find ascender and do ascend
         _NodePtr const ascender = std::make_shared<_Node>(unsaturated.second);
-        _NodePtr newRoot = Ascender<Key>(ascender, std::move(history), cursor).Ascend();
+        _NodePtr newRoot = Ascender<Key>(ascender, std::move(history), cursor, kMaxKey).Ascend();
 
         // commit
         if (newRoot)
@@ -110,7 +112,7 @@ namespace bptree
       // TODO: impl
     } // Find
 
-    BPTreeImpl() = default;
+    BPTreeImpl(size_t maxKeyCount) : kMaxKey{maxKeyCount}, kMaxChild{maxKeyCount + 1} {}
     BPTreeImpl(const BPTreeImpl &other) = delete;
     BPTreeImpl(BPTreeImpl &&other) = delete;
     ~BPTreeImpl(){};
