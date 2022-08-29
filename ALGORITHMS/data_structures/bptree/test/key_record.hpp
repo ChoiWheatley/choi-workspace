@@ -8,6 +8,13 @@ using std::string;
 
 // unique key
 using Key = uint32_t;
+enum Grade
+{
+  Freshman = 1,
+  Sophomore = 2,
+  Junior = 3,
+  Senior = 4,
+};
 template <class Key>
 struct RecordImpl : public bptree::Record<Key>
 {
@@ -15,13 +22,7 @@ struct RecordImpl : public bptree::Record<Key>
 
   uint32_t id;
   string name;
-  enum Grade
-  {
-    Freshman = 1,
-    Sophomore = 2,
-    Junior = 3,
-    Senior = 4,
-  } grade;
+  Grade grade;
 
   ~RecordImpl() override{};
   RecordImpl(uint32_t id, const string &name, Grade grade)

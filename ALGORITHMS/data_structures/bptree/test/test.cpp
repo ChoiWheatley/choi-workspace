@@ -11,12 +11,12 @@ TEST(Init, ForBetterCompilation)
 
   constexpr size_t M = 3;
   const vector<R> records{
-      R{1, "name", R::Freshman},
-      R{2, "name1", R::Freshman},
-      R{3, "name2", R::Freshman},
-      R{4, "name3", R::Freshman},
-      R{5, "name4", R::Freshman},
-      R{6, "name5", R::Freshman},
+      R{1, "name", Freshman},
+      R{2, "name1", Freshman},
+      R{3, "name2", Freshman},
+      R{4, "name3", Freshman},
+      R{5, "name4", Freshman},
+      R{6, "name5", Freshman},
   };
   // auto record = RecordImpl<Key>{1, "name", R::Male, 100, R::Freshman};
 
