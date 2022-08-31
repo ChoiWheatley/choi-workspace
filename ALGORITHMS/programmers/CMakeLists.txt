@@ -6,7 +6,7 @@ set(CMAKE_VERBOSE_MAKEFILE TRUE)
 set(CMAKE_EXECUTABLE_SUFFIX .out)
 
 set(TEST_TARGET
-    ${CMAKE_PROJECT_NAME})
+  ${CMAKE_PROJECT_NAME})
 
 add_compile_options(-Wall)
 
@@ -21,7 +21,8 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(${TEST_TARGET}
-    최소직사각형.cpp
+  최소직사각형.cpp
+  "같은 숫자는 싫어.cpp"
 )
 
 target_link_libraries(${TEST_TARGET}
