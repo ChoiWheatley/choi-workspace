@@ -78,7 +78,7 @@ namespace bptree
         parent() = std::move(newParent);
       }
       else
-      // parent was root
+      // parent was root: It could be Leaf OR Non Leaf
       // start from empty parent and link to cursor
       {
         Key const ascendKey = ascender_->keys.front();

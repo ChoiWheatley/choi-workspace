@@ -21,8 +21,8 @@ namespace bptree
   // for distinguishing Leaf and NonLeaf
   enum Has
   {
-    ChildNodes,
-    RecordPointers,
+    ChildNodes = 0,
+    RecordPointers = 1,
   };
 
   template <class Key>

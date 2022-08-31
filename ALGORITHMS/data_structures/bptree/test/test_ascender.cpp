@@ -4,26 +4,39 @@
 #include <memory>
 #include <stack>
 
+using bptree::Has;
+using std::make_shared;
+using std::shared_ptr;
+using std::stack;
+using std::vector;
+using _RecordImpl = RecordImpl<Key>;
+
 template <class _K>
-class AscenderExtension : bptree::Ascender<_K>
+class AscenderExtension : public bptree::Ascender<_K>
 {
   using _Ascender = bptree::Ascender<_K>;
   using _Node = bptree::Node<_K>;
   using _NodePtr = std::shared_ptr<_Node>;
 
 public:
-  auto parent() const -> _NodePtr { return _Ascender::parent(); }
-  auto descender() const -> _NodePtr { return _Ascender::desender(); }
+  auto parent() -> _NodePtr { return _Ascender::parent(); }
+  auto descender() -> _NodePtr { return _Ascender::descender(); }
   auto ascender() const -> _NodePtr { return _Ascender::ascender(); }
-  auto history() const -> const std::stack<_NodePtr> &
+  auto history() const -> const std::stack<_NodePtr>
   {
     return _Ascender::history();
   }
   auto cursor() const -> _NodePtr { return _Ascender::cursor(); }
+
+  AscenderExtension(const _NodePtr ascender,
+                    stack<_NodePtr> &&history,
+                    _NodePtr cursor,
+                    size_t maxKey) : _Ascender{ascender, std::move(history), cursor, maxKey} {}
 }; // class AscenderExtension
 
 class TestAscender1 : public ::testing::Test
 {
+public:
   using _Ascender = bptree::Ascender<Key>;
   using _Node = bptree::Node<Key>;
   using _NodePtr = std::shared_ptr<_Node>;
@@ -31,7 +44,7 @@ class TestAscender1 : public ::testing::Test
   using _RecordPtr = std::shared_ptr<_Record>;
 
 protected:
-  const size_t maxKeys = 3;
+  const size_t kMaxKey = 3;
   std::vector<RecordImpl<Key>> records = {
       {0, "name", Freshman},
       {1, "sarah", Sophomore},
@@ -92,7 +105,6 @@ protected:
 
 TEST_F(TestAscender1, AfterSetUp)
 {
-  using bptree::Has;
   /* check out SetUp() has been complitly finished*/
   ASSERT_EQ(Has::ChildNodes, rootNode->has);
   for (const auto &child : children)
@@ -108,4 +120,38 @@ TEST_F(TestAscender1, AfterSetUp)
   EXPECT_EQ(2, rootNode->childNodes[0]->records.size());
   EXPECT_EQ(2, rootNode->childNodes[1]->records.size());
   EXPECT_EQ(3, rootNode->childNodes[2]->records.size());
+}
+
+/// [0,1,2,3] -> split -> [0,1], [2,3]
+/// ascend [2,3] result is
+/// [2,,]
+/// - [0,1,]
+/// - [2,3,]
+/// retval = [2,,]
+TEST_F(TestAscender1, GettersCheck)
+{
+  auto rootNode = make_shared<bptree::Node<Key>>(Has::RecordPointers);
+  auto fakeStack = stack<_NodePtr>{/*empty*/};
+  rootNode->records = vector<shared_ptr<_Record>>{
+      make_shared<_RecordImpl>(records[0]),
+      make_shared<_RecordImpl>(records[1]),
+      make_shared<_RecordImpl>(records[2]),
+      make_shared<_RecordImpl>(records[3]),
+  };
+  std::sort(rootNode->records.begin(), rootNode->records.end());
+  auto unsaturated = split(*rootNode);
+  auto left = make_shared<_Node>(unsaturated.first);
+  auto right = make_shared<_Node>(unsaturated.second);
+  auto ascender =
+      AscenderExtension<Key>(
+          right,
+          std::move(fakeStack),
+          rootNode,
+          kMaxKey);
+
+  EXPECT_EQ(nullptr, ascender.parent());
+  EXPECT_EQ(right, ascender.descender());
+  EXPECT_EQ(right, ascender.ascender());
+  EXPECT_TRUE(ascender.history().empty()) << ascender.history().size();
+  EXPECT_EQ(rootNode, ascender.cursor());
 }

@@ -10,3 +10,9 @@ TEST(Stack, EmptyTop)
   EXPECT_EQ(0, myStack.size());
   // myStack.pop(); // undefined behavior
 }
+
+TEST(Stack, EmptyStack)
+{
+  auto fakeStack = std::stack<int>{/*empty*/};
+  EXPECT_TRUE(fakeStack.empty());
+}
