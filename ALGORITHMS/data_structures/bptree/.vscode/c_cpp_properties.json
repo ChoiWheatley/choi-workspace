@@ -1,0 +1,19 @@
+{
+  "configurations": [
+    {
+      "name": "Linux",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "${workspaceFolder}/include",
+        "/home/chltm/workspace/choi-workspace/ALGORITHMS/data_structures/bptree/include",
+        "/usr/include/c++/10",
+        "/usr/include/x86_64-linux-gnu/c++/10"
+      ],
+      "defines": [],
+      "compilerPath": "/usr/bin/clang",
+      "intelliSenseMode": "linux-clang-x64",
+      "configurationProvider": "ms-vscode.makefile-tools"
+    }
+  ],
+  "version": 4
+}
