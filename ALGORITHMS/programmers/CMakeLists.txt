@@ -21,8 +21,9 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(${TEST_TARGET}
-  최소직사각형.cpp
+  "최소직사각형.cpp"
   "같은 숫자는 싫어.cpp"
+  "성격 유형 검사.cpp"
 )
 
 target_link_libraries(${TEST_TARGET}
