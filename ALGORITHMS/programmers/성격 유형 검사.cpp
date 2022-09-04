@@ -1,6 +1,7 @@
 #include <array>
 #include <cassert>
 #include <gtest/gtest.h>
+#include <iostream>
 #include <map>
 #include <string>
 #include <vector>
@@ -9,16 +10,16 @@ using namespace std;
 
 namespace persona
 {
-  enum class Servey
+  enum class Servey : char
   {
-    RT,
-    TR,
-    FC,
-    CF,
-    MJ,
-    JM,
-    AN,
-    NA,
+    RT = 'T',
+    TR = 'R',
+    FC = 'C',
+    CF = 'F',
+    MJ = 'J',
+    JM = 'M',
+    AN = 'N',
+    NA = 'A',
   };
 
   auto indexOf(Servey s) -> size_t
@@ -40,6 +41,28 @@ namespace persona
     }
   }
 
+  auto sameScoreLookUp(Servey s) -> char
+  {
+    switch (s)
+    {
+    case Servey::RT:
+    case Servey::TR:
+      return 'R';
+    case Servey::FC:
+    case Servey::CF:
+      return 'C';
+    case Servey::MJ:
+    case Servey::JM:
+      return 'J';
+    case Servey::AN:
+    case Servey::NA:
+      return 'A';
+    }
+  }
+
+  /// @brief servey string의 원소는 "RT" 와 같이 두 개의 char로 이루어져 있다.
+  /// 첫번째 char는 비동의 관련 선택지를 선택하면 받는 성격유형이다.
+  /// 두번째 char는 동의 관련 선택지를 선택하면 받는 성격유형이다.
   const std::map<string, Servey> serveyLookUp = {
       {"RT", Servey::RT},
       {"TR", Servey::TR},
@@ -61,17 +84,6 @@ namespace persona
     POSITIVE = 6,
     VERY_POSITIVE = 7,
   };
-
-  /// @brief 각 인덱스는 비트필드의 각 위치와도 매핑이 된다. 예를 들어 0b0101 = "RFJN"
-  // const std::vector<std::map<uint8_t, char>> indexLookUp = {
-  //     {{1, 'R'}, {0, 'T'}},
-  //     {{1, 'C'}, {0, 'F'}},
-  //     {{1, 'J'}, {0, 'M'}},
-  //     {{1, 'A'}, {0, 'N'}},
-  // };
-
-  const std::vector<char> sameScoreLookUp = {
-      {'R', 'C', 'J', 'A'}};
 
   // <<interface>>
   // 단일 지표에 대한 정보를 다룬다.
@@ -95,7 +107,6 @@ namespace persona
     /// @brief 상태를 변경하는 메서드.
     /// @param Choice 질문의 선택지
     virtual auto Choice(Choices) -> void = 0;
-
   }; // class Question
 
   /// @brief <<interface>> 공통된 메서드만 구현함.
@@ -202,29 +213,69 @@ namespace persona
     {
       return allInstances_;
     }
-  };
+  }; // class QuestionFactory
 
+  // TR vs RT, CF vs FC, NA vs AN, JM vs MJ 격돌시켜서 승자 뽑아내기
+  auto compare(const Question &a, const Question &b) -> char
+  {
+    // TODO: problem
+    char retval = '\0';
+    if (a.score() < b.score())
+    {
+      retval = static_cast<char>(b.servey());
+    }
+    else if (a.score() > b.score())
+    {
+      retval = static_cast<char>(a.servey());
+    }
+    else
+    {
+      retval = sameScoreLookUp(a.servey());
+    }
+    return retval;
+  }
 } // namespace persona
 
 string solution(vector<string> servey, vector<int> choices)
 {
-  auto answer = string{4, '\0'};
-  persona::QuestionFactory factory;
+  using namespace persona;
+
+  auto answer = string{};
+  std::cerr << "\t" << answer << "\t\n";
+  QuestionFactory factory;
 
   assert(servey.size() == choices.size());
   for (size_t i = 0; i < servey.size(); ++i)
   {
     auto *question = factory.getInstanceOf(servey[i]);
-    question->Choice(static_cast<persona::Choices>(choices[i]));
+    question->Choice(static_cast<Choices>(choices[i]));
   }
 
-  auto arenaOfEachPersonality = std::map<persona::Servey, persona::Question::ScoreType>{};
-  for (auto const *question : factory.getAllInstances())
+#if CMAKE_BUILD_TYPE == DEBUG
+  // DEBUG: show all scores without comparing
+  for (auto const *inst : factory.getAllInstances())
   {
-    auto const [iter, success] = arenaOfEachPersonality.insert({question->servey(), question->score()});
-    assert(success);
-    // TODO: TR vs RT, CF vs FC, NA vs AN, JM vs MJ 격돌시켜서 승자 뽑아내기
+    std::cerr << static_cast<char>(inst->servey()) << ": " << inst->score() << "\n";
   }
+#endif // DEBUG
+
+  answer.insert(answer.end(),
+                compare(
+                    *factory.getInstanceOf(Servey::RT),
+                    *factory.getInstanceOf(Servey::TR)));
+  answer.insert(answer.end(),
+                compare(
+                    *factory.getInstanceOf(Servey::CF),
+                    *factory.getInstanceOf(Servey::FC)));
+  answer.insert(answer.end(),
+                compare(
+                    *factory.getInstanceOf(Servey::JM),
+                    *factory.getInstanceOf(Servey::MJ)));
+  answer.insert(answer.end(),
+                compare(
+                    *factory.getInstanceOf(Servey::AN),
+                    *factory.getInstanceOf(Servey::NA)));
+  std::cout << answer << "\n";
 
   return answer;
 }
