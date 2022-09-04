@@ -55,36 +55,40 @@ static auto ParseReport(const string &str) -> Report
   return Report{.id = words[0], .to = words[1]};
 }
 
+static auto MakeIndexMap(const vector<string> &id_list) -> IndexMap
+{
+  IndexMap ret;
+  for (index_t idx = 0; idx < id_list.size(); ++idx)
+  {
+    ret.insert({id_list[idx], idx});
+  }
+  return ret;
+}
+
+static auto MakeReportSet(const vector<string> &report) -> set<Report>
+{
+  set<Report> ret;
+  for (auto const &r : report)
+  {
+    ret.insert({ParseReport(r)});
+  }
+  return ret;
+}
+
 static vector<int> solution(vector<string> id_list, vector<string> report, int k)
 {
   auto answer = vector<int>{static_cast<int>(id_list.size()), 0};
 
-  auto const indexMap = [&id_list]() -> IndexMap
-  {
-    IndexMap ret;
-    for (index_t idx = 0; idx < id_list.size(); ++idx)
-    {
-      ret.insert({id_list[idx], idx});
-    }
-    return ret;
-  }();
+  auto const indexMap = MakeIndexMap(id_list);
 
-  auto const reports = [&report]() -> set<Report>
-  {
-    set<Report> ret;
-    for (auto const &r : report)
-    {
-      ret.insert({ParseReport(r)});
-    }
-    return ret;
-  }();
+  auto const reports = MakeReportSet(report);
 
-  auto const reportWithIndex = [&reports, &indexMap]() -> vector<ReportWithIdx>
+  auto const reportWithIndex = [&reports, &indexMap]() -> set<ReportWithIdx>
   {
-    vector<ReportWithIdx> ret;
+    set<ReportWithIdx> ret;
     for (Report const &r : reports)
     {
-      ret.push_back(ReportWithIdx{
+      ret.insert(ReportWithIdx{
           r.id, indexMap.at(r.id),
           r.to, indexMap.at(r.to)});
     }
@@ -133,6 +137,27 @@ namespace testing
     auto const str = "muzi frodo";
     auto const ans = Report{"muzi", "frodo"};
     EXPECT_EQ(ans, ParseReport(str));
+  }
+
+  TEST(IndexMap, MakeIndexMap)
+  {
+    auto const str = vector<string>{
+        {"a"},
+        {"b"},
+        {"c"},
+        {"d"},
+        {"e"},
+        {"f"},
+    };
+    auto const ans = IndexMap{
+        {"a", 0},
+        {"b", 1},
+        {"c", 2},
+        {"d", 3},
+        {"e", 4},
+        {"f", 5},
+    };
+    EXPECT_EQ(MakeIndexMap(str), ans);
   }
 
   class ReportFixture : public Test
