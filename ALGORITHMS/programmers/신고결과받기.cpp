@@ -32,6 +32,8 @@ struct ReportWithIdx : public Report
     return (id == other.id && to == other.to) &&
            (id_idx == other.id_idx && to_idx == other.to_idx);
   }
+  ReportWithIdx(string id, size_t id_idx, string to, size_t to_idx)
+      : Report{.id = id, .to = to}, id_idx{id_idx}, to_idx{to_idx} {}
 }; // ReportWithIdx
 
 /// @brief Parse string that contains reporter and reportee splitted by whitespace
@@ -67,6 +69,18 @@ static vector<int> solution(vector<string> id_list, vector<string> report, int k
     for (auto const &r : report)
     {
       ret.push_back(ParseReport(r));
+    }
+    return ret;
+  }();
+
+  auto const reportWithIndex = [reports, indexMap]() -> vector<ReportWithIdx>
+  {
+    vector<ReportWithIdx> ret;
+    for (Report const &r : reports)
+    {
+      ret.push_back(ReportWithIdx{
+          r.id, indexMap.at(r.id),
+          r.to, indexMap.at(r.to)});
     }
     return ret;
   }();
