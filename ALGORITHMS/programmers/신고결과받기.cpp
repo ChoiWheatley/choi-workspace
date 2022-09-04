@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <set>
 #include <sstream>
 #include <string>
@@ -9,14 +10,46 @@
 
 using namespace std;
 
+/// @brief simply contains two strings, reporting id and be reported id
+struct Report
+{
+  string id;
+  string to;
+  bool operator==(const Report &other) const
+  {
+    return (id == other.id && to == other.to);
+  }
+}; // struct Report
+
+/// @brief Parse string that contains reporter and reportee splitted by whitespace
+/// @param str 'a b' means `a` reported `b`
+static auto ParseReport(const string &str) -> Report
+{
+  auto words = vector<string>{};
+  auto input_stream = istringstream{str};
+  for (string word; std::getline(input_stream, word, ' ');)
+  {
+    words.push_back(word);
+  }
+  return Report{.id = words[0], .to = words[1]};
+}
+
 static vector<int> solution(vector<string> id_list, vector<string> report, int k)
 {
-  vector<int> answer;
+  auto answer = vector<int>{static_cast<int>(id_list.size()), 0};
+
   return answer;
 }
 
 namespace testing
 {
+  TEST(ParseString, ParseReport)
+  {
+    auto const str = "muzi frodo";
+    auto const ans = Report{"muzi", "frodo"};
+    EXPECT_EQ(ans, ParseReport(str));
+  }
+
   class ReportFixture : public Test
   {
   protected:
