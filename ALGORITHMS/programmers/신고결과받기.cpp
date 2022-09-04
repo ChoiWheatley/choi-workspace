@@ -22,6 +22,11 @@ struct Report
   {
     return (id == other.id && to == other.to);
   }
+
+  bool operator<(const Report &other) const
+  {
+    return (id < other.id);
+  }
 }; // struct Report
 
 struct ReportWithIdx : public Report
@@ -54,7 +59,7 @@ static vector<int> solution(vector<string> id_list, vector<string> report, int k
 {
   auto answer = vector<int>{static_cast<int>(id_list.size()), 0};
 
-  auto const indexMap = [id_list]() -> IndexMap
+  auto const indexMap = [&id_list]() -> IndexMap
   {
     IndexMap ret;
     for (index_t idx = 0; idx < id_list.size(); ++idx)
@@ -64,17 +69,17 @@ static vector<int> solution(vector<string> id_list, vector<string> report, int k
     return ret;
   }();
 
-  auto const reports = [report]() -> vector<Report>
+  auto const reports = [&report]() -> set<Report>
   {
-    vector<Report> ret;
+    set<Report> ret;
     for (auto const &r : report)
     {
-      ret.push_back(ParseReport(r));
+      ret.insert({ParseReport(r)});
     }
     return ret;
   }();
 
-  auto const reportWithIndex = [reports, indexMap]() -> vector<ReportWithIdx>
+  auto const reportWithIndex = [&reports, &indexMap]() -> vector<ReportWithIdx>
   {
     vector<ReportWithIdx> ret;
     for (Report const &r : reports)
@@ -86,7 +91,7 @@ static vector<int> solution(vector<string> id_list, vector<string> report, int k
     return ret;
   }();
 
-  auto const countReports = [reportWithIndex]() -> vector<size_t>
+  auto const countReports = [&reportWithIndex]() -> vector<size_t>
   {
     auto ret = vector<size_t>(static_cast<int>(reportWithIndex.size()), 0);
     for (auto const &r : reportWithIndex)
@@ -96,7 +101,7 @@ static vector<int> solution(vector<string> id_list, vector<string> report, int k
     return ret;
   }();
 
-  auto const userOverTolerance = [k, countReports]() -> set<index_t>
+  auto const userOverTolerance = [&k, &countReports]() -> set<index_t>
   {
     set<index_t> ret;
     for (index_t idx = 0; idx < countReports.size(); ++idx)
@@ -108,6 +113,15 @@ static vector<int> solution(vector<string> id_list, vector<string> report, int k
     }
     return ret;
   }();
+
+  for (auto const &report : reportWithIndex)
+  {
+    auto const badUser = userOverTolerance.find(report.to_idx);
+    if (badUser != userOverTolerance.end())
+    {
+      answer.at(report.id_idx) += 1;
+    }
+  }
 
   return answer;
 }
