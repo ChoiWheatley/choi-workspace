@@ -10,6 +10,8 @@
 
 using namespace std;
 
+using IndexMap = unordered_map<string /*id*/, size_t /*idx*/>;
+
 /// @brief simply contains two strings, reporting id and be reported id
 struct Report
 {
@@ -20,6 +22,17 @@ struct Report
     return (id == other.id && to == other.to);
   }
 }; // struct Report
+
+struct ReportWithIdx : public Report
+{
+  size_t id_idx;
+  size_t to_idx;
+  bool operator==(const ReportWithIdx &other) const
+  {
+    return (id == other.id && to == other.to) &&
+           (id_idx == other.id_idx && to_idx == other.to_idx);
+  }
+}; // ReportWithIdx
 
 /// @brief Parse string that contains reporter and reportee splitted by whitespace
 /// @param str 'a b' means `a` reported `b`
@@ -37,6 +50,26 @@ static auto ParseReport(const string &str) -> Report
 static vector<int> solution(vector<string> id_list, vector<string> report, int k)
 {
   auto answer = vector<int>{static_cast<int>(id_list.size()), 0};
+
+  auto const indexMap = [id_list]() -> IndexMap
+  {
+    IndexMap ret;
+    for (size_t idx = 0; idx < id_list.size(); ++idx)
+    {
+      ret.insert({id_list[idx], idx});
+    }
+    return ret;
+  }();
+
+  auto const reports = [report]() -> vector<Report>
+  {
+    vector<Report> ret;
+    for (auto const &r : report)
+    {
+      ret.push_back(ParseReport(r));
+    }
+    return ret;
+  }();
 
   return answer;
 }
