@@ -10,7 +10,8 @@
 
 using namespace std;
 
-using IndexMap = unordered_map<string /*id*/, size_t /*idx*/>;
+using index_t = size_t;
+using IndexMap = unordered_map<string /*id*/, index_t /*idx*/>;
 
 /// @brief simply contains two strings, reporting id and be reported id
 struct Report
@@ -25,14 +26,14 @@ struct Report
 
 struct ReportWithIdx : public Report
 {
-  size_t id_idx;
-  size_t to_idx;
+  index_t id_idx;
+  index_t to_idx;
   bool operator==(const ReportWithIdx &other) const
   {
     return (id == other.id && to == other.to) &&
            (id_idx == other.id_idx && to_idx == other.to_idx);
   }
-  ReportWithIdx(string id, size_t id_idx, string to, size_t to_idx)
+  ReportWithIdx(string id, index_t id_idx, string to, index_t to_idx)
       : Report{.id = id, .to = to}, id_idx{id_idx}, to_idx{to_idx} {}
 }; // ReportWithIdx
 
@@ -56,7 +57,7 @@ static vector<int> solution(vector<string> id_list, vector<string> report, int k
   auto const indexMap = [id_list]() -> IndexMap
   {
     IndexMap ret;
-    for (size_t idx = 0; idx < id_list.size(); ++idx)
+    for (index_t idx = 0; idx < id_list.size(); ++idx)
     {
       ret.insert({id_list[idx], idx});
     }
@@ -81,6 +82,29 @@ static vector<int> solution(vector<string> id_list, vector<string> report, int k
       ret.push_back(ReportWithIdx{
           r.id, indexMap.at(r.id),
           r.to, indexMap.at(r.to)});
+    }
+    return ret;
+  }();
+
+  auto const countReports = [reportWithIndex]() -> vector<size_t>
+  {
+    auto ret = vector<size_t>(static_cast<int>(reportWithIndex.size()), 0);
+    for (auto const &r : reportWithIndex)
+    {
+      ret.at(r.to_idx) += 1;
+    }
+    return ret;
+  }();
+
+  auto const userOverTolerance = [k, countReports]() -> set<index_t>
+  {
+    set<index_t> ret;
+    for (index_t idx = 0; idx < countReports.size(); ++idx)
+    {
+      if (k < countReports[idx])
+      {
+        ret.insert(idx);
+      }
     }
     return ret;
   }();
