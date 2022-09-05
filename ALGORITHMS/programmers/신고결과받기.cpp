@@ -129,10 +129,18 @@ static vector<int> solution(vector<string> id_list, vector<string> report, int k
 
   vector<size_t> const countReports = CountReports(reportWithIdx);
 
-  vector<size_t> const badUsersList = filter<size_t>(
-      countReports,
-      [k](const size_t &elem) -> bool
-      { return (k < elem); });
+  auto const badUsersList = [&countReports, &k]() -> vector<index_t>
+  {
+    vector<index_t> ret;
+    for (index_t i = 0; i < countReports.size(); ++i)
+    {
+      if (k <= countReports[i])
+      {
+        ret.push_back(i);
+      }
+    }
+    return ret;
+  }();
 
   auto const badUsersSet = set<index_t>{badUsersList.begin(), badUsersList.end()};
 
@@ -332,6 +340,16 @@ namespace testing
     report = {"a b", "c b"};
     k = 2;
     result = {1, 0, 1};
+
+    DoTest();
+  }
+
+  TEST_F(ReportFixture, 4)
+  {
+    id_list = {"a", "b", "c", "d", "e", "f"};
+    report = {"a b", "c b", "d b", "e b", "f b", "a c", "b c"};
+    k = 2;
+    result = {2, 1, 1, 1, 1, 1};
 
     DoTest();
   }
