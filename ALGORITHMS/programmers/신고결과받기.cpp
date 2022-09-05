@@ -25,8 +25,14 @@ struct Report
 
   bool operator<(const Report &other) const
   {
+    if (id == other.id)
+    {
+      return (to < other.to);
+    }
     return (id < other.id);
   }
+
+  Report(string id, string to) : id{id}, to{to} {}
 }; // struct Report
 
 struct ReportWithIdx : public Report
@@ -39,7 +45,7 @@ struct ReportWithIdx : public Report
            (id_idx == other.id_idx && to_idx == other.to_idx);
   }
   ReportWithIdx(string id, index_t id_idx, string to, index_t to_idx)
-      : Report{.id = id, .to = to}, id_idx{id_idx}, to_idx{to_idx} {}
+      : Report{id, to}, id_idx{id_idx}, to_idx{to_idx} {}
 }; // ReportWithIdx
 
 /// @brief Parse string that contains reporter and reportee splitted by whitespace
@@ -52,7 +58,7 @@ static auto ParseReport(const string &str) -> Report
   {
     words.push_back(word);
   }
-  return Report{.id = words[0], .to = words[1]};
+  return Report{words[0], words[1]};
 }
 
 static auto MakeIndexMap(const vector<string> &id_list) -> IndexMap
@@ -144,14 +150,14 @@ static vector<int> solution(vector<string> id_list, vector<string> report, int k
 
 namespace testing
 {
-  TEST(ParseString, ParseReport)
+  TEST(신고결과받기, ParseReport)
   {
     auto const str = "muzi frodo";
     auto const ans = Report{"muzi", "frodo"};
     EXPECT_EQ(ans, ParseReport(str));
   }
 
-  TEST(Filter, Filter)
+  TEST(신고결과받기, Filter)
   {
     auto const vec = []() -> vector<int>
     {
@@ -184,7 +190,7 @@ namespace testing
         ans);
   }
 
-  TEST(IndexMap, MakeIndexMap)
+  TEST(신고결과받기, IndexMap)
   {
     auto const str = vector<string>{
         {"a"},
@@ -203,6 +209,41 @@ namespace testing
         {"f", 5},
     };
     EXPECT_EQ(MakeIndexMap(str), ans);
+  }
+
+  TEST(신고결과받기, MakeReportSet)
+  {
+    auto const report = vector<string>{
+        {"a b"},
+        {"a c"},
+        {"a d"},
+        {"a e"},
+        {"b a"},
+        {"b c"},
+        {"c d"},
+        {"f d"},
+        {"f d"},
+        {"e d"},
+        {"e d"},
+    };
+
+    auto const ans = set<Report>{
+        Report{"a", "c"},
+        Report{"a", "d"},
+        Report{"a", "e"},
+        Report{"b", "a"},
+        Report{"c", "d"},
+        Report{"f", "d"},
+        Report{"f", "d"},
+        Report{"b", "c"},
+        Report{"e", "d"},
+        Report{"e", "d"},
+        Report{"a", "b"},
+    };
+
+    auto const ret = MakeReportSet(report);
+    EXPECT_EQ(ret.size(), ans.size());
+    EXPECT_EQ(ret, ans);
   }
 
   class ReportFixture : public Test
