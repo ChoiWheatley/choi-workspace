@@ -97,14 +97,15 @@ static auto CountReports(const set<ReportWithIdx> &reportWithIdx) -> vector<size
   return ret;
 }
 
-static auto FindBadUsers(size_t k, const vector<size_t> &countReports) -> set<index_t>
+template <typename _T>
+static auto filter(const vector<_T> &list, std::function<bool(const _T &)> condition) -> vector<_T>
 {
-  set<index_t> ret;
-  for (index_t idx = 0; idx < countReports.size(); ++idx)
+  vector<_T> ret;
+  for (auto const &each : list)
   {
-    if (k < countReports[idx])
+    if (condition(each))
     {
-      ret.insert(idx);
+      ret.push_back(each);
     }
   }
   return ret;
@@ -122,12 +123,17 @@ static vector<int> solution(vector<string> id_list, vector<string> report, int k
 
   vector<size_t> const countReports = CountReports(reportWithIdx);
 
-  set<index_t> const userOverTolerance = FindBadUsers(k, countReports);
+  vector<size_t> const badUsersList = filter<size_t>(
+      countReports,
+      [k](const size_t &elem) -> bool
+      { return (k < elem); });
+
+  auto const badUsersSet = set<index_t>{badUsersList.begin(), badUsersList.end()};
 
   for (auto const &report : reportWithIdx)
   {
-    auto const badUser = userOverTolerance.find(report.to_idx);
-    if (badUser != userOverTolerance.end())
+    auto const badUser = badUsersSet.find(report.to_idx);
+    if (badUser != badUsersSet.end())
     {
       answer.at(report.id_idx) += 1;
     }
