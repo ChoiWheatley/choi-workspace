@@ -151,6 +151,39 @@ namespace testing
     EXPECT_EQ(ans, ParseReport(str));
   }
 
+  TEST(Filter, Filter)
+  {
+    auto const vec = []() -> vector<int>
+    {
+      vector<int> ret;
+      for (int i = 0; i < 100; ++i)
+      {
+        ret.push_back(i);
+      }
+      return ret;
+    }();
+
+    auto const ans = []() -> vector<int>
+    {
+      vector<int> ret;
+      for (int i = 0; i < 100; ++i)
+      {
+        if ((i % 2) == 0)
+        {
+          ret.push_back(i);
+        }
+      }
+      return ret;
+    }();
+
+    EXPECT_EQ(
+        filter<int>(
+            vec,
+            [](const int &elem)
+            { return (elem % 2) == 0; }),
+        ans);
+  }
+
   TEST(IndexMap, MakeIndexMap)
   {
     auto const str = vector<string>{
