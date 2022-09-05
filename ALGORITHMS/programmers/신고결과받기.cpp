@@ -75,50 +75,56 @@ static auto MakeReportSet(const vector<string> &report) -> set<Report>
   return ret;
 }
 
+static auto MakeReportWithIdx(const set<Report> &reports, const IndexMap &indexMap) -> set<ReportWithIdx>
+{
+  set<ReportWithIdx> ret;
+  for (Report const &r : reports)
+  {
+    ret.insert(ReportWithIdx{
+        r.id, indexMap.at(r.id),
+        r.to, indexMap.at(r.to)});
+  }
+  return ret;
+}
+
+static auto CountReports(const set<ReportWithIdx> &reportWithIdx) -> vector<size_t>
+{
+  auto ret = vector<size_t>(static_cast<int>(reportWithIdx.size()), 0);
+  for (auto const &r : reportWithIdx)
+  {
+    ret.at(r.to_idx) += 1;
+  }
+  return ret;
+}
+
+static auto FindBadUsers(size_t k, const vector<size_t> &countReports) -> set<index_t>
+{
+  set<index_t> ret;
+  for (index_t idx = 0; idx < countReports.size(); ++idx)
+  {
+    if (k < countReports[idx])
+    {
+      ret.insert(idx);
+    }
+  }
+  return ret;
+}
+
 static vector<int> solution(vector<string> id_list, vector<string> report, int k)
 {
   auto answer = vector<int>{static_cast<int>(id_list.size()), 0};
 
-  auto const indexMap = MakeIndexMap(id_list);
+  IndexMap const indexMap = MakeIndexMap(id_list);
 
-  auto const reports = MakeReportSet(report);
+  set<Report> const reports = MakeReportSet(report);
 
-  auto const reportWithIndex = [&reports, &indexMap]() -> set<ReportWithIdx>
-  {
-    set<ReportWithIdx> ret;
-    for (Report const &r : reports)
-    {
-      ret.insert(ReportWithIdx{
-          r.id, indexMap.at(r.id),
-          r.to, indexMap.at(r.to)});
-    }
-    return ret;
-  }();
+  set<ReportWithIdx> const reportWithIdx = MakeReportWithIdx(reports, indexMap);
 
-  auto const countReports = [&reportWithIndex]() -> vector<size_t>
-  {
-    auto ret = vector<size_t>(static_cast<int>(reportWithIndex.size()), 0);
-    for (auto const &r : reportWithIndex)
-    {
-      ret.at(r.to_idx) += 1;
-    }
-    return ret;
-  }();
+  vector<size_t> const countReports = CountReports(reportWithIdx);
 
-  auto const userOverTolerance = [&k, &countReports]() -> set<index_t>
-  {
-    set<index_t> ret;
-    for (index_t idx = 0; idx < countReports.size(); ++idx)
-    {
-      if (k < countReports[idx])
-      {
-        ret.insert(idx);
-      }
-    }
-    return ret;
-  }();
+  set<index_t> const userOverTolerance = FindBadUsers(k, countReports);
 
-  for (auto const &report : reportWithIndex)
+  for (auto const &report : reportWithIdx)
   {
     auto const badUser = userOverTolerance.find(report.to_idx);
     if (badUser != userOverTolerance.end())
