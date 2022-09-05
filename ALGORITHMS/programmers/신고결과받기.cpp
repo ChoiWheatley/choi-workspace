@@ -119,7 +119,7 @@ static auto filter(const vector<_T> &list, std::function<bool(const _T &)> condi
 
 static vector<int> solution(vector<string> id_list, vector<string> report, int k)
 {
-  auto answer = vector<int>{static_cast<int>(id_list.size()), 0};
+  auto answer = vector<int>(static_cast<int>(id_list.size()), 0);
 
   IndexMap const indexMap = MakeIndexMap(id_list);
 
@@ -322,6 +322,16 @@ namespace testing
     report = {"ryan con", "ryan con", "ryan con", "ryan con"};
     k = 3;
     result = {0, 0};
+
+    DoTest();
+  }
+
+  TEST_F(ReportFixture, 3)
+  {
+    id_list = {"a", "b", "c"};
+    report = {"a b", "c b"};
+    k = 2;
+    result = {1, 0, 1};
 
     DoTest();
   }
