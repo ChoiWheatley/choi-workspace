@@ -25,6 +25,7 @@ add_executable(${TEST_TARGET}
   "같은 숫자는 싫어.cpp"
   "성격 유형 검사.cpp"
   "신고결과받기.cpp"
+  "신고결과받기.re.cpp"
 )
 
 target_link_libraries(${TEST_TARGET}
