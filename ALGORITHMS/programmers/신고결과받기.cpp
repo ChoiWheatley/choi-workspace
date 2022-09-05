@@ -1,4 +1,6 @@
 /// https://school.programmers.co.kr/learn/courses/30/lessons/92334
+#include <algorithm>
+#include <functional>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <map>
@@ -93,9 +95,9 @@ static auto MakeReportWithIdx(const set<Report> &reports, const IndexMap &indexM
   return ret;
 }
 
-static auto CountReports(const set<ReportWithIdx> &reportWithIdx) -> vector<size_t>
+static auto CountReports(const IndexMap &indexMap, const set<ReportWithIdx> &reportWithIdx) -> vector<size_t>
 {
-  auto ret = vector<size_t>(static_cast<int>(reportWithIdx.size()), 0);
+  auto ret = vector<size_t>(static_cast<int>(indexMap.size()), 0);
   for (auto const &r : reportWithIdx)
   {
     ret.at(r.to_idx) += 1;
@@ -127,7 +129,7 @@ static vector<int> solution(vector<string> id_list, vector<string> report, int k
 
   set<ReportWithIdx> const reportWithIdx = MakeReportWithIdx(reports, indexMap);
 
-  vector<size_t> const countReports = CountReports(reportWithIdx);
+  vector<size_t> const countReports = CountReports(indexMap, reportWithIdx);
 
   auto const badUsersList = [&countReports, &k]() -> vector<index_t>
   {
@@ -257,6 +259,17 @@ namespace testing
   class ReportFixture : public Test
   {
   protected:
+    static constexpr size_t MIN_ID_LIST_SIZE = 2;
+    static constexpr size_t MAX_ID_LIST_SIZE = 1000;
+    static constexpr size_t MIN_ID_SIZE = 1;
+    static constexpr size_t MAX_ID_SIZE = 10;
+    static constexpr size_t MIN_REPORT_SIZE = 1;
+    static constexpr size_t MAX_REPORT_SIZE = 200000;
+    static constexpr size_t MIN_REPORT_STR_SIZE = 3;
+    static constexpr size_t MAX_REPORT_STR_SIZE = 21;
+    static constexpr size_t MIN_K = 1;
+    static constexpr size_t MAX_K = 200;
+
     vector<string> id_list;
     vector<string> report;
     int k;
@@ -264,24 +277,24 @@ namespace testing
 
     auto DoTest() -> void
     {
-      ASSERT_GE(id_list.size(), 2);
-      ASSERT_LE(id_list.size(), 1000);
+      ASSERT_GE(id_list.size(), MIN_ID_LIST_SIZE);
+      ASSERT_LE(id_list.size(), MAX_ID_LIST_SIZE);
       set<string> id_set;
       for (const auto &id : id_list)
       {
-        ASSERT_GE(id.size(), 1);
-        ASSERT_LE(id.size(), 10);
+        ASSERT_GE(id.size(), MIN_ID_SIZE);
+        ASSERT_LE(id.size(), MAX_ID_SIZE);
         // no duplicated elements
         auto [iter, success] = id_set.insert(id);
         ASSERT_TRUE(success);
       }
 
-      ASSERT_GE(report.size(), 1);
-      ASSERT_LE(report.size(), 200000);
+      ASSERT_GE(report.size(), MIN_REPORT_SIZE);
+      ASSERT_LE(report.size(), MAX_REPORT_SIZE);
       for (const auto &each : report)
       {
-        ASSERT_GE(each.size(), 3);
-        ASSERT_LE(each.size(), 21);
+        ASSERT_GE(each.size(), MIN_REPORT_STR_SIZE);
+        ASSERT_LE(each.size(), MAX_REPORT_STR_SIZE);
         // only two splitted words
         set<string> words;
         auto input = istringstream{each};
@@ -293,8 +306,8 @@ namespace testing
         ASSERT_EQ(words.size(), 2) << "Each report must have exactly two words!";
       }
 
-      ASSERT_GE(k, 1);
-      ASSERT_LE(k, 200);
+      ASSERT_GE(k, MIN_K);
+      ASSERT_LE(k, MAX_K);
 
       ASSERT_EQ(result.size(), id_list.size());
 
@@ -350,6 +363,29 @@ namespace testing
     report = {"a b", "c b", "d b", "e b", "f b", "a c", "b c"};
     k = 2;
     result = {2, 1, 1, 1, 1, 1};
+
+    DoTest();
+  }
+
+  TEST_F(ReportFixture, 5)
+  {
+    id_list = {"a", "b", "c", "d", "e", "f"};
+    report = {"a f", "c f", "d f", "e f", "f b", "a f", "b f"};
+    k = 2;
+    result = {1, 1, 1, 1, 1, 0};
+
+    DoTest();
+  }
+
+  TEST_F(ReportFixture, ReportSizeBoundary)
+  {
+    id_list = {"a", "b"};
+    for (size_t i = 0; i < MAX_REPORT_SIZE; ++i)
+    {
+      report.push_back({"a b"});
+    }
+    k = 2;
+    result = {0, 0};
 
     DoTest();
   }
