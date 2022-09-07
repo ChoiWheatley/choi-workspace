@@ -30,11 +30,11 @@ template <typename _T>
 static auto mergeSort(vector<_T> &sorting, vector<size_t> &indices, size_t l, size_t r) -> void
 {
   // halt condition
-  if (!(l < r))
+  if (l >= r - 1)
   {
     return;
   }
-  auto const mid = static_cast<size_t>(ceil((l + r) / 2.0));
+  auto const mid = static_cast<size_t>(floor((l + r) / 2.0));
   mergeSort(sorting, indices, l, mid);
   mergeSort(sorting, indices, mid, r);
   // merge l to r
@@ -44,8 +44,8 @@ static auto mergeSort(vector<_T> &sorting, vector<size_t> &indices, size_t l, si
   vector<size_t> tmpIndices;
   while ((leftCursor < mid) && (rightCursor < r))
   {
-    auto const leftElem = sorting[leftCursor];
-    auto const rightElem = sorting[rightCursor];
+    auto const leftElem = sorting.at(leftCursor);
+    auto const rightElem = sorting.at(rightCursor);
     if (rightElem < leftElem)
     {
       tmpSorting.push_back(rightElem);
@@ -62,16 +62,21 @@ static auto mergeSort(vector<_T> &sorting, vector<size_t> &indices, size_t l, si
   // remain?
   if (leftCursor < mid)
   {
-    tmpSorting.push_back(sorting[leftCursor]);
+    tmpSorting.push_back(sorting.at(leftCursor));
     tmpIndices.push_back(leftCursor);
   }
   if (rightCursor < r)
   {
-    tmpSorting.push_back(sorting[rightCursor]);
+    tmpSorting.push_back(sorting.at(rightCursor));
     tmpIndices.push_back(rightCursor);
   }
   // finally do move
-  sorting = move(tmpSorting);
+  for (size_t i = 0; i < r - l; ++i)
+  {
+    auto const idx = l + i;
+    sorting.at(idx) = tmpSorting.at(i);
+    indices.at(idx) = tmpIndices.at(i);
+  }
 };
 
 // merge sort
@@ -99,7 +104,10 @@ namespace testing
   TEST(Sorting, Basic)
   {
     auto before = vector<int>{5, 4, 3, 2, 1};
+    auto const after = vector<int>{1, 2, 3, 4, 5};
     auto const [sorted, indices] = Sort(move(before));
+
+    EXPECT_EQ(sorted, after);
   }
   class 로또Fixture : public Test
   {
