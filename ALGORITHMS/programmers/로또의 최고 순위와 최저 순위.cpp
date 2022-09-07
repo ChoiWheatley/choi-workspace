@@ -3,6 +3,8 @@
 #include <cmath>
 #include <functional>
 #include <gtest/gtest.h>
+#include <limits>
+#include <random>
 #include <sstream>
 #include <string>
 #include <tuple>
@@ -115,6 +117,20 @@ namespace testing
 
     EXPECT_EQ(sorted, after_sorted);
     EXPECT_EQ(indices, after_indices);
+  }
+  TEST(Sorting, RandomNumberSorting)
+  {
+    std::random_device rd;
+    std::uniform_int_distribution<int> dist(0, numeric_limits<int>::max());
+
+    auto before = vector<int>{};
+    for (size_t i = 0; i < 200000; ++i)
+    {
+      before.push_back(dist(rd));
+    }
+    auto answer = vector<int>(before);
+    sort(answer.begin(), answer.end());
+    EXPECT_EQ(answer, Sort(move(before)).first);
   }
   class 로또Fixture : public Test
   {
