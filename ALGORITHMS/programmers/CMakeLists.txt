@@ -26,6 +26,7 @@ add_executable(${TEST_TARGET}
   "성격 유형 검사.cpp"
   "신고결과받기.cpp"
   "신고결과받기.re.cpp"
+  "로또의 최고 순위와 최저 순위.cpp"
 )
 
 target_link_libraries(${TEST_TARGET}
