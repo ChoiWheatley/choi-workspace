@@ -42,33 +42,38 @@ static auto mergeSort(vector<_T> &sorting, vector<size_t> &indices, size_t l, si
   auto rightCursor = mid;
   vector<_T> tmpSorting;
   vector<size_t> tmpIndices;
-  while ((leftCursor < mid) && (rightCursor < r))
+  while ((leftCursor < mid) || (rightCursor < r))
   {
+    if (leftCursor >= mid)
+    {
+      auto const rightElem = sorting.at(rightCursor);
+      tmpSorting.push_back(rightElem);
+      tmpIndices.push_back(indices.at(rightCursor));
+      ++rightCursor;
+      continue;
+    }
+    if (rightCursor >= r)
+    {
+      auto const leftElem = sorting.at(leftCursor);
+      tmpSorting.push_back(leftElem);
+      tmpIndices.push_back(indices.at(leftCursor));
+      ++leftCursor;
+      continue;
+    }
     auto const leftElem = sorting.at(leftCursor);
     auto const rightElem = sorting.at(rightCursor);
     if (rightElem < leftElem)
     {
       tmpSorting.push_back(rightElem);
-      tmpIndices.push_back(rightCursor);
+      tmpIndices.push_back(indices.at(rightCursor));
       ++rightCursor;
     }
     else
     {
       tmpSorting.push_back(leftElem);
-      tmpIndices.push_back(leftCursor);
+      tmpIndices.push_back(indices.at(leftCursor));
       ++leftCursor;
     }
-  }
-  // remain?
-  if (leftCursor < mid)
-  {
-    tmpSorting.push_back(sorting.at(leftCursor));
-    tmpIndices.push_back(leftCursor);
-  }
-  if (rightCursor < r)
-  {
-    tmpSorting.push_back(sorting.at(rightCursor));
-    tmpIndices.push_back(rightCursor);
   }
   // finally do move
   for (size_t i = 0; i < r - l; ++i)
@@ -81,7 +86,7 @@ static auto mergeSort(vector<_T> &sorting, vector<size_t> &indices, size_t l, si
 
 // merge sort
 template <typename _T>
-static auto Sort(vector<_T> &&vec) -> pair<vector<_T> & /*sorted*/, vector<size_t> /*index*/>
+static auto Sort(vector<_T> &&vec) -> pair<vector<_T> /*sorted*/, vector<size_t> /*index*/>
 {
   auto sorting = vector<_T>(move(vec));
   auto indices = vector<size_t>{};
@@ -90,7 +95,7 @@ static auto Sort(vector<_T> &&vec) -> pair<vector<_T> & /*sorted*/, vector<size_
     indices.push_back(i);
   }
   mergeSort(sorting, indices, 0, sorting.size());
-  return {sorting, indices};
+  return pair<vector<_T>, vector<size_t>>(move(sorting), indices);
 }
 
 // 몇 개 맞췄는지 보고, 그 다음에 와일드카드가 각각 모두 정답인 경우와
@@ -104,10 +109,12 @@ namespace testing
   TEST(Sorting, Basic)
   {
     auto before = vector<int>{5, 4, 3, 2, 1};
-    auto const after = vector<int>{1, 2, 3, 4, 5};
+    auto const after_sorted = vector<int>{1, 2, 3, 4, 5};
+    auto const after_indices = vector<size_t>{4, 3, 2, 1, 0};
     auto const [sorted, indices] = Sort(move(before));
 
-    EXPECT_EQ(sorted, after);
+    EXPECT_EQ(sorted, after_sorted);
+    EXPECT_EQ(indices, after_indices);
   }
   class 로또Fixture : public Test
   {
