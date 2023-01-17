@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16) # 요구 CMake 최소 버전
 project("bak") # 프로젝트 이름 및 버전
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_BUILD_TYPE DEBUG) # 빌드 config 및 기타등등 옵션
 
 set(CMAKE_VERBOSE_MAKEFILE TRUE)

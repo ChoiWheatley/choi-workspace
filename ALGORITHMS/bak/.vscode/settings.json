@@ -1,3 +1,15 @@
 {
-  "sonarlint.pathToCompileCommands": "${workspaceFolder}/build/compile_commands.json"
+  "sonarlint.pathToCompileCommands": "${workspaceFolder}/build/compile_commands.json",
+  "files.associations": {
+    "*.h": "c",
+    "*.tcc": "cpp",
+    "chrono": "cpp",
+    "string_view": "cpp",
+    "random": "cpp",
+    "istream": "cpp",
+    "limits": "cpp",
+    "numeric": "cpp",
+    "ratio": "cpp",
+    "bit": "cpp"
+  }
 }
