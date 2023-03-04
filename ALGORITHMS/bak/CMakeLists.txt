@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16) # 요구 CMake 최소 버전
 project("bak") # 프로젝트 이름 및 버전
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_BUILD_TYPE DEBUG) # 빌드 config 및 기타등등 옵션
 
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
@@ -15,6 +15,8 @@ set(MY_TEST_TARGET MY_TEST)
 # 공통 컴파일 옵션
 add_compile_options(-Wall)
 
+include_directories(useful)
+
 # Googlt Test
 # declare a dependency on GoogleTest which is downloaded from github
 # FetchContent : https://cmake.org/cmake/help/latest/module/FetchContent.html
@@ -26,8 +28,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-file(GLOB_RECURSE SOURCE_FILES "problem/main*")
-file(GLOB_RECURSE TEST_FILES "problem/tests*")
+file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "main.cc")
+file(GLOB_RECURSE TEST_FILES CONFIGURE_DEPENDS "tests.cc")
 
 # ################################################
 # compile source files
@@ -64,6 +66,10 @@ foreach(TEST_PATH ${TEST_FILES})
     message("@@@@ TEST_TARGET : ${TEST_TARGET}")
 
     add_executable(${TEST_TARGET} ${TEST_PATH})
+    set_target_properties(${TEST_TARGET}
+        PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
     target_link_libraries(${TEST_TARGET} PUBLIC GTest::gtest_main)
     include(GoogleTest)
     gtest_discover_tests(${TEST_TARGET})
