@@ -51,27 +51,15 @@ public:
       }
     }
 
+    round_up(result);
+
     return BigNumber(std::move(result), decimal_point);
   }
 
   /**
    * @brief converts to human-readable number format
-   *
-   * 유의사항, m_digits를 한 번 훑으면서 자릿수별로 10이 넘는 원소를 올림한다.
    */
-  string to_string() {
-
-    int roundup = 0;
-    for (auto &digit : m_digits) {
-
-      digit += roundup;
-      roundup = digit / 10;
-      digit = digit %= 10;
-    }
-    while (roundup > 0) {
-      m_digits.push_back(roundup % 10);
-      roundup /= 10;
-    }
+  string to_string() const {
 
     stringstream ss;
     size_t point_count = m_digits.size();
@@ -92,6 +80,20 @@ public:
 private:
   BigNumber(vector<int> &&digits, size_t decimal_point)
       : m_digits{std::move(digits)}, m_decimal_point(decimal_point) {}
+
+  static void round_up(vector<int> &digits) {
+    int roundup = 0;
+    for (auto &digit : digits) {
+
+      digit += roundup;
+      roundup = digit / 10;
+      digit = digit %= 10;
+    }
+    while (roundup > 0) {
+      digits.push_back(roundup % 10);
+      roundup /= 10;
+    }
+  }
 
   vector<int> m_digits;   // 10의 idx승번째 digit을 저장
   size_t m_decimal_point; // 소수자리수
