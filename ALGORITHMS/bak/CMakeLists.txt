@@ -1,8 +1,9 @@
-cmake_minimum_required(VERSION 3.16) # 요구 CMake 최소 버전
+cmake_minimum_required(VERSION 3.25) # 요구 CMake 최소 버전
 project("bak") # 프로젝트 이름 및 버전
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_BUILD_TYPE DEBUG) # 빌드 config 및 기타등등 옵션
+set(CMAKE_EXPORT_COMPILE_COMMANDS) # SonarLint vscode extension이 이거 써달래.
 
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 set(CMAKE_EXECUTABLE_SUFFIX .out)
@@ -13,7 +14,7 @@ set(LIB_TARGET lib${CMAKE_PROJECT_NAME})
 set(MY_TEST_TARGET MY_TEST)
 
 # 공통 컴파일 옵션
-add_compile_options(-Wall)
+add_compile_options(-Wall -fno-builtin -fno-limit-debug-info -O0 -D_GLIBCXX_DEBUG)
 
 include_directories(useful)
 
