@@ -14,7 +14,7 @@ set(LIB_TARGET lib${CMAKE_PROJECT_NAME})
 set(MY_TEST_TARGET MY_TEST)
 
 # 공통 컴파일 옵션
-add_compile_options(-Wall -fno-builtin -fno-limit-debug-info -O0 -D_GLIBCXX_DEBUG)
+add_compile_options(-Wall -fno-builtin -O0 -D_GLIBCXX_DEBUG)
 
 include_directories(useful)
 
