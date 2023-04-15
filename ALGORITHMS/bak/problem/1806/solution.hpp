@@ -29,6 +29,9 @@ template <typename T, class Fn> inline T first_true(T begin, T end, Fn pred) {
 - to: exclusive
 */
 inline i64 sum_between(Vec cr sum, size_t from, size_t to) {
+  if (to == 0) {
+    return sum[0];
+  }
   if (from == 0) {
     return sum[to - 1];
   }
@@ -62,10 +65,6 @@ inline size_t solution(Vec &&sum, i64 S) {
   auto ret = first_true(size_t(0), sum.size(), [&sum, S](auto length) {
     for (size_t from = 0; from <= sum.size() - length; ++from) {
       size_t to = from + length;
-      // corner case
-      if (length == 0) {
-        to = from;
-      }
       if (sum_between(sum, from, to) >= S) {
         return true;
       }
