@@ -5,21 +5,6 @@
 
 #define cr const &
 
-struct Point {
-  int index;
-  int *price_ptr;
-  explicit Point(int index, int *price_ptr)
-      : index(index), price_ptr(price_ptr) {}
-};
-
-inline bool operator<(Point cr lhs, Point cr rhs) {
-  if (*lhs.price_ptr == *rhs.price_ptr) {
-    // NOTICE: index is reversed order
-    return lhs.index > rhs.index;
-  }
-  return *lhs.price_ptr < *rhs.price_ptr;
-}
-
 using namespace std;
 using VecDeque = deque<int>;
 
@@ -39,7 +24,7 @@ x if affordable.
 affordable.
 6. PROFIT 💸
 */
-inline VecDeque solution(VecDeque &&prices, int m) {
+static VecDeque solution(VecDeque &&prices, int m) {
   if (prices.size() <= 1) {
     return {};
   }
@@ -48,10 +33,12 @@ inline VecDeque solution(VecDeque &&prices, int m) {
   a = 1; // we can assure `prices` are at least have two elements
   b = 0;
   // 1. 2.
-  for (int i = 2; i < n; ++i) {
+  for (int i = 1; i < n; ++i) {
     if (prices[i] <= prices[a]) {
       a = i;
     }
+  }
+  for (int i = 0; i < n; ++i) {
     if (prices[i] <= prices[b]) {
       b = i;
     }
@@ -85,11 +72,12 @@ inline VecDeque solution(VecDeque &&prices, int m) {
   // 5.
   for_each(next(result.rbegin()), result.rend(), [&](auto &digit) {
     for (int i = n - 1; i > b; --i) {
-      int delta_price = prices[i] - prices[b];
+      int delta_price = prices[i] - prices[digit];
       if (m >= delta_price) {
         // replace `b` with new number-tag
         digit = i;
         m -= delta_price;
+        return;
       }
     }
   });

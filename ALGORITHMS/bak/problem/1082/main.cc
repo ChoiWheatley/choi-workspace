@@ -7,6 +7,7 @@ using namespace std;
 int main(void) {
   ios::sync_with_stdio(false);
   cin.tie(nullptr);
+  cout.tie(nullptr);
 
   int n;
   cin >> n;
@@ -21,12 +22,12 @@ int main(void) {
 
   auto submit = solution(std::move(prices), m);
   if (submit.empty()) {
-    cout << '0';
+    cout << '0' << "\n";
   } else {
     for_each(submit.crbegin(), submit.crend(),
              [](auto cr elem) { cout << elem; });
+    cout << "\n";
   }
-  cout << "\n";
 
   return 0;
 }
