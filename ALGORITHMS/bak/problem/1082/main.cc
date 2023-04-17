@@ -24,8 +24,9 @@ int main(void) {
   if (submit.empty()) {
     cout << '0' << "\n";
   } else {
-    for_each(submit.crbegin(), submit.crend(),
-             [](auto cr elem) { cout << elem; });
+    for (int i = int(submit.size()) - 1; i >= 0; --i) {
+      cout << submit[i];
+    }
     cout << "\n";
   }
 

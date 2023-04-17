@@ -29,17 +29,19 @@ static VecDeque solution(VecDeque &&prices, int m) {
     return {};
   }
   const auto n = int(prices.size());
-  int a, b;
-  a = 1; // we can assure `prices` are at least have two elements
-  b = 0;
+  int min_price_a = 500;
+  int min_price_b = 500;
+  int a = 0, b = 0; // we can assure `prices` are at least have two elements
   // 1. 2.
   for (int i = 1; i < n; ++i) {
-    if (prices[i] <= prices[a]) {
+    if (prices[i] <= min_price_a) {
+      min_price_a = prices[i];
       a = i;
     }
   }
   for (int i = 0; i < n; ++i) {
-    if (prices[i] <= prices[b]) {
+    if (prices[i] <= min_price_b) {
+      min_price_b = prices[i];
       b = i;
     }
   }
@@ -70,17 +72,18 @@ static VecDeque solution(VecDeque &&prices, int m) {
   }
 
   // 5.
-  for_each(next(result.rbegin()), result.rend(), [&](auto &digit) {
-    for (int i = n - 1; i > b; --i) {
-      int delta_price = prices[i] - prices[digit];
+  for (int i = int(result.size()) - 2; i >= 0; --i) {
+    auto &digit = result[i];
+    for (int j = n - 1; j > b; --j) {
+      int delta_price = prices[j] - prices[digit];
       if (m >= delta_price) {
         // replace `b` with new number-tag
-        digit = i;
+        digit = j;
         m -= delta_price;
-        return;
+        break;
       }
     }
-  });
+  }
 
   return result;
 }
