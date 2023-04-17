@@ -68,6 +68,7 @@ static VecDeque solution(VecDeque &&prices, int m) {
       // replace `a` with new number-tag
       result.back() = i;
       m -= delta_price;
+      break;
     }
   }
 
