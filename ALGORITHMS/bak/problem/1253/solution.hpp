@@ -4,57 +4,57 @@
 #include <ios>
 #include <iostream>
 #include <iterator>
+#include <numeric>
+#include <unordered_map>
 #include <vector>
 
 #define cr const &
 
+constexpr size_t N = 2000;
+constexpr size_t E = 1'000'000'000;
+
 using namespace std;
 using i64 = long long;
+using idx_t = size_t;
+using Map = unordered_map<i64, size_t>;
+using BitSet = bitset<N>;
 
-constexpr size_t N = 2000;
-
-template <typename T, class Fn> inline T first_true(T begin, T end, Fn pred) {
-  auto l = begin;
-  auto r = end;
-  while (l < r) {
-    auto m = l + (r - l) / 2;
-    if (pred(m)) {
-      // move left, next range is [l, m)
-      r = m;
-    } else {
-      // move right, next range is [m + 1, r)
-      l = m + 1;
-    }
+/**
+@brief: find value from key, and mark as visited
+*/
+inline size_t map_search(Map &hashmap, i64 key) {
+  auto itr = hashmap.find(key);
+  if (itr != hashmap.end()) {
+    size_t ret = itr->second;
+    hashmap.erase(itr);
+    return ret;
   }
-  return l;
+  return 0;
 }
 
 inline size_t solution(vector<i64> &&ls) {
-  auto const n = ls.size();
-  auto visited = bitset<N + 1>();
+  Map hashmap;
 
-  std::sort(ls.begin(), ls.end());
+  for (size_t i = 0; i < ls.size(); ++i) {
+    auto cr e = ls[i];
+    hashmap[e] += 1;
+  }
 
-  size_t count = 0;
-
-  for (size_t i = 0; i < n; ++i) {
-    for (size_t j = i + 1; j < n; ++j) {
-      auto sum = ls[i] + ls[j];
-
-      auto lb = first_true(ls.begin(), ls.end(),
-                           [sum](auto x) { return (*x) >= sum; });
-      auto ub = first_true(ls.begin(), ls.end(),
-                           [sum](auto x) { return (*x) > sum; });
-
-      for (auto itr = lb; itr != ub; ++itr) {
-        auto index = std::distance(ls.begin(), itr);
-        if (index != i && index != j && (*itr) == sum && !visited[index]) {
-          visited.set(index);
-          count += 1;
-        }
+  size_t cnt = 0;
+  for (size_t i = 0; i < ls.size(); ++i) {
+    for (size_t j = i + 1; j < ls.size(); ++j) {
+      // corner case: zeros
+      if (ls[i] == 0 && ls[j] == 0 && hashmap[0] <= 2) {
+        continue;
       }
+      auto sum = ls[i] + ls[j];
+      // corner case: self
+      if ((ls[i] == 0 || ls[j] == 0) && hashmap[sum] <= 1) {
+        continue;
+      }
+      cnt += map_search(hashmap, sum);
     }
   }
 
-  return count;
+  return cnt;
 }
