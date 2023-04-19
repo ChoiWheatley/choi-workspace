@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <array>
 #include <bitset>
 #include <cstddef>
@@ -12,13 +13,14 @@ constexpr size_t K = 10;
 
 using std::array;
 using std::bitset;
+using std::for_each;
 using std::vector;
 using Vec = vector<int>;
 using BitSet = bitset<N + 1>;
 
 struct Node {
-  int id;
-  int next;
+  int id = -1;
+  int next = -1;
 };
 
 /**
@@ -29,8 +31,8 @@ A is the dependee
 B is the depender
 */
 struct Dependency {
-  int dependee = 0;
-  int depender = 0;
+  int dependee = -1;
+  int depender = -1;
 };
 
 /**head of linked list*/
@@ -49,6 +51,11 @@ static void init_linked_list(vector<Dependency> cr dependencies) {
   }
 }
 
+/**
+@brief: do a recursive topological sort.
+
+@notice: https://www.geeksforgeeks.org/topological-sorting/
+*/
 static void topological_sort(int head_id, BitSet &visited, vector<int> &out) {
 
   auto node_ptr = head[head_id];
@@ -68,6 +75,14 @@ static void topological_sort(int head_id, BitSet &visited, vector<int> &out) {
   out.push_back(head_id);
 }
 
+/**
+@params:
+- dependencies: directed edge that contains A -> B, where A is dependee, B is
+depender
+
+- weights: counted from zero(DISCLAIMER: the problem counts elements from one)
+to N
+*/
 static int solution(vector<Dependency> &&dependencies, vector<int> &&weights,
                     int w) {
 
@@ -75,9 +90,30 @@ static int solution(vector<Dependency> &&dependencies, vector<int> &&weights,
 
   BitSet visited;
   vector<int> sorted_rev;
-  for (int i = 1; i <= int(dependencies.size()); ++i) {
-    topological_sort(i, visited, sorted_rev);
+  for (int i = 0; i < int(weights.size()); ++i) {
+    if (!visited[i]) {
+      topological_sort(i, visited, sorted_rev);
+    }
   }
 
-  return weights[w];
+  auto results = vector<int>(weights);
+  // Propagate weights into connected nodes.
+  // In this problem, we have to choose bigger weights compare to merging from
+  // different nodes.
+  for_each(sorted_rev.crbegin(), sorted_rev.crend(), [&](auto cr from) {
+    // for each node connected from `from` node
+    auto node_ptr = head[from];
+    while (node_ptr != -1) {
+      auto node = nodes[node_ptr];
+
+      results[node.id] =
+          std::max(results[node.id],                // previously propagated one
+                   weights[node.id] + results[from] // and newcomer `from`
+          );
+
+      node_ptr = node.next;
+    }
+  });
+
+  return results[w];
 }

@@ -18,9 +18,9 @@ int main(void) {
     int n, k, w;
     cin >> n >> k;
 
-    vector<int> weights(n);
+    vector<int> weights(n + 1);
     for (int i = 0; i < n; ++i) {
-      cin >> weights[i];
+      cin >> weights[i + 1]; // counts from 1
     }
 
     vector<Dependency> dependencies(k);
