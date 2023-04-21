@@ -6,28 +6,38 @@ using std::vector;
 using usize = unsigned long long;
 using isize = long long;
 using Idx = isize;
-using Cnt = usize;
+using Cnt = isize;
 
 constexpr usize N = 100000;
 constexpr usize Q = 100000;
 
+using DpArr = array<Cnt, N + 1>;
+
 struct PtrNode {
   vector<PtrNode *> children;
   PtrNode *parent;
+  Idx index;
+
   explicit PtrNode() = default;
+
   auto add_child(PtrNode *child) { this->children.push_back(child); }
-  auto count_subtree() const -> Cnt {
+  auto count_subtree(DpArr &dp) const -> Cnt {
+    if (dp[index] >= 0) {
+      return dp[index];
+    }
     Cnt sum = 0;
     for (auto const *child : children) {
-      sum += child->count_subtree();
+      sum += child->count_subtree(dp);
     }
-    return sum + 1;
+    dp[index] = sum + 1;
+    return dp[index];
   }
 };
 
 static PtrNode g_mem_pool[N + 1];
 inline PtrNode *g_node_at(Idx index) {
   PtrNode *ret = g_mem_pool + index;
+  ret->index = index;
   return ret;
 }
 
@@ -43,10 +53,12 @@ struct LinkedList {
 };
 
 class Tree {
+  DpArr dp;
 
 public:
-  auto count_subtree_of(Idx root) const -> Cnt {
-    return g_node_at(root)->count_subtree();
+  explicit Tree() { dp.fill(-1); }
+  auto count_subtree_of(Idx root) -> Cnt {
+    return g_node_at(root)->count_subtree(dp);
   }
 };
 
