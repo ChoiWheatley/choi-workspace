@@ -18,7 +18,7 @@ using std::vector;
 using Vec = vector<int>;
 using BitSet = bitset<N + 1>;
 
-struct Node {
+struct PtrNode {
   int id = -1;
   int next = -1;
 };
@@ -38,7 +38,7 @@ struct Dependency {
 /**head of linked list*/
 static array<int, N + 1> head;
 /**fixed sized, flatten 1D array of linked lists*/
-static array<Node, K + 1> nodes;
+static array<PtrNode, K + 1> nodes;
 
 static void init_linked_list(vector<Dependency> cr dependencies) {
   head.fill(-1);

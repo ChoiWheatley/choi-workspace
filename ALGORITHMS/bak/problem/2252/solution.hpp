@@ -20,13 +20,13 @@ using VecInDegree = vector<Cnt>;
 using Queue = queue<Idx>;
 
 class Builder;
-struct Node {
+struct PtrNode {
   Idx idx = -1;
   Idx next_sibling = -1;
 };
 struct LinkedList {
   array<Idx, N + 1> heads;
-  vector<Node> nodes;
+  vector<PtrNode> nodes;
 };
 
 class TopoSort {
@@ -72,7 +72,7 @@ public:
       // update in-degrees connected from this node
       Idx sibling = ls.heads[idx];
       while (sibling != -1) {
-        Node node = ls.nodes[sibling];
+        PtrNode node = ls.nodes[sibling];
         in_degree[node.idx] -= 1;
         if (in_degree[node.idx] == 0) {
           // newly founded zero-in-degree node
@@ -107,7 +107,7 @@ public:
   */
   auto add_edge(Idx from, Idx to) -> void {
     in_degree[to] += 1;
-    ls.nodes.push_back(Node{.idx = to, .next_sibling = ls.heads[from]});
+    ls.nodes.push_back(PtrNode{.idx = to, .next_sibling = ls.heads[from]});
     ls.heads[from] = int(ls.nodes.size() - 1);
   }
   auto build() -> TopoSort {
@@ -117,6 +117,6 @@ public:
       : vertex_cnt(vertex_cnt), edge_cnt(edge_cnt), in_degree(vertex_cnt + 1) {
     ls.heads.fill(-1);
     // index counts from 1
-    ls.nodes.push_back(Node());
+    ls.nodes.push_back(PtrNode());
   };
 };
