@@ -15,7 +15,7 @@ int main(void) {
     int input;
     cin >> input;
     auto result = solution(input);
-    if (result == -1) {
+    if (result == INFINITE) {
       cout << "Hello, BOJ 2023!\n";
     } else {
       cout << result << "\n";

@@ -1,41 +1,15 @@
 #include <algorithm>
-#include <cmath>
-#include <cstddef>
-#include <iterator>
 #include <math.h>
 #include <set>
-#include <string>
-#include <vector>
 
 #define cr const &
 
 using std::set;
-using std::string;
-using std::vector;
 using Result = int;
 
 constexpr Result INFINITE = -1;
 
 using Set = set<int>;
-
-/**
-@brief: do (n-1)Ck
-*/
-inline vector<vector<int>> comb(int n, int k) {
-  n = n - 1;
-  vector<bool> bitmask(size_t(k), true);
-  bitmask.resize(n, false);
-  vector<vector<int>> ret;
-  do {
-    ret.emplace_back();
-    for (int i = 0; i < n; ++i) {
-      if (bitmask[i] == true) {
-        ret.back().push_back(i);
-      }
-    }
-  } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
-  return ret;
-}
 
 inline int my_pow(int base, int exp) {
   int sum = 1;
@@ -68,26 +42,23 @@ inline int splice(int n, int from, int to) {
 inline int digits_of(int n) {
   return static_cast<int>(std::ceil(std::log10(n)));
 }
-
 /**
-@brief: if n = 2023, indices = {0, 1, 2}, returns 2+0+2+3
+@brief: split integer just like string::substr in std
 
-if n = 2023, indices = {0, 1}, returns 20+2+3
+@usage:
+- split_int(2023, 0) => {2023}, {}
+- split_int(2023, 1) => {202}, {3}
+- split_int(2023, 2) => {20}, {23}
+- split_int(2023, 3) => {2}, {23}
 */
-inline int to_splitted_sum(int n, vector<int> indices) {
-  int ret = 0;
-  // normalize
-  for (auto &e : indices) {
-    e += 1;
+inline std::pair<int, int> split_int(int n, int digit) {
+  if (n == 0) {
+    return std::make_pair(n, 0);
   }
-  // initial one
-  ret += splice(n, 0, indices[0]);
-  for (int i = 1; i < int(indices.size()); ++i) {
-    ret += splice(n, indices[i - 1], indices[i]);
-  }
-  // last one
-  ret += splice(n, indices.back(), digits_of(n));
-  return ret;
+  int pow_result = my_pow(10, digit);
+  int first = n / pow_result;
+  int second = n % pow_result;
+  return std::make_pair(first, second);
 }
 
 /**
@@ -96,15 +67,19 @@ inline int to_splitted_sum(int n, vector<int> indices) {
 make_s(2023) =>
   S_n = {2023, 202+3, 20+23, 2+023, 20+2+3, 2+02+3, 2+0+23, 2+0+2+3}
 */
-inline Set make_s(int n) {
+static Set make_s(int n) {
   int digits = digits_of(n);
   Set ret = {n}; // itself when `number_of_plus` == 0
-  for (int number_of_plus = 1; number_of_plus < digits - 1; ++number_of_plus) {
-    auto indices = comb(digits, number_of_plus);
-    for (auto cr e : indices) {
-      ret.insert(to_splitted_sum(n, e));
+
+  for (int i = 1; i < digits; ++i) {
+    // split this number from i-th digit
+    auto splitted = split_int(n, i);
+    Set tmps = make_s(splitted.first);
+    for (int from_first : tmps) {
+      ret.insert(from_first + splitted.second);
     }
   }
+
   return ret;
 }
 
