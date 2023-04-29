@@ -1,77 +1,70 @@
-#include <deque>
-#include <utility>
-using std::deque;
-using std::pair;
+#include <algorithm>
+#include <array>
+#include <iterator>
+#include <numeric>
+#include <vector>
+#define cr const &
+using std::array;
+using std::max;
+using std::vector;
 
-using Card = int;
 using Score = int;
-using Result = pair<Score, Score>;
-using Turn = bool;
+using Idx = int;
 
-enum class TakeCard { Left, Right };
+constexpr int MAX_N = 1001;
+using Arr = array<array<Score, MAX_N>, MAX_N>;
+
+static inline Score sum_of(vector<Score> cr sum, Idx k, Idx j) {
+  if (k == 0) {
+    return sum[j];
+  }
+  return sum[j] - sum[k - 1];
+}
 
 /**
-@brief: from list of card is placed like {l1, l2, ... , r2, r1}, player can only
-select one side of the list: Left and Right
+@param:
+- k: inclusive begin
+- j: inclusive end
 */
-inline TakeCard strategy(Card l1, Card l2, Card r2, Card r1) {
-  if (l2 < r2) {
-    Card best_inner = r2;
-    if (best_inner <= r1) {
-      return TakeCard::Right;
-    }
-    return TakeCard::Left;
+static inline Score sol_recur(Arr &dp, vector<Score> cr cards,
+                              vector<Score> cr sum, Idx k, Idx j) {
+  if (dp[k][j] != 0) {
+    goto FAST_RETURN;
   }
-  Card best_inner = l2;
-  if (best_inner <= l1) {
-    return TakeCard::Left;
+  if (k == j) {
+    dp[k][j] = cards[k];
+    goto FAST_RETURN;
   }
-  return TakeCard::Right;
+  if (k + 1 == j) {
+    dp[k][j] = max(cards[k], cards[j]);
+    goto FAST_RETURN;
+  }
+  dp[k][j] = max(
+      cards[k] + sum_of(sum, k + 1, j) - sol_recur(dp, cards, sum, k + 1, j),
+      cards[j] + sum_of(sum, k, j - 1) - sol_recur(dp, cards, sum, k, j - 1));
+
+FAST_RETURN:
+  return dp[k][j];
 }
 
 /**
 @brief: Player "G" always take the card first, and then player "M"
 interchangely. Given that two players play to get best score, find out the score
 of player "G" and "M"
+
+@idea: DP[k, j] = max {
+  c[k] + c[k+1:j].sum - DP[k+1, j],
+  c[j] + c[k:j-1].sum - DP[k, j-1]
+}
 */
-inline Result solution(deque<Card> &&cards) {
-  Score g = 0;
-  Score m = 0;
-  Turn turn = true; // true: G, false: M
-  while (cards.size() >= 4) {
-    Card popped = 0;
-    if (strategy(cards.front(), *(cards.begin() + 1), *(cards.rbegin() + 1),
-                 cards.back()) == TakeCard::Left) {
-      popped = cards.front();
-      cards.pop_front();
-    } else {
-      popped = cards.back();
-      cards.pop_back();
-    }
-    if (turn) {
-      g += popped;
-    } else {
-      m += popped;
-    }
-    turn = !turn;
-  }
-  // greedly take left of cards
-  while (!cards.empty()) {
-    Card popped = 0;
-    if (cards.front() < cards.back()) {
-      popped = cards.back();
-      cards.pop_back();
-    } else {
-      popped = cards.front();
-      cards.pop_front();
-    }
-    if (turn) {
-      g += popped;
-    } else {
-      m += popped;
-    }
-    turn = !turn;
+inline Score solution(vector<Score> cr cards) {
+  vector<Score> sum;
+  std::partial_sum(cards.cbegin(), cards.cend(), std::back_inserter(sum));
+
+  Arr dp;
+  for (auto &line : dp) {
+    line.fill(0);
   }
 
-  return std::make_pair(g, m);
+  return sol_recur(dp, cards, sum, 0, Idx(cards.size() - 1));
 }

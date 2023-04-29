@@ -1,7 +1,7 @@
 #include "solution.hpp"
-#include <deque>
 #include <ios>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -14,12 +14,12 @@ int main(void) {
   for (int tc = 0; tc < t; ++tc) {
     int n;
     cin >> n;
-    deque<Card> d(n);
+    vector<Score> d(n);
     for (int i = 0; i < n; ++i) {
       cin >> d[i];
     }
-    Result submit = solution(move(d));
-    cout << submit.first << "\n";
+    Score submit = solution(d);
+    cout << submit << "\n";
   }
 
   return 0;
