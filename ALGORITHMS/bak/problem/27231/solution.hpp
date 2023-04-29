@@ -96,9 +96,22 @@ inline int calc_m(int n, int m) {
   return ret;
 }
 
+/**
+@brief: check this number only contains 0 and 1
+*/
+inline bool is_infinite_cond(int n) {
+  while (n > 0) {
+    if (n % 10 != 0 && n % 10 != 1) {
+      return false;
+    }
+    n /= 10;
+  }
+  return true;
+}
+
 inline Result solution(int n) {
-  if (splice(n, digits_of(n), digits_of(n) + 1) == 1 &&
-      splice(n, 0, digits_of(n)) == 0) {
+  // if this number only contains 0 and 1 => infinite loop
+  if (is_infinite_cond(n)) {
     return INFINITE;
   }
   // let's assume there are no `infinite` case
