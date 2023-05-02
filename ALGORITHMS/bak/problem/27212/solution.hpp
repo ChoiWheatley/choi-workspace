@@ -6,11 +6,13 @@ using usize = unsigned long long;
 using i64 = long long;
 
 constexpr usize C = 16;
+constexpr usize MAX_N = 1000;
+constexpr usize MAX_M = 1000;
 
 using std::array;
 using std::vector;
 
-static array<array<i64, C>, C> dp_global;
+static array<array<i64, MAX_M>, MAX_N> dp_global;
 
 /**
 @brief: DP[i][j]: A 대학의 i번째 학생과 B 대학의 j 이하번째 학생이 악수를 했을
