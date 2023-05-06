@@ -1,5 +1,4 @@
 {
-  "sonarlint.pathToCompileCommands": "${workspaceFolder}/build/compile_commands.json",
   "files.associations": {
     "*.h": "c",
     "*.tcc": "cpp",
@@ -11,5 +10,6 @@
     "numeric": "cpp",
     "ratio": "cpp",
     "bit": "cpp"
-  }
+  },
+  "sonarlint.pathToCompileCommands": "${workspaceFolder}/build/compile_commands.json"
 }
