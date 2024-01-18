@@ -22,9 +22,7 @@ class MyContainer {
         }
 
         /// @brief end 여부와 비교하기 위한 연산자
-        friend bool operator!=(const iterator &lhs, const iterator &rhs) {
-            return lhs.mCur != rhs.mCur;
-        }
+        bool operator!=(const iterator &rhs) { return mCur != rhs.mCur; }
 
         int &operator*() { return *mCur; }
     };
